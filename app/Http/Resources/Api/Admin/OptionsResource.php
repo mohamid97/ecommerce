@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Http\Resources\Api\Admin;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class OptionsResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'stock'=> $this->stock,
+            'sku'=> $this->sku,
+            'price'=> $this->price,
+            'values' => $this->whenLoaded('values' , function(){
+                return ProductoptionvalueResource::collection($this->values);
+            }), 
+        ];
+    }
+}
