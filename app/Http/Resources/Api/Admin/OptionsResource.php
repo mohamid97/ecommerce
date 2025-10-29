@@ -15,6 +15,7 @@ class OptionsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'product_option_id' => $this->id,
             'stock'=> $this->stock,
             'sku'=> $this->sku,
             'price'=> $this->price,

@@ -16,7 +16,7 @@ class ProductoptionResource extends JsonResource
     {
         
         return [
-            'id'=> $this->id,
+            
             'product_id' => $this->id,
             'title'=> $this->getColumnLang('title'),
             'base_price'=> $this->base_price,

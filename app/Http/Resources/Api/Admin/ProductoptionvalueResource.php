@@ -18,7 +18,7 @@ class ProductoptionvalueResource extends JsonResource
     {
         return [
             'option_id' => $this->option_name_id,
-            'option_image'=>$this->getImageUrl($this->option ? $this->option->option_image : null),
+            // 'option_image'=>$this->getImageUrl($this->option ? $this->option->option_image : null),
             'option_name'=> $this->option ? $this->getColumnLang('title' , 'option') : null,
             'value'=> $this->getColumnLang('value'),
  

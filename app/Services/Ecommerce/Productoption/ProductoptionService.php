@@ -9,6 +9,7 @@ use App\Models\Api\Ecommerce\ProductOptionValues;
 use App\Services\BaseModelService;
 use App\Traits\StoreMultiLang;
 
+
 class ProductoptionService extends BaseModelService
 {
 
@@ -17,7 +18,10 @@ class ProductoptionService extends BaseModelService
     protected $ProductOptionValues;
 
     public function all($request){
-       return Product::with('options.values.option')->find($request->product_id);
+      if(!isset($request['product_id'])){
+        throw new \Exception("Product ID is required.");
+      }
+       return Product::with('options.values.option')->find($request['product_id']);
     }
 
     public function store()
