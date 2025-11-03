@@ -15,6 +15,9 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('/verfiy-otp', 'verfiyOtp');
         Route::post('/register', 'register');
         Route::post('/login', 'login');
+
+        // start carts with authanicate 
+        Route::prefix('carts')->controller();
     });
 
 
@@ -23,7 +26,6 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     // contact and messages
     Route::post('send-message', [MessageController::class, 'sendMessage']);
-
 
     // dynamic endpoint to get profile data
     Route::prefix('data')->controller('FrontendController')->group(function(){

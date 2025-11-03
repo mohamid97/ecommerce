@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->tinyInteger('order')->nullable();
             // $table->string('barcode')->nullable();
-            $table->decimal('base_price', 10, 2)->default(0);
             $table->boolean('has_options')->default(false);
             $table->enum('status' , ['published' , 'pending'])->default('published');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');

@@ -38,6 +38,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api/front')
                 ->namespace('App\Http\Controllers\Api\Front')
                 ->group(base_path('routes/api/front.php'));
+            Route::middleware('api')
+                ->prefix('api/ecommerce')
+                ->namespace('App\Http\Controllers\Api\Ecommerce')
+                ->group(base_path('routes/api/ecommerce.php'));
 
 
             Route::middleware('api')

@@ -2,6 +2,7 @@
 namespace App\Services\Admin\Product;
 
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\NoOptionStock;
 use App\Services\BaseModelService;
 use App\Traits\HandlesImage;
 use App\Traits\StoreMultiLang;
@@ -27,8 +28,11 @@ class ProductService extends BaseModelService
       
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $this->data['slug']  = $this->createSlug($this->data); 
-        $product = parent::store($this->getBasicColumn(['product_image', 'status','has_options','breadcrumb' , 'order'  , 'base_price'  , 'brand_id','category_id']));
+        $product = parent::store($this->getBasicColumn(['product_image', 'status','has_options','breadcrumb' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);  
+        if(!$product->has_options){
+            $this->completeProductData($product->id);
+        }
         return $product;
         
     }
@@ -37,8 +41,11 @@ class ProductService extends BaseModelService
 
     public function update($id ){
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
-        $product = parent::update($id , $this->getBasicColumn(['status','product_image','has_options' ,'breadcrumb' , 'order' , 'base_price'  ,'brand_id', 'category_id']));
+        $product = parent::update($id , $this->getBasicColumn(['status','product_image','has_options' ,'breadcrumb' , 'order','brand_id', 'category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
+        if(!$product->has_options){
+            $this->completeProductData($product->id);
+        }
         return $product;
         
     }
@@ -55,10 +62,33 @@ class ProductService extends BaseModelService
               ->orWhereTranslationLike('slug', "%$search%");
         });
     }
+    
 
     public function orderBy(Builder $query, string $orderBy, string $direction = 'asc')
     {
         return $query->orderBy($orderBy, $direction);
     }
+
+
+    private function completeProductData($id){
+        
+            NoOptionStock::updateOrCreate( 
+                [
+                    'product_id' => $id,
+                   
+                ],
+                [
+                    'sku' => $this->data['sku'],
+                    'stock' => $this->data['stock'],
+                    'base_price' => $this->data['base_price'],
+                ]
+            );
+
+
+        
+    }
+    
+
+    
 
 }
