@@ -7,7 +7,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     Route::prefix('auth:sanctum')->controller('CartController')->group(function(){
         // start carts with authanicate 
-        Route::prefix('carts')->group(function(){
+        Route::prefix('carts/auth')->group(function(){
             Route::post('store' , 'addToCart');
 
         });

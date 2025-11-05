@@ -26,7 +26,7 @@ class mainSettingSeeder extends Seeder
         ]);
         DB::table('setting_translations')->insert([
             [
-                'aboutus_id' => Setting::first()->id,
+                'setting_id' => Setting::first()->id,
                 'locale'=>'ar',
                 'title'=>'Setting ar',
                 'breif'=>'TEST BREIUF',
@@ -37,7 +37,7 @@ class mainSettingSeeder extends Seeder
         ]);
         DB::table('setting_translations')->insert([
             [
-                'aboutus_id' => Setting::first()->id,
+                'setting_id' => Setting::first()->id,
                 'locale'=>'en',
                 'title'=>'Setting en',
                 'breif'=>'TEST BREIUF',

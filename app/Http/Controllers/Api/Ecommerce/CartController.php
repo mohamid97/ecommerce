@@ -17,7 +17,7 @@ class CartController extends Controller
         try {
             DB::beginTransaction();
             $dto = AddToCartDTO::fromRequest($request->validated());
-            $userId = $request->user->id ?? 'guest';
+            $userId = $request->user()->id;
             $cart->StoreToCart($userId , $dto);
             DB::commit();
 
