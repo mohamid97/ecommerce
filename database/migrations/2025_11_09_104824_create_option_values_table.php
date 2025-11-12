@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('options', function (Blueprint $table) {
+        Schema::create('option_values', function (Blueprint $table) {
             $table->id();
-            $table->string('option_image')->nullable();
-            $table->string('code')->unique();
-            $table->enum('value_type', ['text', 'image', 'code'])->default('text');
+            $table->foreignId('option_id')->constrained('options')->onDelete('cascade');
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('options');
+        Schema::dropIfExists('option_values');
     }
 };

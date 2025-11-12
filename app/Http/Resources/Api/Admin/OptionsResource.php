@@ -14,13 +14,14 @@ class OptionsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+      
         return [
             'product_option_id' => $this->id,
             'stock'=> $this->stock,
             'sku'=> $this->sku,
             'price'=> $this->price,
-            'values' => $this->whenLoaded('values' , function(){
-                return ProductoptionvalueResource::collection($this->values);
+            'values' => $this->whenLoaded('options' , function(){
+                return ProductoptionvalueResource::collection($this->options);
             }), 
         ];
     }

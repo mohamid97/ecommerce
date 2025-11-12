@@ -34,9 +34,8 @@ class ProductoptionUpdateRequest extends FormRequest
             'stock' => 'sometimes|integer|min:0',
             'sku' => 'nullable|string|max:100|unique:product_options,sku,' . $optionId,
             'options' => 'required|array|min:1',
-            'options.*.option_name_id' => 'required|exists:options,id',
-            'options.*.value'=>'required|array|min:1',
-            'options.*.value.*' => 'required|string|max:255'
+            'options.*.option_id' => 'required|exists:options,id',
+            'options.*.option_value_id'=>'required|exists:option_values,id',
         ];
     }
 

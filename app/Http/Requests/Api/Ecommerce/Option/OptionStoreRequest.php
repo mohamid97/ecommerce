@@ -25,10 +25,17 @@ class OptionStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+       
         return [
             'option_image'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'title' => 'required|array|min:1',
             'title.*'=>'required|max:255',
+            'code'=>'required|string|max:255|unique:options,code',
+            'value_type'=>'required|in:text,code,image',
+            'values'=>'required|array|min:1',
+            'values.*.title'=>'required|array|min:1',
+            'values.*.title.*'=>'required|max:255',
+            
 
         ];
     }

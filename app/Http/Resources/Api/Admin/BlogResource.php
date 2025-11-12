@@ -28,9 +28,9 @@ class BlogResource extends JsonResource
             'category_id' => $this->category_id,
             'category' => $this->whenLoaded('category' , function(){
                     return [
-                        'id'=>$this->category ? $this->category->id : null,
-                        'title'=>$this->category ? $this->category->title : null,
-                        'slug' => $this->slug  ? $this->category->slug : null
+                        'id'    =>$this->category ? $this->category->id : null,
+                        'title' =>$this->category ? $this->getColumnLang('title','category') : null,
+                        'slug'  =>$this->category ? $this->getColumnLang('slug','category') : null,
                     ];
             }),
             'meta_title' => $this->getColumnLang('meta_title'),

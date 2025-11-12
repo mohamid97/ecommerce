@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('product_option_values', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_option_id');
-            $table->unsignedBigInteger('option_name_id');
-            $table->foreign('product_option_id')->references('id')->on('product_options')->onDelete('cascade');
-            $table->foreign('option_name_id')->references('id')->on('options')->onDelete('cascade');
+            $table->foreignId('product_option_id')->constrained()->onDelete('cascade');
+            $table->foreignId('option_id')->constrained()->onDelete('cascade');
+            $table->foreignId('option_value_id')->references('id')->on('option_values')->onDelete('cascade');
             $table->timestamps();
         });
     }

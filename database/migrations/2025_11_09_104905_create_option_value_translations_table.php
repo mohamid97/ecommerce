@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_option_values_translations', function (Blueprint $table) {
+        Schema::create('option_value_translations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('p_o_value_id');
+            $table->unsignedBigInteger('option_value_id');
             $table->string('locale')->index();
-            $table->unique(['p_o_value_id', 'locale']);
-            $table->string('value'); // red, 5kg, 100m, etc.
-            $table->foreign('p_o_value_id')->references('id')->on('product_option_values')->onDelete('cascade');
+            $table->unique(['option_value_id', 'locale']);
+            $table->string('title'); // red, 5kg, 100m, etc.
+            $table->foreign('option_value_id')->references('id')->on('option_values')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_option_values_translations');
+        Schema::dropIfExists('option_value_translations');
     }
 };

@@ -26,12 +26,12 @@ class ServiceResource extends JsonResource
             'category_id' => $this->category_id,
             'category' => $this->whenLoaded('category' , function(){
                 return [
-                    'id'=>$this->category ? $this->category->id : null,
-                    'title'=>$this->category ? $this->category->title : null,
-                    'slug'=>$this->category ? $this->category->slug : null,
+                    'id'    =>$this->category ? $this->category->id : null,
+                    'title' =>$this->category ? $this->getColumnLang('title','category') : null,
+                    'slug'  =>$this->category ? $this->getColumnLang('slug','category') : null,
                 ];
             }),
-            'order' => $this->order,
+            'order'     => $this->order,
             'small_des' => $this->getColumnLang('small_des'),
             'des' => $this->getColumnLang('des'),
             'breadcrumb' => $this->getImageUrl($this->breadcrumb),

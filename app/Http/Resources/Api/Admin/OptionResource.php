@@ -20,7 +20,12 @@ class OptionResource extends JsonResource
         return [
             'id' => $this->id,
             'option_image' => $this->getImageUrl($this->option_image),
+            'code'=> $this->code,
+            'value_type'=> $this->value_type,
             'title' => $this->getColumnLang('title'),
+            'values' => $this->whenLoaded('values', function () {
+               return $this->getColumnsLangWithArrayRelation(['title'] , 'values' , ['value']);
+            }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

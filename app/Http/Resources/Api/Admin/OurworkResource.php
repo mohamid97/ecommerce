@@ -41,9 +41,9 @@ class OurworkResource extends JsonResource
             }),
             'category' => $this->whenLoaded('category' , function(){
                         return [
-                            'id'=>$this->category ? $this->category->id : null,
-                            'title'=>$this->category ? $this->category->title : null,
-                            'slug' => $this->slug  ? $this->category->slug : null
+                                'id'    =>$this->category ? $this->category->id : null,
+                                'title' =>$this->category ? $this->getColumnLang('title','category') : null,
+                                'slug'  =>$this->category ? $this->getColumnLang('slug','category') : null,
                         ];
             }),
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d') : null,

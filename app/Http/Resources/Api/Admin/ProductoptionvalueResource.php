@@ -16,11 +16,15 @@ class ProductoptionvalueResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
         return [
-            'option_id' => $this->option_name_id,
+            'option_id' => $this->option_id,
+            'option_value_id'=> $this->option_value_id,
+            'option_name'=>$this->option->title,
+            'option_value'=> $this->optionValue->title,
             // 'option_image'=>$this->getImageUrl($this->option ? $this->option->option_image : null),
-            'option_name'=> $this->option ? $this->getColumnLang('title' , 'option') : null,
-            'value'=> $this->getColumnLang('value'),
+            // 'option_name'=> $this->option ? $this->getColumnLang('title' , 'option') : null,
+            // 'value'=> $this->getColumnLang('value'),
  
         ];
     }

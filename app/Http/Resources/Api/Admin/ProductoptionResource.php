@@ -15,6 +15,7 @@ class ProductoptionResource extends JsonResource
     public function toArray(Request $request): array
     {
         
+    
         return [
             
             'product_id' => $this->id,

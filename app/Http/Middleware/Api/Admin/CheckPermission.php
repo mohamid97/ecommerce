@@ -17,6 +17,7 @@ class CheckPermission
      */
     public function handle(Request $request, Closure $next , $action): Response
     {
+    
             $model = $request->model;
           
             $permission = $action . ' ' . strtolower($model);
