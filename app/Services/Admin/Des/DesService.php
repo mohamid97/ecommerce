@@ -45,6 +45,13 @@ class DesService extends BaseModelService
         return $des;
     }
 
+
+
+    public function orderBy(Builder $query, string $orderBy, string $direction = 'asc')
+    {
+        return $query->orderBy($orderBy, $direction);
+    }
+
     
 
     
