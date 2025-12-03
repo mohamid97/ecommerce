@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Admin\Product;
+namespace App\Services\Ecommerce\Product;
 
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\NoOptionStock;
@@ -23,22 +23,26 @@ class ProductService extends BaseModelService
         return $productDetails;
     }
 
-    public function store()
+    
+    public function store(StoreProductService $storeProductService)
     {
       
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $this->data['slug']  = $this->createSlug($this->data); 
         $product = parent::store($this->getBasicColumn(['product_image', 'status','has_options','breadcrumb' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);  
-        if(!$product->has_options){
-            $this->completeProductData($product->id);
-        }
+        ($product->has_options) ? $storeProductService->addProductOption($this->data['product_options'],$product->id): $storeProductService->completeProductData($this->data,$product->id);  
         return $product;
         
-    }
+    } // end store product
     
 
 
+
+
+
+
+    
     public function update($id ){
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $product = parent::update($id , $this->getBasicColumn(['status','product_image','has_options' ,'breadcrumb' , 'order','brand_id', 'category_id']));
@@ -56,37 +60,24 @@ class ProductService extends BaseModelService
     }
 
 
-    public function applySearch(Builder $query, string $search ){
-        return $query->where(function ($q) use ($search) {
-            $q->whereTranslationLike('title', "%$search%")
-              ->orWhereTranslationLike('slug', "%$search%");
-        });
-    }
+    // public function applySearch(Builder $query, string $search ){
+    //     return $query->where(function ($q) use ($search) {
+    //         $q->whereTranslationLike('title', "%$search%")
+    //           ->orWhereTranslationLike('slug', "%$search%");
+    //     });
+    // }
     
 
-    public function orderBy(Builder $query, string $orderBy, string $direction = 'asc')
-    {
-        return $query->orderBy($orderBy, $direction);
-    }
+    // public function orderBy(Builder $query, string $orderBy, string $direction = 'asc')
+    // {
+    //     return $query->orderBy($orderBy, $direction);
+    // }
 
 
-    private function completeProductData($id){
-        
-            NoOptionStock::updateOrCreate( 
-                [
-                    'product_id' => $id,
-                   
-                ],
-                [
-                    'sku' => $this->data['sku'],
-                    'stock' => $this->data['stock'],
-                    'base_price' => $this->data['base_price'],
-                ]
-            );
 
 
-        
-    }
+
+
     
 
     

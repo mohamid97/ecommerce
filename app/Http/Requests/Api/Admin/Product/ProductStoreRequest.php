@@ -26,6 +26,7 @@ class ProductStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+
             'base_price' => 'required|numeric|min:0',
             'category_id'=>'nullable|exists:categories,id',
             'brand_id'=>'nullable|exists:brands,id',
@@ -41,7 +42,14 @@ class ProductStoreRequest extends FormRequest
             'meta_title.*' => 'nullable|max:255',
             'meta_des.*' => 'nullable|max:255',
             'has_options' => 'required|boolean',
-            'status'=>'nullable|in:published,pending'
+            'status'=>'nullable|in:published,pending',
+            'stock'=>"required_if:has_options,true|nullable_if:has_options,false",
+            'sku'=>"required_if:has_options,true|nullable_if:has_options,false",
+            'product_options'=>'required_if:has_options,true|nullable_if:has_options,false|array',
+            'product_options.*.option_id'=>'required_if:has_options,true|nullable_if:has_options,false|exists:options,id',
+            'product_options.*.value_ids'=>'required_if:has_options,true|nullable_if:has_options,false|array',
+            'product_options.*.value_ids.*'=>'required_if:has_options,true|nullable_if:has_options,false|exists:option_values,id',
+
         ];
     }
 

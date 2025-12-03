@@ -24,7 +24,7 @@ class ModelServiceFactory
         'feedback'=> \App\Services\Admin\Feedback\FeedbackService::class,
         'achivement'=>\App\Services\Admin\Achivement\AchivementService::class,
         'service'=>\App\Services\Admin\Service\ServiceService::class,
-        'product'=>\App\Services\Admin\Product\ProductService::class,
+        'product'=>\App\Services\Ecommerce\Product\ProductService::class,
         'branch'=>\App\Services\Admin\Branch\BranchService::class,
         'setting'=>\App\Services\Admin\Setting\SettingService::class,
         'metasetting'=>\App\Services\Admin\Metasetting\MetasettingService::class,
@@ -39,7 +39,6 @@ class ModelServiceFactory
         'page'=> \App\Services\Admin\Page\PageService::class,
         'des'=> \App\Services\Admin\Des\DesService::class,
         'option'=> \App\Services\Ecommerce\Option\OptionService::class,
-        'productoption'=> \App\Services\Ecommerce\ProductOption\ProductOptionService::class,
       
     ];
 

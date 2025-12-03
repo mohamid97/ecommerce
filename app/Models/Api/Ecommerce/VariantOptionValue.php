@@ -5,20 +5,18 @@ namespace App\Models\Api\Ecommerce;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductOptionValue extends Model
+class VariantOptionValue extends Model
 {
     use HasFactory;
-    protected $fillable = ['product_option_id' , 'option_value_id'];
-
-
-    public function productOption()
+    protected $fillable = ['product_variant_id' , 'option_value_id'];
+    public function productVariant()
     {
-        return $this->belongsTo(ProductOption::class);
+        return $this->belongsTo(ProductVariant::class);
     }
     public function optionValue()
     {
         return $this->belongsTo(OptionValue::class);
     }
-    
 
+    
 }

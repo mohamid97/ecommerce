@@ -178,11 +178,7 @@ class ModelRequestFactory
                 'store' => \App\Http\Requests\Api\Ecommerce\Option\OptionStoreRequest::class,
                 'update' => \App\Http\Requests\Api\Ecommerce\Option\OptionUpdateRequest::class,
             ],
-            'productoption'=>[
-                'store' => \App\Http\Requests\Api\Ecommerce\Productoption\ProductoptionStoreRequest::class,
-                'update' => \App\Http\Requests\Api\Ecommerce\Productoption\ProductoptionUpdateRequest::class,
-            ],
-            
+
 
         ];
 
