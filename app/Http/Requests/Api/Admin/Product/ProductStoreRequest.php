@@ -51,6 +51,7 @@ class ProductStoreRequest extends FormRequest
             'product_options.*.value_ids.*'=>'required_if:has_options,true|nullable_if:has_options,false|exists:option_values,id',
 
         ];
+        
     }
 
 
@@ -63,6 +64,7 @@ class ProductStoreRequest extends FormRequest
                 
             )
         );
+        
     }
 
     
