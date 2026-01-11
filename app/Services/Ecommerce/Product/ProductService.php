@@ -24,13 +24,13 @@ class ProductService extends BaseModelService
     }
 
     
-    public function store(StoreProductService $storeProductService)
+    public function store()
     {
-      
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $this->data['slug']  = $this->createSlug($this->data); 
-        $product = parent::store($this->getBasicColumn(['product_image', 'status','has_options','breadcrumb' , 'order' , 'brand_id','category_id']));
+        $product = parent::store($this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'cost_price', 'sales_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);  
+        $storeProductService = app(StoreProductService::class);
         ($product->has_options) ? $storeProductService->addProductOption($this->data['product_options'],$product->id): $storeProductService->completeProductData($this->data,$product->id);  
         return $product;
         
@@ -45,11 +45,10 @@ class ProductService extends BaseModelService
     
     public function update($id ){
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
-        $product = parent::update($id , $this->getBasicColumn(['status','product_image','has_options' ,'breadcrumb' , 'order','brand_id', 'category_id']));
+        $product = parent::update($id , $this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'cost_price', 'sales_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
-        if(!$product->has_options){
-            $this->completeProductData($product->id);
-        }
+        $updateProductService = app(UpdateProductService::class);
+        ($product->has_options) ? $updateProductService->updateProductOption($this->data['product_options'],$product->id): $updateProductService->completeProductData($this->data,$product->id);  
         return $product;
         
     }

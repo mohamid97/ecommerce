@@ -26,29 +26,50 @@ class ProductStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-
-            'base_price' => 'required|numeric|min:0',
-            'category_id'=>'nullable|exists:categories,id',
-            'brand_id'=>'nullable|exists:brands,id',
-            'order'=>'nullable|integer|unique:service,order',
+            'product_image'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'images'=>'nullable|array',
             'images.*'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'breadcrumb'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
-            'product_image'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
+            'status'=>'nullable|in:published,pending',
+            'has_options' => 'required|boolean',
+            'category_id'=>'nullable|exists:categories,id',
+            'brand_id'=>'nullable|exists:brands,id',
+            'order'=>'nullable|integer|unique:products,order',
+            'on_demand'=>'nullable|boolean',
+            'cost_price' => 'nullable|numeric|min:0',
+            'sales_price'=>'nullable|numeric|min:0',
+            'discount'=>'nullable|numeric|min:0',
+            'discount_type'=>'nullable|in:fixed,percentage',
+            'sku'=>'nullable|string|max:255',
+            'barcode'=>'nullable|string|max:255',
             'title' => 'required|array|min:1',
             'title.*'=>'required|max:255',
-            'small_des' => 'nullable|max:255',
+            'small_des'=>'nullable|array|min:1',
+            'small_des.*'=>'nullable|string|max:255',
+            'des'=>'nullable|array|min:1',
             'des.*'=>'nullable|max:5000',
-            'meta_title.*' => 'nullable|max:255',
-            'meta_des.*' => 'nullable|max:255',
-            'has_options' => 'required|boolean',
-            'status'=>'nullable|in:published,pending',
-            'stock'=>"required_if:has_options,true|nullable_if:has_options,false",
-            'sku'=>"required_if:has_options,true|nullable_if:has_options,false",
-            'product_options'=>'required_if:has_options,true|nullable_if:has_options,false|array',
-            'product_options.*.option_id'=>'required_if:has_options,true|nullable_if:has_options,false|exists:options,id',
-            'product_options.*.value_ids'=>'required_if:has_options,true|nullable_if:has_options,false|array',
-            'product_options.*.value_ids.*'=>'required_if:has_options,true|nullable_if:has_options,false|exists:option_values,id',
+            'meta_title'=>'nullable|array|min:1',
+            'meta_title.*'=>'nullable|max:255',
+            'meta_des'=>'nullable|array|min:1', 
+            'meta_des.*'=>'nullable|max:255',
+
+
+
+            'product_options'=>'nullable|required_if:has_options,true|array',
+            'product_options.*.option_id'=>'nullable|required_if:has_options,true|exists:options,id',
+            'product_options.*.value_ids'=>'nullable|required_if:has_options,true|array',
+            'product_options.*.value_ids.*'=>'nullable|required_if:has_options,true|exists:option_values,id',
+
+
+            'length'=>'nullable|numeric|min:0',
+            'width'=>'nullable|numeric|min:0',
+            'height'=>'nullable|numeric|min:0',
+            'weight'=>'nullable|numeric|min:0',
+            'min_estimated_delivery'=>'nullable|numeric|min:0',
+            'max_estimated_delivery'=>'nullable|numeric|min:0',
+
+
+
 
         ];
         

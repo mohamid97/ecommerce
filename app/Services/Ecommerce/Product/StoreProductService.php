@@ -1,33 +1,36 @@
 <?php
 
 namespace App\Services\Ecommerce\Product;
+use App\Models\Api\Ecommerce\ProductOption;
+use App\Models\Api\Ecommerce\ProductOptionValue;
 
 class StoreProductService
 {
 
 
-    public function completeProductData($data , $id){
+    // public function completeProductData($data , $id){
         
-            NoOptionStock::updateOrCreate( 
-                [
-                    'product_id' => $id,
+    //         NoOptionStock::updateOrCreate( 
+    //             [
+    //                 'product_id' => $id,
                    
-                ],
-                [
-                    'sku' => $data['sku'],
-                    'stock' => $data['stock'],
-                    'base_price' => $data['base_price'],
-                ]
-            );
+    //             ],
+    //             [
+    //                 'sku' => $data['sku'],
+    //                 'stock' => $data['stock'],
+    //                 'base_price' => $data['base_price'],
+    //             ]
+    //         );
 
 
         
-    }
+    // }
 
 
-    public function addProductOption($data , $id){
+    public function addProductOption($data , $id):void{
 
         foreach ($data as $option) {
+            
             $productOption = ProductOption::create(
                 [
                     'product_id' => $id,

@@ -23,8 +23,13 @@ class ProductResource extends JsonResource
         'id' => $this->id,
         'title' => $this->getColumnLang('title'),
         'slug' => $this->getColumnLang('slug'),
-        'base_price' => $this->base_price,
-        'category_id' => $this->category_id,
+        'cost_price' => $this->cost_price,
+        'sales_price' => $this->sales_price,
+        'discount' => $this->discount,
+        'discount_type' => $this->discount_type,
+        'sku' => $this->sku,
+        'barcode' => $this->barcode,
+        'stock' => $this->stock,
         'category' => $this->whenLoaded('category' , function(){
                 return [
                     'id'=>$this->category ? $this->category->id : null,
@@ -52,6 +57,7 @@ class ProductResource extends JsonResource
         'order'=>$this->order,
         'has_options'=>$this->has_options,
         'status'=>$this->status,
+        'on_demand'=>$this->on_demand,
         'created_at' => $this->created_at?->format('Y-m-d'),
         'updated_at' => $this->updated_at?->format('Y-m-d'),
     
