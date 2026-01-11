@@ -1,0 +1,36 @@
+<mxfile host="65bd71144e">
+    <diagram id="owm6WiVdTBa5DxbBS6JU" name="Page-1">
+        <mxGraphModel dx="582" dy="434" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="products&lt;br&gt;1-id&lt;br&gt;main product data" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="20" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="productOption&lt;br&gt;1-product_id&lt;br&gt;2-option_id" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="305" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="product has many options" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="160" y="20" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="6" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="productoption Has many value" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="7">
+                    <mxGeometry x="0.1473" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="6" value="&lt;div style=&quot;&quot;&gt;&lt;font face=&quot;sans-serif&quot;&gt;&lt;span style=&quot;font-size: 13.12px; background-color: rgb(255, 255, 255);&quot;&gt;&lt;b&gt;productOptionvalues&lt;br&gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;1-&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); font-family: sans-serif; font-size: 13.12px; font-weight: 700;&quot;&gt;product_option_id&lt;br&gt;2-&lt;/span&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255);&quot;&gt;&lt;font face=&quot;sans-serif&quot; color=&quot;#000000&quot;&gt;&lt;span style=&quot;font-size: 13.12px;&quot;&gt;&lt;b&gt;option_value_id&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;br&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font face=&quot;sans-serif&quot;&gt;&lt;span style=&quot;font-size: 13.12px;&quot;&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="250" width="170" height="101" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

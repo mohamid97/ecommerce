@@ -3,6 +3,7 @@
 namespace App\Models\Api\Admin;
 
 use App\Models\Api\Ecommerce\NoOptionStock;
+use App\Models\Api\Ecommerce\ProductOption;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -11,7 +12,7 @@ use Astrotomic\Translatable\Translatable;
 class Product extends Model implements TranslatableContract
 {
     use HasFactory,Translatable;
-    protected $fillable = ['product_image','has_options' , 'status','breadcrumb' , 'order' , 'brand_id','category_id'];
+    protected $fillable = ['product_image','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id'];
     public $translatedAttributes = ['title' , 'slug' , 'small_des' ,'des' , 'meta_title' , 'meta_des' , 'alt_image', 'title_image'];
     public $translationForeignKey = 'product_id';
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';
@@ -35,7 +36,7 @@ class Product extends Model implements TranslatableContract
 
     public function options()
     {
-        return $this->hasMany(\App\Models\Api\Ecommerce\ProductOptions::class, 'product_id');
+        return $this->hasMany(ProductOption::class, 'product_id');
     }
     public function noOption(){
         return $this->hasOne(NoOptionStock::class , 'product_id');

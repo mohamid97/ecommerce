@@ -18,7 +18,13 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->tinyInteger('order')->nullable();
+            $table->boolean('on_demand')->default(false);
             // $table->string('barcode')->nullable();
+            $table->decimal('cost_price', 10, 2)->nullable();
+            $table->decimal('sale_price', 10, 2)->nullable();
+            $table->decimal('discount', 10, 2)->nullable();
+            $table->enum('discount_type' , ['fixed' , 'percent'])->nullable();
+            $table->unsignedInteger('stock')->nullable();
             $table->boolean('has_options')->default(false);
             $table->enum('status' , ['published' , 'pending'])->default('published');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
