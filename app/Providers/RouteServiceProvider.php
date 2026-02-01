@@ -49,6 +49,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace('App\Http\Controllers\Api\General')
                 ->group(base_path('routes/api/general.php'));
 
+
         });
         
     }

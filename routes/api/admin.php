@@ -95,7 +95,14 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('category/brands' ,"CategoryController@getBrand");
 
         // home page 
-    Route::get('/home' ,'HomeController@index');
+        Route::get('/home' ,'HomeController@index');
+
+        // start product file route
+         require __DIR__.'/product.php';
+
+
+
+
     
 
 
