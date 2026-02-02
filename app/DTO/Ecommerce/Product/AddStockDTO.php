@@ -13,7 +13,7 @@ class AddStockDTO
         public string $type,
         public ?string $note,
         public ?float $cost_price,
-        public float $sales_price,
+        public float $sale_price,
     ) {}
 
     public static function fromRequest(array $data): self
@@ -25,7 +25,7 @@ class AddStockDTO
             $data['type'] ?? 'increase', 
             $data['note'] ?? null,
             $data['cost_price'] ?? null,
-            $data['sales_price'],
+            $data['sale_price'],
         );
     }
 }

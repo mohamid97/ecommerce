@@ -175,8 +175,8 @@ class ModelRequestFactory
                 'update' => \App\Http\Requests\Api\Admin\Des\DesUpdateRequest::class,
             ],
             'option'=>[
-                'store' => \App\Http\Requests\Api\Ecommerce\Option\OptionStoreRequest::class,
-                'update' => \App\Http\Requests\Api\Ecommerce\Option\OptionUpdateRequest::class,
+                'store' => \App\Http\Requests\Api\Admin\Ecommerce\Option\OptionStoreRequest::class,
+                'update' => \App\Http\Requests\Api\Admin\Ecommerce\Option\OptionUpdateRequest::class,
             ],
 
 

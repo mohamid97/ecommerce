@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Ecommerce\Option;
+namespace App\Services\Admin\Ecommerce\Option;
 
 use App\Models\Api\Ecommerce\Option;
 use App\Services\BaseModelService;

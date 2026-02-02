@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Api\Ecommerce\Product;
+namespace App\Http\Requests\Api\Admin\Ecommerce\Option;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class AddStockRequest extends FormRequest
+class OptionStoreRequest extends FormRequest
 {
     use ResponseTrait;
     /**
@@ -25,16 +25,22 @@ class AddStockRequest extends FormRequest
      */
     public function rules(): array
     {
+       
         return [
-            'product_id' => 'required|exists:products,id',
-            'variant_id' => 'nullable|exists:product_variants,id',
-            'quantity' => 'required|numeric',
-            'type' => 'nullable|in:increase,decrease',
-            'note' => 'nullable|string|max:255',
-            'cost_price' => 'nullable|numeric',
-            'sales_price' => 'nullable|numeric',
+            'option_image'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
+            'title' => 'required|array|min:1',
+            'title.*'=>'required|max:255',
+            'code'=>'required|string|max:255|unique:options,code',
+            'value_type'=>'required|in:text,code,image',
+            'values'=>'required|array|min:1',
+            'values.*.title'=>'required|array|min:1',
+            'values.*.title.*'=>'required|max:255',
+            
+
         ];
     }
+
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
@@ -45,8 +51,4 @@ class AddStockRequest extends FormRequest
             )
         );
     }
-
-
-    
-
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Ecommerce\Option;
+namespace App\Http\Requests\Api\Admin\Ecommerce\Option;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;

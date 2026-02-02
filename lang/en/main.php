@@ -32,6 +32,8 @@ return [
     'retrieved_successfully'=>'The :model has been retrieved successfully.',
     'no_data'=>'No Data Found',
     'retrieved_gallery_successfully'=>'The :model Gallery has been retrieved successfully.',
+    'model_not_found_id'=>":model with id :id not founded"
+
 
     
 ];

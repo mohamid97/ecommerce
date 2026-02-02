@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Ecommerce\Product;
+namespace App\Http\Requests\Api\Admin\Ecommerce\Product\Stock;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
@@ -33,7 +33,7 @@ class UpdateStockRequest extends FormRequest
             'type' => 'nullable|in:increase,decrease',
             'note' => 'nullable|string',
             'cost_price' => 'nullable|numeric|min:0',
-            'sales_price' => 'required|numeric|min:0',
+            'sale_price' => 'required|numeric|min:0',
         ];
     }
 

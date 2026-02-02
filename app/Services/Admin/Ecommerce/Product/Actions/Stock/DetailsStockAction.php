@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Ecommerce\Product\Actions;
+namespace App\Services\Admin\Ecommerce\Product\Actions\Stock;
 use App\Models\Api\Ecommerce\StockMovment;
 
 class DetailsStockAction
@@ -15,9 +15,9 @@ class DetailsStockAction
     } // all batches
 
 
-    public function batchDetails($request)
+    public function batchDetails($batch_id)
     {
-        return StockMovment::findOrFail($request->batch_id);
+        return StockMovment::findOrFail($batch_id);
     } // batch details
 
     

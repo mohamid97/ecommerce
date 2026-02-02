@@ -17,8 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('variant_id')->nullable();
             $table->decimal('quantity', 8, 2)->nullable();
             $table->decimal('cost_price', 8, 2)->nullable();
-            $table->decimal('sales_price', 8, 2);
-            $table->enum('type' , ['increase' , 'decrease'])->default('increase');
+            $table->decimal('sale_price', 8, 2);
             $table->string('note')->nullable();
             $table->enum('status' , ['draft' , 'active','inactive','depleted'])->default('draft');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');

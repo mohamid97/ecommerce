@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 class StockMovment extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'product_id',
+        'variant_id',
+        'quantity',
+        'cost_price',
+        'sale_price',
+        'note',
+        'status',
+    ];
 
     // need to make relations is product and variant
     public function product()
