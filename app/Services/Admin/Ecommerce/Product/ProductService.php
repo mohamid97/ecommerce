@@ -7,6 +7,8 @@ use App\Services\BaseModelService;
 use App\Traits\HandlesImage;
 use App\Traits\StoreMultiLang;
 use Illuminate\Database\Eloquent\Builder;
+use App\Services\Admin\Ecommerce\Product\StoreProductService;
+use App\Services\Admin\Ecommerce\Product\UpdateProductService;
 class ProductService extends BaseModelService
 {
     use StoreMultiLang , HandlesImage;

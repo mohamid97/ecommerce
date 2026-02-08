@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Ecommerce\Product;
+namespace App\Services\Admin\Ecommerce\Product;
 
 use App\Models\Api\Ecommerce\ProductOption;
 use App\Models\Api\Ecommerce\ProductOptionValue;
