@@ -12,7 +12,7 @@ use Astrotomic\Translatable\Translatable;
 class Product extends Model implements TranslatableContract
 {
     use HasFactory,Translatable;
-    protected $fillable = ['product_image','sku','barcode','stock','cost_price','sales_price','discount','discount_type','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id'];
+    protected $fillable = ['product_image','sku','barcode','stock','sale_price','discount','discount_type','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id'];
     public $translatedAttributes = ['title' , 'slug' , 'small_des' ,'des' , 'meta_title' , 'meta_des' , 'alt_image', 'title_image'];
     public $translationForeignKey = 'product_id';
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';

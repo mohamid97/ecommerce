@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('bundels', function (Blueprint $table) {
             $table->id();
             $table->decimal('price', 10, 2);
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('null');
-            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('null');
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->unsignedBigInteger('brand_id')->nullable();
+            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
             $table->string('bundle_image')->nullable();
+            $table->enum('status' , ['active','inactive'])->default('active');
             $table->timestamps();
         });
     }

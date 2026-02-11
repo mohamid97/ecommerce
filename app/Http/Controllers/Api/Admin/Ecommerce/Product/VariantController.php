@@ -3,18 +3,37 @@
 namespace App\Http\Controllers\Api\Admin\Ecommerce\Product;
 
 use App\DTO\Ecommerce\Product\StoreVaraintDTO;
+use App\DTO\Ecommerce\Product\UpdateVaraintDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\AllVarinatsRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\StoreVariantRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\UpdateVaraintRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\VariantCombinationRequest;
+use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\ProductVaraintsResource;
+use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\VarinatDetailsResource;
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\ProductVariant;
 use App\Services\Admin\Ecommerce\Product\Actions\Variant\DeleteVaraintAction;
-use App\Services\Admin\Ecommerce\Product\Actions\Variant\StoreVariantAction;
-use App\Services\Admin\Ecommerce\Product\Actions\Variant\UpdateVaraintAction;
-use Illuminate\Http\Request;
+// use App\Services\Admin\Ecommerce\Product\Actions\Variant\DeleteVaraintAction;
 use Illuminate\Support\Facades\DB;
+use App\Traits\ResponseTrait;
+use App\Services\Admin\Ecommerce\Product\Actions\Variant\StoreVaraintAction;
+use App\Services\Admin\Ecommerce\Product\Actions\Variant\UpdateVaraintAction;
+use App\Services\Admin\Ecommerce\Product\UpdateProductService;
 
 class VariantController extends Controller
 {
+    use ResponseTrait;
+
+
+    // get all varaints of product 
+    public function varintsProduct(AllVarinatsRequest $request){
+        $variants = ProductVariant::with('variants.optionValue.option')->where('product_id' , $request->product_id)->get();
+
+        return $this->success( ProductVaraintsResource::collection($variants) , 'main.retreived_successfully' , ['model' => 'Variant']  );
+        
+
+    }
     // get all combination of varinats 
    public function variantsCombinations(VariantCombinationRequest $request){
     $product = Product::findOrFail($request->product_id);
@@ -105,11 +124,11 @@ private function generateCombinations(array $optionsArray)
      
    try{
         DB::beginTransaction();  
-            $DTO = StoreVaraintDTO::fromRequest($request->validated());
-            $service = app(StoreVariantAction::class);
-            $service->storeVariant($DTO);
+        $DTO = StoreVaraintDTO::fromRequest($request->validated());
+        $service = app(StoreVaraintAction::class);
+        $details = $service->storeVariant($DTO);
         DB::commit();
-        return $this->success(__('main.added_successfully' , ['model' => 'Variant']));
+        return $this->success(new VarinatDetailsResource($details) , __('main.stored_successfully' , ['model' => 'Variant']));
 
    }catch(\Exception $e){
         DB::rollBack();
@@ -127,14 +146,15 @@ private function generateCombinations(array $optionsArray)
 
 
 
- public function updateVariant(StoreVariantRequest $request){
+ public function updateVariant(UpdateVaraintRequest $request){
     try{
+
         DB::beginTransaction();  
             $DTO = UpdateVaraintDTO::fromRequest($request->validated());
             $service = app(UpdateVaraintAction::class);
-            $service->updateVariant($DTO);
+            $details = $service->updateVariant($DTO);
         DB::commit();
-        return $this->success(__('main.updated_successfully' , ['model' => 'Variant']));
+        return $this->success(new VarinatDetailsResource($details) , __('main.updated_successfully' , ['model' => 'Variant']));
 
    }catch(\Exception $e){
         DB::rollBack();
@@ -148,7 +168,7 @@ private function generateCombinations(array $optionsArray)
     try{
             $service = app(DeleteVaraintAction::class);
             $service->deleteVariant($id);
-            return $this->success(__('main.deleted_successfully' , ['model' => 'Variant']));
+            return $this->success(null , __('main.deleted_successfully' , ['model' => 'Variant']));
 
    }catch(\Exception $e){
         return $this->error($e->getMessage(), 500); 

@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Admin\Ecommerce\Product\Actions\Variant;
 
+use App\Models\Api\Admin\Lang;
 use App\Models\Api\Ecommerce\ProductVariant;
 
 class UpdateVaraintAction
@@ -25,7 +26,6 @@ class UpdateVaraintAction
         $productVaraint = ProductVariant::find($dto->variant_id);
         $this->updateVariantTranslations($dto, $productVaraint);
 
-
         
     }
 
@@ -33,18 +33,29 @@ class UpdateVaraintAction
 
 
     public function updateVariantTranslations($dto, $productVaraint){
-        foreach($dto->titles as $locale => $title){
-            $productVaraint->translateOrNew($locale)->title = $title;
-            if(isset($dto->des[$locale])){
-                $productVaraint->translateOrNew($locale)->des = $dto->des[$locale];
+        foreach(Lang::all() as $locale){
+            if(isset($dto->title[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->title = $dto->title[$locale->code];
             }
-            if(isset($dto->meta_title[$locale])){
-                $productVaraint->translateOrNew($locale)->meta_title = $dto->meta_title[$locale];
+            if(isset($dto->slug[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->slug = $dto->slug[$locale->code];
             }
-            if(isset($dto->meta_des[$locale])){
-                $productVaraint->translateOrNew($locale)->meta_des = $dto->meta_des[$locale];
+            if(isset($dto->des[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->des = $dto->des[$locale->code];
+            }
+            if(isset($dto->meta_title[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->meta_title = $dto->meta_title[$locale->code];
+            }
+            if(isset($dto->meta_des[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->meta_des = $dto->meta_des[$locale->code];
             }
             $productVaraint->save();
         }
     }
+
+    
+
+
+
+
 }

@@ -14,4 +14,9 @@ class OptionValue extends Model implements TranslatableContract
     public $translatedAttributes = ['title'];
     public $translationForeignKey = 'option_value_id';
     public $translationModel = 'App\Models\Api\Ecommerce\OptionValueTranslation';
+
+    public function option()
+    {
+        return $this->belongsTo(Option::class , 'option_id' , 'id');
+    }
 }

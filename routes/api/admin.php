@@ -98,7 +98,8 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::get('/home' ,'HomeController@index');
 
         // start product file route
-         require __DIR__.'/product.php';
+         require __DIR__.'/admin/product.php';
+         require __DIR__.'/admin/bundel.php';
 
 
 

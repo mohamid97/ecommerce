@@ -1,19 +1,21 @@
 <?php 
 namespace App\Services\Admin\Ecommerce\Product\Actions\Variant;
 
+use App\Models\Api\Admin\Lang;
 use App\Models\Api\Ecommerce\ProductVariant;
+use App\Models\Api\Ecommerce\VariantOptionValue;
 
-class StoreVariantAction
+class StoreVaraintAction
 {
+
     public function storeVariant($dto){
-        $this->checkIfVariantExists($dto->product_id, $dto->option_value_ids);
+        $this->checkIfVariantExists($dto->product_id, $dto->optionValueIds);
+
         $productVaraint = ProductVariant::create([
             'product_id' => $dto->product_id,
-            'option_value_ids' => $dto->option_value_ids,
-            'cost_price' => $dto->cost_price,
-            'sale_price' => $dto->sale_price,
+            'sale_price' => $dto->salePrice,
             'discount' => $dto->discount,
-            'discount_type' => $dto->discount_type,
+            'discount_type' => $dto->discountType,
             'sku' => $dto->sku,
             'barcode' => $dto->barcode,
             'length' => $dto->length,
@@ -21,31 +23,41 @@ class StoreVariantAction
             'width' => $dto->width,
             'height' => $dto->height,
             'stock' => $dto->stock,
-            'price' => $dto->price,
-            'delivery_time' => $dto->delivery_time,
-            'max_time' => $dto->max_time,
+            'delivery_time' => $dto->deliveryTime,
+            'max_time' => $dto->maxTime,
         ]);
         $this->storeVariantTranslations($dto, $productVaraint);
 
-        // store images if exist
+        // store variant option value
+        foreach($dto->optionValueIds as $optionValueId){
+            VariantOptionValue::create([
+                'product_variant_id' => $productVaraint->id,
+                'option_value_id' => $optionValueId,
+            ]);
+        }
+
+        return $productVaraint;
         
 
-        // store option value ids relation
-        $productVaraint->optionValueIds()->attach($dto->optionValueIds);
 
     }
 
     public function storeVariantTranslations($dto, $productVaraint){
-        foreach($dto->titles as $locale => $title){
-            $productVaraint->translateOrNew($locale)->title = $title;
-            if(isset($dto->des[$locale])){
-                $productVaraint->translateOrNew($locale)->des = $dto->des[$locale];
+        foreach(Lang::all() as $locale){
+            if(isset($dto->title[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->title = $dto->title[$locale->code];
             }
-            if(isset($dto->meta_title[$locale])){
-                $productVaraint->translateOrNew($locale)->meta_title = $dto->meta_title[$locale];
+            if(isset($dto->slug[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->slug = $dto->slug[$locale->code];
             }
-            if(isset($dto->meta_des[$locale])){
-                $productVaraint->translateOrNew($locale)->meta_des = $dto->meta_des[$locale];
+            if(isset($dto->des[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->des = $dto->des[$locale->code];
+            }
+            if(isset($dto->metaTitle[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->meta_title = $dto->metaTitle[$locale->code];
+            }
+            if(isset($dto->metaDes[$locale->code])){
+                $productVaraint->translateOrNew($locale->code)->meta_des = $dto->metaDes[$locale->code];
             }
             $productVaraint->save();
         }
@@ -65,6 +77,10 @@ class StoreVariantAction
                     ->havingRaw('COUNT(DISTINCT option_value_id) = ?', [count($option_value_ids)]);
             })
             ->first();
+
+            if($existingVariant){
+                throw new \Exception('Variant already exists');
+            }
     }
 
 

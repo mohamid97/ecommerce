@@ -28,7 +28,7 @@ class LocationService extends BaseModelService
 
     public function update($id){    
         
-        $location = parent::update($id , $this->getBasicColumn('location'));
+        $location = parent::update($id , $this->getBasicColumn(['location']));
         $this->processTranslations($location, $this->data, ['address' , 'government','country']);
         $location =  $this->storeRelations($this->data, ['phones' , 'emails'], $location);
         return $location;

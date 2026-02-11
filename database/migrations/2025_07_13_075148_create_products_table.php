@@ -21,8 +21,7 @@ return new class extends Migration
             $table->boolean('on_demand')->default(false);
             $table->string('sku')->nullable();
             $table->string('barcode')->nullable();
-            $table->decimal('cost_price', 10, 2)->nullable();
-            $table->decimal('sales_price', 10, 2)->nullable();
+            $table->decimal('sale_price', 10, 2)->nullable();
             $table->decimal('discount', 10, 2)->nullable();
             $table->enum('discount_type' , ['fixed' , 'percent'])->nullable();
             $table->boolean('has_options')->default(false);

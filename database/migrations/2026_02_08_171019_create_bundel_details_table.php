@@ -13,11 +13,23 @@ return new class extends Migration
     {
         Schema::create('bundel_details', function (Blueprint $table) {
             $table->id();
-            $table->foreign('bundel_id')->references('id')->on('bundels')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
+            $table->unsignedBigInteger('bundel_id');
+            $table->unsignedBigInteger('product_id');
+
+            $table->foreign('bundel_id')
+                ->references('id')
+                ->on('bundels')
+                ->onDelete('cascade');
+
+            $table->foreign('product_id')
+                ->references('id')
+                ->on('products')
+                ->onDelete('cascade');
+
             $table->json('variant_ids')->nullable();
-            $table->integer('quantity');
             $table->timestamps();
+
         });
     }
 

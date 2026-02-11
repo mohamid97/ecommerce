@@ -2,10 +2,14 @@
 
 namespace App\Http\Requests\Api\Admin\Ecommerce\Product\Variant;
 
+use App\Traits\ResponseTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
-class VariantCombinationRequest extends FormRequest
+class AllVarinatsRequest extends FormRequest
 {
+    use ResponseTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,4 +31,14 @@ class VariantCombinationRequest extends FormRequest
     }
 
 
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            $this->error(
+                $validator->errors()->first(), 
+                422, 
+                
+            )
+        );
+    }
 }

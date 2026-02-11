@@ -2,14 +2,10 @@
 
 namespace App\Http\Requests\Api\Admin\Ecommerce\Product\Variant;
 
-use App\Traits\ResponseTrait;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreVariantRequest extends FormRequest
+class UpdateVaraintRequest extends FormRequest
 {
-    use ResponseTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,9 +22,7 @@ class StoreVariantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:products,id',
-            'option_value_ids' => 'required|array',
-            'option_value_ids.*' => 'required|exists:option_values,id',
+            'id' => 'required|exists:product_variants,id',
             'sale_price'=>'nullable|numeric|min:0',
             'discount'=>'nullable|numeric|min:0',
             'discount_type'=>'nullable|in:fixed,percentage',
@@ -49,19 +43,4 @@ class StoreVariantRequest extends FormRequest
 
         ];
     }
-
-
-   protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            $this->error(
-                $validator->errors()->first(), 
-                422, 
-                
-            )
-        );
-    }
-
-
-
 }

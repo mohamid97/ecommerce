@@ -16,6 +16,13 @@ Route::namespace('Ecommerce\Product')->group(function () {
     // variants
     Route::post('variants-combinations' , 'VariantController@variantsCombinations')->middleware('checkPermision:view');
     Route::post('store-variant' , 'VariantController@storeVariant')->middleware('checkPermision:create');
+    Route::post('update-variant','VariantController@updateVariant')->middleware('checkPermision:update');
+    Route::post('/varints-product' , 'VariantController@varintsProduct')->middleware('checkPermision:view');
+
+
+
+
+    
 
 
 
