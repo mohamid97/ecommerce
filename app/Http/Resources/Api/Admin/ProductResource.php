@@ -24,7 +24,7 @@ class ProductResource extends JsonResource
         'title' => $this->getColumnLang('title'),
         'slug' => $this->getColumnLang('slug'),
         'cost_price' => $this->cost_price,
-        'sales_price' => $this->sales_price,
+        'sales_price' => $this->sales_price,  
         'discount' => $this->discount,
         'discount_type' => $this->discount_type,
         'sku' => $this->sku,
