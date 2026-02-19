@@ -100,6 +100,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         // start product file route
          require __DIR__.'/admin/product.php';
          require __DIR__.'/admin/bundel.php';
+         return __DIR__.'/admin/promotion.php';
 
 
 

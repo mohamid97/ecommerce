@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('locale')->index();
             $table->unique(['promotion_id', 'locale']);
             $table->string('title');
-            $table->text('des');
+            $table->text('des')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_des')->nullable();
             $table->foreign('promotion_id')->references('id')->on('promotions')->onDelete('cascade');
             $table->timestamps();
         });

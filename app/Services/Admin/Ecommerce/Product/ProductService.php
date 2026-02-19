@@ -33,8 +33,12 @@ class ProductService extends BaseModelService
         $product = parent::store($this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'sale_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);  
         $storeProductService = app(StoreProductService::class);
-        ($product->has_options) ? $storeProductService->addProductOption($this->data['product_options'],$product->id): $storeProductService->completeProductData($this->data,$product->id);  
-        return $product;
+        if(!$product->has_options)
+            return $product;
+
+        else
+           return  $storeProductService->addProductOption($this->data['product_options']);
+
         
     } // end store product
     
