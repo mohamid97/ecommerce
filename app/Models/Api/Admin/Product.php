@@ -4,6 +4,7 @@ namespace App\Models\Api\Admin;
 
 use App\Models\Api\Ecommerce\NoOptionStock;
 use App\Models\Api\Ecommerce\ProductOption;
+use App\Models\Api\Ecommerce\ProductShipement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -18,6 +19,10 @@ class Product extends Model implements TranslatableContract
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';
 
 
+
+    public function shipmentDetails(){
+        return $this->hasOne(ProductShipement::class , 'product_id');
+    }
     
     protected function serializeDate(\DateTimeInterface $date)
     {

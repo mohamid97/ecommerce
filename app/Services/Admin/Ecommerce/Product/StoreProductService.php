@@ -3,6 +3,7 @@
 namespace App\Services\Admin\Ecommerce\Product;
 use App\Models\Api\Ecommerce\ProductOption;
 use App\Models\Api\Ecommerce\ProductOptionValue;
+use App\Models\Api\Ecommerce\ProductShipement;
 
 class StoreProductService
 {
@@ -56,6 +57,20 @@ class StoreProductService
 
         
     } // end store product option
+
+
+    public function storeProductShipment($data , $productId){
+        ProductShipement::create([
+            'product_id'=>$productId,
+            'variant_id'=>$data['variant_id']?? null,
+            'length'=>$data['length'],
+            'width'=>$data['width'],
+            'height'=>$data['height'],
+            'weight'=>$data['weight'],
+            'min_estimated_delivery'=>$data['min_estimated_delivery'],
+            'max_estimated_delivery'=>$data['max_estimated_delivery']
+        ]);
+    }
     
 
 

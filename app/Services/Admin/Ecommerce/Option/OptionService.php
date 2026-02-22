@@ -3,6 +3,7 @@ namespace App\Services\Admin\Ecommerce\Option;
 
 use App\Models\Api\Ecommerce\Option;
 use App\Services\BaseModelService;
+use App\Traits\HandlesImage;
 use App\Traits\StoreMultiLang;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -11,7 +12,7 @@ class OptionService extends BaseModelService
 {
 
     protected array $relations = ['values'];
-    use StoreMultiLang;
+    use StoreMultiLang , HandlesImage;
     
     protected string $modelClass = Option::class;
     public function all($request){
@@ -35,9 +36,11 @@ class OptionService extends BaseModelService
             foreach ($this->data['values'] as $valueData) {
                 // check if value image or string
                 if($this->data['value_type'] == 'image' && isset($valueData['value'])){
+                 
                     // upload image
-                    $imagePath = $this->uploadSingleImage($valueData['value'], 'uploads/option_values');
+                    $imagePath = $this->uploadImage($valueData['value'], 'uploads/option_values');
                     $valueData['value'] = $imagePath;
+
                 } else {
                     $valueData['value'] = $valueData['value'] ?? null;
                 }
@@ -62,27 +65,9 @@ class OptionService extends BaseModelService
         // Update Option Values
         if (isset($this->data['values']) && is_array($this->data['values'])) {
             foreach ($this->data['values'] as $valueData) {
-                if (isset($valueData['id'])) {
-                    // Update existing OptionValue
-                    $optionValue = $option->values()->find($valueData['id']);
-                    
-                    if (isset($optionValue)) {
-                        // check if value image or string
-                        if($this->data['value_type'] == 'image' && isset($valueData['value'])){
-                            // upload image
-                            $imagePath = $this->uploadSingleImage($valueData['value'], 'uploads/option_values');
-                            $valueData['value'] = $imagePath;
-                        } else if($this->data['value_type'] != 'image' && isset($valueData['value'])) {
-                            $valueData['value'] = $valueData['value'] ?? null;
-                        }
-                        $optionValue->update([
-                            'value' => $valueData['value'] ?? null,
-                        ]);
-                        // Process translations for OptionValue
-                        $this->processTranslations($optionValue, $valueData, ['title']);
-                    }
-                } else {
-                    // Create new OptionValue
+
+                   // need to delete all value at first 
+                    $option->values()->delete();
                     if($this->data['value_type'] == 'image' && isset($valueData['value_image'])){
                         // upload image
                         $imagePath = $this->uploadSingleImage($valueData['value'], 'uploads/option_values');
@@ -95,11 +80,11 @@ class OptionService extends BaseModelService
                     ]);
                     // Process translations for OptionValue
                     $this->processTranslations($optionValue, $valueData, ['title']);
-                }
+              
             }
         }
         return $option;        
-    }   
+    } // update option   
      
     public function delete($id){
         $option = parent::delete($id);

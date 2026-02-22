@@ -13,9 +13,10 @@ class ProductService extends BaseModelService
 {
     use StoreMultiLang , HandlesImage;
     protected string $modelClass = Product::class;
-    protected array  $relations  = ['category' , 'brand'];
+    protected array  $relations  = ['category' , 'shipmentDetails' , 'options.option','options.values.optionValue','category','brand'];
 
     public function all($request){      
+       
         $product = parent::all($request);
         return $product;
     }
@@ -33,11 +34,16 @@ class ProductService extends BaseModelService
         $product = parent::store($this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'sale_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);  
         $storeProductService = app(StoreProductService::class);
-        if(!$product->has_options)
-            return $product;
+        if($product->has_options)
+  
+            $storeProductService->addProductOption($this->data['product_options'] , $product->id);
+             
 
-        else
-           return  $storeProductService->addProductOption($this->data['product_options']);
+
+        $storeProductService->storeProductShipment($this->data , $product->id);
+        
+
+        return $product;
 
         
     } // end store product
@@ -54,8 +60,18 @@ class ProductService extends BaseModelService
         $product = parent::update($id , $this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'cost_price', 'sales_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
         $updateProductService = app(UpdateProductService::class);
-        ($product->has_options) ? $updateProductService->updateProductOption($this->data['product_options'],$product->id): $updateProductService->completeProductData($this->data,$product->id);  
+
+
+        if($product->has_options)
+            
+           $updateProductService->updateProductOption($this->data['product_options'],$product->id);
+
+
+
+        $updateProductService->updateProductShipment($this->data , $product->id);
         return $product;
+
+  
         
     }
 

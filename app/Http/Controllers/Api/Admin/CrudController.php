@@ -19,12 +19,33 @@ class CrudController extends Controller
     use \App\Traits\ResponseTrait;
     
     protected $data;
+    protected $except     = ['Product' , 'Option'];
+
+
+
+
+    protected function getExceptResource($modelName ,  $msg = 'main.stored_successfully'){
+        
+        if(is_array($this->data)|| $this->data instanceof \Illuminate\Support\Collection){
+            $resourceClass = "App\\Http\\Resources\\Api\\Admin\\{$modelName}Resource";
+            return  $this->success($resourceClass::collection($this->data) , __($msg, ['model' => $modelName]));
+
+        }
+        $resourceClass = "App\\Http\\Resources\\Api\\Admin\\{$modelName}DetailsResource";
+        return $this->success(new $resourceClass($this->data) , __($msg, ['model' => $modelName]));
+
+    }
+
+
+
 
     protected function getResourceClass(string $modelName  , $msg = 'main.stored_successfully')
     {
 
       
         $studlyName = Str::studly($modelName);
+      
+        
         
         $resourceClass =  "App\\Http\\Resources\\Api\\Admin\\{$studlyName}Resource";
 
@@ -43,6 +64,10 @@ class CrudController extends Controller
                     __($msg, ['model' => $modelName])
                 );
              }
+
+            if(in_array($studlyName , $this->except)){
+                 return $this->getExceptResource($studlyName);
+            }
     
             return $this->success( is_array($this->data)|| $this->data instanceof \Illuminate\Support\Collection  ? $resourceClass::collection($this->data) : new $resourceClass($this->data), __($msg, ['model' => $modelName]));
         }
@@ -50,6 +75,8 @@ class CrudController extends Controller
 
         
     }
+
+
 
     public function all(Request $request)
     {

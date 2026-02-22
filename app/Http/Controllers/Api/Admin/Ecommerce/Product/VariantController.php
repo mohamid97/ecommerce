@@ -67,13 +67,13 @@ class VariantController extends Controller
 
     // Generate combinations AFTER collecting all options
     $combinations = $this->generateCombinations($optionsArray);
-    
-    return response()->json([
-        'success' => true,
+    return $this->success([     
         'product_id' => $product->id,
         'total_combinations' => count($combinations),
         'combinations' => $combinations
-    ]);
+    ] ,  __('main.list_successfully' , ['model'=>'Combinations']));
+    
+
 }
 
 private function generateCombinations(array $optionsArray)

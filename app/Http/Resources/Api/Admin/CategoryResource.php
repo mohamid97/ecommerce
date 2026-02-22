@@ -32,7 +32,7 @@ class CategoryResource extends JsonResource
                 ] : null;
             }),
             'childrens' => $this->whenLoaded('childrens', function () {
-                  return $this->getColumnsLangWithArrayRelation(['title' , 'slug'] , 'childrens');
+                  return $this->getColumnsLangWithArrayRelation(['title' , 'slug' , 'category_image'] , 'childrens');
             }),
             'meta_des' => $this->getColumnLang('meta_des'),
             'category_image' => $this->getImageUrl($this->category_image),

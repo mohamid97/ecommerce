@@ -19,7 +19,7 @@ class BundelController extends Controller
             DB::beginTransaction();
             $dto = StoreBundelDTO::fromRequest($request->all());
             $service = app(BundelService::class);
-            $details = $service->storeBundel($dto);
+            $details = $service->storeBundel($dto); 
             DB::commit();
             return $this->success(new BundeDetailsResource($details) , __('main.stored_successfully' , ['model'=>'Bundel']));
 

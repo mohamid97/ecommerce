@@ -4,6 +4,7 @@ namespace App\Services\Admin\Des;
 use App\Models\Api\Admin\Des;
 use App\Services\BaseModelService;
 use App\Traits\StoreMultiLang;
+use Illuminate\Database\Eloquent\Builder;
 
 class DesService extends BaseModelService
 {
