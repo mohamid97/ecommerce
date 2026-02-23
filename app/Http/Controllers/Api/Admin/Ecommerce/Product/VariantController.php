@@ -20,17 +20,26 @@ use App\Traits\ResponseTrait;
 use App\Services\Admin\Ecommerce\Product\Actions\Variant\StoreVaraintAction;
 use App\Services\Admin\Ecommerce\Product\Actions\Variant\UpdateVaraintAction;
 use App\Services\Admin\Ecommerce\Product\UpdateProductService;
+use Symfony\Component\HttpFoundation\Request;
 
 class VariantController extends Controller
 {
     use ResponseTrait;
 
 
+    // view varaint details data
+    public function viewVariant(Request $request){
+        $variant = ProductVariant::with('variants.optionValue.option')->findOrFail($request->variant_id);
+        return $this->success(new VarinatDetailsResource($variant)  , __('main.retreived_successfully' , ['model' => 'Variant']) );
+
+
+    }
+
     // get all varaints of product 
     public function varintsProduct(AllVarinatsRequest $request){
         $variants = ProductVariant::with('variants.optionValue.option')->where('product_id' , $request->product_id)->get();
 
-        return $this->success( ProductVaraintsResource::collection($variants) , 'main.retreived_successfully' , ['model' => 'Variant']  );
+        return $this->success( ProductVaraintsResource::collection($variants) , __('main.retreived_successfully' , ['model' => 'Variant'])  );
         
 
     }

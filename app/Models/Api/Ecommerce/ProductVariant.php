@@ -25,4 +25,5 @@ class ProductVariant extends Model implements TranslatableContract
         return $this->hasMany(VariantOptionValue::class);
     }
     
+    
 }

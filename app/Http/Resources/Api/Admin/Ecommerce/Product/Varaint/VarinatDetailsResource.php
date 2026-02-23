@@ -28,8 +28,43 @@ class VarinatDetailsResource extends JsonResource
             'weight' => $this->weight,
             'delivery_time' => $this->delivery_time,
             'max_time' => $this->max_time,
+            'title'=>$this->getColumnLang('title'),
+            'slug'=>$this->getColumnLang('slug'),
+            'des'=>$this->getColumnLang('des'),
+            'meta_title'=>$this->getColumnLang('meta_title'),
+            'meta_des'=>$this->getColumnLang('meta_title'),
+            'variant_full_name' => $this->whenLoaded('variants', function () {
+                    return $this->buildVariantName();
+             }),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];
     }
+
+
+        protected function buildVariantName()
+        {
+            return $this->variants
+                ->map(function ($variantOptionValue) {
+
+                    $optionTitle = optional(
+                        $variantOptionValue->optionValue?->option
+                    )->title;
+
+                    $valueTitle = $variantOptionValue->optionValue?->title;
+
+                    if (!$optionTitle || !$valueTitle) {
+                        return null;
+                    }
+
+                    return $optionTitle . ' ' . $valueTitle;
+
+                })
+                ->filter()
+                ->implode(' ');
+        }
+
+
+
+
 }
