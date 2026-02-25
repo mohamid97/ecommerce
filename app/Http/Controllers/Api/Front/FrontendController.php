@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Front;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Front\DynamicFilter\DynamicFilterRequest;
+use App\Http\Resources\Api\Front\Data\DataResource;
 use App\Models\Api\Admin\Applicant;
 use App\Services\Front\Profile\FrontendService;
 use Illuminate\Http\Request;
@@ -105,6 +106,31 @@ class FrontendController extends Controller
         }
         
     }
+
+
+
+        public function search(Request $request){
+        try{
+            if(!$request->has('model')){              
+                return $this->error(__('main.no_model') , 404);
+            }
+            if(!$request->has('value') || $request->has('column')){              
+                return $this->error(__('main.no_search') , 404);
+            }
+            $this->prepareModel($request->model);
+            $data = $this->modelClass::whereHas('translations',function($query) use ($request){
+                $query->where($request->column, 'like', '%' . $request->value . '%');
+            })->get();
+
+            return  $this->success(DataResource::collection($data), __('main.retrieved_successfully', ['model' => $this->studlyName]));           
+
+        }catch(\Exception $e){
+            return $this->error($e->getMessage() , 500);
+        }
+    }// end search function  
+
+
+
 
 
 

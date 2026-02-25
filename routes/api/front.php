@@ -31,7 +31,8 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
     Route::prefix('data')->controller('FrontendController')->group(function(){
         Route::post('get' , 'get');  
         Route::post('dynamic/filter' , 'dynamicFilter');
-        Route::post('gallery' , 'getGallery');     
+        Route::post('gallery' , 'getGallery'); 
+        Route::post('search' , 'search');     
     });
     
     Route::prefix('applicant')->controller('ApplicantController')->group(function(){
