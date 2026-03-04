@@ -16,15 +16,15 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-       
       
-    return [      
+    return [
+
         'id' => $this->id,
         'title' => $this->getColumnLang('title'),
         'slug' => $this->getColumnLang('slug'),
-        'cost_price' => $this->cost_price,
-        'sales_price' => $this->sales_price,  
-        'discount' => $this->discount,
+        'cost_price' => (float) $this->cost_price,
+        'sales_price' => (float) $this->sale_price,  
+        'discount' => (float) $this->discount,
         'discount_type' => $this->discount_type,
         'sku' => $this->sku,
         'barcode' => $this->barcode,
@@ -36,7 +36,6 @@ class ProductResource extends JsonResource
                     'slug' => $this->getColumnLang('slug','category')
                 ];
         }),
-
         'brand' => $this->whenLoaded('brand' , function(){
                 return [
                     'id'=>$this->brand ? $this->brand->id : null,
@@ -53,7 +52,6 @@ class ProductResource extends JsonResource
         'alt_image' => $this->getColumnLang('alt_image'),
         'meta_title' => $this->getColumnLang('meta_title'),
         'meta_des' => $this->getColumnLang('meta_des'),
-        'order'=>$this->order,
         'has_options'=>$this->has_options ? true :false,
         'status'=>$this->status,
         'on_demand'=>$this->on_demand ? true :false,

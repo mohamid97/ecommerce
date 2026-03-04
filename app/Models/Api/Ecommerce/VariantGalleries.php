@@ -22,4 +22,6 @@ class VariantGalleries extends Model
     {
         return $this->belongsTo(ProductVariant::class , 'varaint_id' , 'id');
     }
+
+    
 }

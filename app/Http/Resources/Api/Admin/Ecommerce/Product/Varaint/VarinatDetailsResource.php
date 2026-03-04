@@ -17,10 +17,10 @@ class VarinatDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
-            'sale_price' => $this->sale_price,
+            'sale_price' => (float) $this->sale_price,
             'stock' => $this->stock,
-            'discount' => $this->discount,
-            'discount_type' => $this->discount_type,
+            'discount' => (float) $this->discount,
+            'discount_type' => (float) $this->discount_type,
             'status' => $this->status,
             'length' => $this->length,
             'width' => $this->width,
@@ -42,27 +42,27 @@ class VarinatDetailsResource extends JsonResource
     }
 
 
-        protected function buildVariantName()
-        {
-            return $this->variants
-                ->map(function ($variantOptionValue) {
+    protected function buildVariantName()
+    {
+        return $this->variants
+            ->map(function ($variantOptionValue) {
 
-                    $optionTitle = optional(
-                        $variantOptionValue->optionValue?->option
-                    )->title;
+                $optionTitle = optional(
+                    $variantOptionValue->optionValue?->option
+                )->title;
 
-                    $valueTitle = $variantOptionValue->optionValue?->title;
+                $valueTitle = $variantOptionValue->optionValue?->title;
 
-                    if (!$optionTitle || !$valueTitle) {
-                        return null;
-                    }
+                if (!$optionTitle || !$valueTitle) {
+                    return null;
+                }
 
-                    return $optionTitle . ' ' . $valueTitle;
+                return $optionTitle . ' ' . $valueTitle;
 
-                })
-                ->filter()
-                ->implode(' ');
-        }
+            })
+            ->filter()
+            ->implode(' ');
+    }
 
 
 

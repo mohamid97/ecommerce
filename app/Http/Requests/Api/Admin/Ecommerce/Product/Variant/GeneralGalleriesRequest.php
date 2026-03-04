@@ -3,6 +3,11 @@
 namespace App\Http\Requests\Api\Admin\Ecommerce\Product\Variant;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\ResponseTrait;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
+
 
 class GeneralGalleriesRequest extends FormRequest
 {
@@ -22,8 +27,23 @@ class GeneralGalleriesRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'pro duct_id' => 'required|exists:products,id',
+           'product_id' => 'required|exists:products,id',
            'image' => 'required|image|mimes:jpeg,webp,png,jpg,gif|max:2048',
         ];
     }
+
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            $this->error(
+                $validator->errors()->first(), 
+                422, 
+                
+            )
+        );
+    }
+
+
+
 }

@@ -22,7 +22,7 @@ class VariantGalleriesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'variant_id' => 'required|exists:variants,id',
+            'variant_id' => 'required|exists:product_variants,id',
             'image_id' => 'required|exists:gerneral_variant_galleries,id',
         ];
     }

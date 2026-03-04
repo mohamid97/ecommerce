@@ -10,15 +10,16 @@ use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\SpecialGalleriesResou
 use App\Models\Api\Ecommerce\GerneralVariantGalleries;
 use App\Models\Api\Ecommerce\VariantGalleries;
 use App\Traits\HandlesImage;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
-    use HandlesImage;
+    use HandlesImage , ResponseTrait;
 
     // get all general images for varaints 
-    public function generalImages($product_id){
-      $images = GerneralVariantGalleries::where('product_id' , $product_id)->get();
+    public function generalImages(Request $request){
+      $images = GerneralVariantGalleries::where('product_id' , $request->product_id)->get();
       return $this->success(GeneralGalleriesResoure::collection($images) , __('main.data_retrieved_successfully' , ['model'=>'Gernal Varaint Gallery']));
     }
     // store global image 
@@ -49,7 +50,7 @@ class GalleryController extends Controller
       return $this->success(SpecialGalleriesResoure::collection($images) , __('main.data_retrieved_successfully' , ['model'=>'Special Variant Gallery']));
     }
     // store variant image 
-    public function storeVariantImage(VariantGalleriesRequest $request){
+    public function storeSpecialImage(VariantGalleriesRequest $request){
       $gallery = VariantGalleries::create([
         'image_id' => $request->image_id,
         'variant_id' => $request->variant_id,
