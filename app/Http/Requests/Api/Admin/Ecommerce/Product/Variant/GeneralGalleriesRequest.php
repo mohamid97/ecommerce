@@ -11,6 +11,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class GeneralGalleriesRequest extends FormRequest
 {
+    use ResponseTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
