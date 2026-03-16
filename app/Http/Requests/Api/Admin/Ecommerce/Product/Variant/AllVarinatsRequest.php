@@ -41,4 +41,8 @@ class AllVarinatsRequest extends FormRequest
             )
         );
     }
+
+
+
+    
 }
