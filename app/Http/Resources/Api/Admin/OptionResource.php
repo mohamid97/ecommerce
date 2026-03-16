@@ -26,8 +26,8 @@ class OptionResource extends JsonResource
             'values' => $this->whenLoaded('values', function () {
                return $this->getColumnsLangWithArrayRelation(['title'] , 'values' , ['value']);
             }),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at->format(),
+            'updated_at' => $this->updated_at->format(),
         ];
     }
 }

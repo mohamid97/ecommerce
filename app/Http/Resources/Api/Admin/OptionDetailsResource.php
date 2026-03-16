@@ -21,7 +21,15 @@ class OptionDetailsResource extends JsonResource
             'value_type'=> $this->value_type,
             'title' => $this->getColumnLang('title'),
             'values' => $this->whenLoaded('values', function () {
-               return $this->getColumnsLangWithArrayRelation(['title'] , 'values' , ['value']);
+               $values = $this->getColumnsLangWithArrayRelation(['title'], 'values', ['value']);
+               if ($this->value_type === 'image') {
+                    foreach ($values as &$value) {
+                        if (!empty($value['value'])) {
+                            $value['value'] = $this->getImageUrl($value['value']);
+                        }
+                    }
+                }
+               return $values;
             }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
