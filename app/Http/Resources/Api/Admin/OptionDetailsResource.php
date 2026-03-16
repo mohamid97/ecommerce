@@ -36,4 +36,7 @@ class OptionDetailsResource extends JsonResource
         ];
 
     }
+
+
+    
 }

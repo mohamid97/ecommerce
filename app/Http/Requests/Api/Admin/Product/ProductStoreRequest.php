@@ -31,7 +31,7 @@ class ProductStoreRequest extends FormRequest
             'images.*'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'breadcrumb'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'status'=>'nullable|in:published,pending',
-            'has_options' => 'required|boolean',
+            'has_options' => 'required|in:true,false',
             'category_id'=>'nullable|exists:categories,id',
             'brand_id'=>'nullable|exists:brands,id',
             'order'=>'nullable|integer|unique:products,order',

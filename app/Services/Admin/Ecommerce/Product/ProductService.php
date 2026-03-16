@@ -57,7 +57,7 @@ class ProductService extends BaseModelService
     
     public function update($id ){
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
-        $product = parent::update($id , $this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'cost_price', 'sales_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
+        $product = parent::update($id , $this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'cost_price', 'sale_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
         $updateProductService = app(UpdateProductService::class);
 

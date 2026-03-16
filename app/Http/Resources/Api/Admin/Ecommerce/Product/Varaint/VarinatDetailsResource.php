@@ -21,13 +21,18 @@ class VarinatDetailsResource extends JsonResource
             'stock' => $this->stock,
             'discount' => (float) $this->discount,
             'discount_type' => (float) $this->discount_type,
+
             'status' => $this->status,
-            'length' => $this->length,
-            'width' => $this->width,
-            'height' => $this->height,
-            'weight' => $this->weight,
-            'delivery_time' => $this->delivery_time,
-            'max_time' => $this->max_time,
+            'shipmentDetails'=>[
+                'length' => $this->length,
+                'width' => $this->width,
+                'height' => $this->height,
+                'weight' => $this->weight,
+                'min_estimated_delivery' => $this->delivery_time,
+                'max_estimated_delivery' => $this->max_time,
+
+
+            ],
             'title'=>$this->getColumnLang('title'),
             'slug'=>$this->getColumnLang('slug'),
             'des'=>$this->getColumnLang('des'),

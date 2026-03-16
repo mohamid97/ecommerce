@@ -18,9 +18,9 @@ class ProductDetailsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->getColumnLang('title'),
             'slug' => $this->getColumnLang('slug'),
-            'cost_price' => $this->cost_price,
-            'sales_price' => $this->sales_price,  
-            'discount' => $this->discount,
+            // 'cost_price' => (float)  $this->cost_price,
+            'sale_price' => (float) $this->sale_price,  
+            'discount' => (float) $this->discount,
             'discount_type' => $this->discount_type,
             'sku' => $this->sku,
             'barcode' => $this->barcode,
@@ -81,12 +81,12 @@ class ProductDetailsResource extends JsonResource
           
             'shipmentDetails'=>$this->whenLoaded('shipmentDetails' , function(){
                     return [
-                        'width'=>$this->shipmentDetails->width,
-                        'height'=>$this->shipmentDetails->height,
-                        'length'=>$this->shipmentDetails->length,
-                        'weight'=>$this->shipmentDetails->weight,
-                        'min_estimated_delivery'=>$this->shipmentDetails->min_estimated_delivery,
-                        'max_estimated_delivery'=>$this->shipmentDetails->max_estimated_delivery,
+                        'width'=> (float) $this->shipmentDetails->width,
+                        'height'=>(float) $this->shipmentDetails->height,
+                        'length'=> (float) $this->shipmentDetails->length,
+                        'weight'=>(float) $this->shipmentDetails->weight,
+                        'min_estimated_delivery'=> (float) $this->shipmentDetails->min_estimated_delivery,
+                        'max_estimated_delivery'=>(float) $this->shipmentDetails->max_estimated_delivery,
                     ];
             }),
 

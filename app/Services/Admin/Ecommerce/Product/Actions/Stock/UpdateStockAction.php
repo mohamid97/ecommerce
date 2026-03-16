@@ -13,7 +13,7 @@ class UpdateStockAction
         'quantity' => $dto->quantity,
         'note' => $dto->note ?? null,
         'cost_price' => $dto->cost_price ?? null,
-        'sales_price' => $dto->sales_price,
+        'sale_price' => $dto->sale_price,
       ]);
 
         

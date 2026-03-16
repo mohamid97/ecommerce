@@ -41,7 +41,7 @@ class ProductUpdateRequest extends FormRequest
             'order' => 'nullable|integer|unique:products,order,' . $this->id,
             'on_demand'=>'nullable|boolean',
             'cost_price' => 'nullable|numeric|min:0',
-            'sales_price'=>'nullable|numeric|min:0',
+            'sale_price'=>'nullable|numeric|min:0',
             'discount'=>'nullable|numeric|min:0',
             'discount_type'=>'nullable|in:fixed,percentage',
             'sku'=>'nullable|string|max:255',
