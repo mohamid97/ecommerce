@@ -12,6 +12,13 @@ class ProductShipement extends Model
     protected $fillable = ['product_id' , 'shipement_id' , 'weight' , 'length' , 
     'width' , 'height' , 'min_estimated_delivery' , 'max_estimated_delivery'];
 
+    protected $casts = [
+        'width'=>'float',
+        'length'=>'float',
+        'height'=>'float',
+        'weight'=>'float',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class , 'product_id');

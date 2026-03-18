@@ -46,6 +46,14 @@ class StoreVariantRequest extends FormRequest
             'meta_title.*'=>'nullable|max:255',
             'meta_des'=>'nullable|array|min:1', 
             'meta_des.*'=>'nullable|max:255',
+            'image_ids'=>'nullable|array',
+            'image_ids.*'=>'nullable|exists:gerneral_variant_galleries,id',
+            'length'=>'nullable|numeric|min:0',
+            'width'=>'nullable|numeric|min:0',
+            'height'=>'nullable|numeric|min:0',
+            'weight'=>'nullable|numeric|min:0',
+            'delivery_time'=>'nullable|integer|min:0',
+            'max_time'=>'nullable|integer|min:0',
 
         ];
     }

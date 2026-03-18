@@ -24,6 +24,7 @@ class StoreVaraintDTO
         public ?string $sku = null,
         public ?array $metaTitle= null,
         public ?array $metaDes = null,
+        public ?array $imagesIds = null,
         
     
     ) {}
@@ -51,6 +52,7 @@ class StoreVaraintDTO
             $data['sku'] ?? null,
             $data['meta_title'] ?? null,
             $data['meta_des'] ?? null,
+            $data['image_ids'] ?? null,
             
         );
     }

@@ -15,6 +15,23 @@ class ProductVariant extends Model implements TranslatableContract
     public $translationForeignKey = 'product_variant_id';
     public $translationModel = 'App\Models\Api\Ecommerce\ProductVariantTranslation';
     protected $fillable = ['product_id' , 'sku' , 'barcode'  , 'status' , 'stock' , 'sale_price' , 'discount_value' , 'discount_type' , 'length' , 'width' , 'height' , 'weight' , 'delivery_time' , 'max_time' , 'images'];
+    protected $casts = [
+        'sale_price' => 'float',
+        'discount_value' => 'float',
+        'length' => 'float',
+        'width' => 'float',
+        'height' => 'float',
+        'weight' => 'float',
+    ];
+
+     protected $appends = ['variant_full_name'];
+
+     protected function serializeDate(\DateTimeInterface $date)
+     {
+       return $date->format('Y-m-d'); 
+     }
+        
+    
     public function product()
     {
         return $this->belongsTo(Product::class);

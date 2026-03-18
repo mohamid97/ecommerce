@@ -2,6 +2,7 @@
 namespace App\Services\Admin\Ecommerce\Product\Actions\Variant;
 
 use App\Models\Api\Admin\Lang;
+use App\Models\Api\Ecommerce\ProductVaraintImages;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\VariantOptionValue;
 
@@ -34,6 +35,16 @@ class StoreVaraintAction
                 'product_variant_id' => $productVaraint->id,
                 'option_value_id' => $optionValueId,
             ]);
+        }
+
+        // store variant images
+        if($dto->imagesIds){
+            foreach($dto->imagesIds as $imageId){
+                ProductVaraintImages::create([
+                    'variant_id' => $productVaraint->id,
+                    'image_id' => $imageId,
+                ]);
+            }
         }
 
         return $productVaraint;

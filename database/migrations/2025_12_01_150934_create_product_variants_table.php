@@ -21,10 +21,10 @@ return new class extends Migration
             $table->integer('stock')->default(0)->nullable();
             $table->decimal('discount_value', 10, 2)->nullable();
             $table->enum('discount_type', ['fixed', 'percentage'])->nullable();
-            $table->integer('length')->default(0)->nullable();
-            $table->integer('width')->default(0)->nullable();
-            $table->integer('height')->default(0)->nullable();
-            $table->integer('weight')->default(0)->nullable();
+            $table->decimal('length', 10, 2)->default(0)->nullable();
+            $table->decimal('width', 10, 2)->default(0)->nullable();
+            $table->decimal('height', 10, 2)->default(0)->nullable();
+            $table->decimal('weight', 10, 2)->default(0)->nullable();
             $table->integer('delivery_time')->default(0)->nullable();
             $table->integer('max_time')->default(0)->nullable();
             $table->json('images')->nullable();

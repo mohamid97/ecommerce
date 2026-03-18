@@ -14,6 +14,9 @@ class GerneralVariantGalleries extends Model
         'product_id',
     ];
 
+    public function variantImage(){
+        return $this->hasMany(ProductVaraintImages::class , 'image_id' , 'id');
+    }
 
     public function product()
     {

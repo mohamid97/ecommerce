@@ -21,6 +21,18 @@ class ProductUpdateRequest extends FormRequest
         return true;
     }
 
+
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'has_options' => filter_var($this->has_options, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            'on_demand'   => filter_var($this->on_demand, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+        ]);
+    }
+
+
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -35,11 +47,11 @@ class ProductUpdateRequest extends FormRequest
             'images.*'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'breadcrumb'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'status'=>'nullable|in:published,pending',
-            'has_options' => 'required|boolean',
+            'has_options'  => 'required|boolean',
+            'on_demand'    => 'nullable|boolean',
             'category_id'=>'nullable|exists:categories,id',
             'brand_id'=>'nullable|exists:brands,id',
             'order' => 'nullable|integer|unique:products,order,' . $this->id,
-            'on_demand'=>'nullable|boolean',
             'cost_price' => 'nullable|numeric|min:0',
             'sale_price'=>'nullable|numeric|min:0',
             'discount'=>'nullable|numeric|min:0',

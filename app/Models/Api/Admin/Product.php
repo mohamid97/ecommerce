@@ -19,6 +19,15 @@ class Product extends Model implements TranslatableContract
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';
 
 
+    protected $casts = [
+        
+        'has_options' => 'boolean',
+        'on_demand' => 'boolean',
+        'sale_price'  => 'float',
+        'discount'    => 'float',
+
+    ];
+
 
     public function shipmentDetails(){
         return $this->hasOne(ProductShipement::class , 'product_id');

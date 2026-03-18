@@ -26,6 +26,18 @@ class UpdateVaraintAction
         $productVaraint = ProductVariant::find($dto->variant_id);
         $this->updateVariantTranslations($dto, $productVaraint);
 
+        // update variant images
+        if($dto->imagesIds){
+            $productVaraint->variantImages()->delete();
+            foreach($dto->imagesIds as $imageId){
+                $productVaraint->variantImages()->create([
+                    'image_id' => $imageId,
+                ]); 
+            }
+        }
+
+        return $productVaraint;
+
         
     }
 

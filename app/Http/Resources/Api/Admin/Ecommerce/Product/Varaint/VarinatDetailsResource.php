@@ -17,10 +17,10 @@ class VarinatDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
-            'sale_price' => (float) $this->sale_price,
+            'sale_price' =>  $this->sale_price,
             'stock' => $this->stock,
-            'discount' => (float) $this->discount,
-            'discount_type' => (float) $this->discount_type,
+            'discount' =>  $this->discount,
+            'discount_type' => $this->discount_type,
 
             'status' => $this->status,
             'shipmentDetails'=>[
