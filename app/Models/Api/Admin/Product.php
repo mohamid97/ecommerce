@@ -23,8 +23,7 @@ class Product extends Model implements TranslatableContract
         
         'has_options' => 'boolean',
         'on_demand' => 'boolean',
-        'sale_price'  => 'float',
-        'discount'    => 'float',
+        'sale_price' => 'decimal:2',
 
     ];
 

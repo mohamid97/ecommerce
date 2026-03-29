@@ -21,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(Request $request): void
     {
+         ini_set('serialize_precision', 14);
 
         if ($request->header('X-Authorization') && !$request->header('Authorization')) {
             $request->headers->set('Authorization', $request->header('X-Authorization'));

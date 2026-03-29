@@ -17,27 +17,33 @@ class VarinatDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
-            'sale_price' =>  $this->sale_price,
+            'sale_price' =>  (float)$this->sale_price,
             'stock' => $this->stock,
-            'discount' =>  $this->discount,
+            'discount' => (float) $this->discount,
             'discount_type' => $this->discount_type,
 
             'status' => $this->status,
             'shipmentDetails'=>[
-                'length' => $this->length,
-                'width' => $this->width,
-                'height' => $this->height,
-                'weight' => $this->weight,
+                'length' => (float)$this->length,
+                'width' => (float)$this->width,
+                'height' => (float)$this->height,
+                'weight' => (float)$this->weight,
                 'min_estimated_delivery' => $this->delivery_time,
                 'max_estimated_delivery' => $this->max_time,
-
-
             ],
             'title'=>$this->getColumnLang('title'),
             'slug'=>$this->getColumnLang('slug'),
             'des'=>$this->getColumnLang('des'),
             'meta_title'=>$this->getColumnLang('meta_title'),
-            'meta_des'=>$this->getColumnLang('meta_title'),
+            'meta_des'=>$this->getColumnLang('meta_des'),
+            'varaint_images'=>$this->whenLoaded('varaintImages', function () {
+                return $this->varaintImages->map(function ($image) {
+                    return [
+                        'id' => $image->id,
+                        'image' => $this->getImageUrl($image->image?->image)
+                    ];
+                });
+            }),
             'variant_full_name' => $this->whenLoaded('variants', function () {
                     return $this->buildVariantName();
              }),

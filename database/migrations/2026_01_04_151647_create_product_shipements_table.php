@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('variant_id')->nullable();
-            $table->decimal('length', 8, 2)->nullable();
-            $table->decimal('width', 8, 2)->nullable();
+            $table->float('length', 8, 2)->nullable();
+            $table->float('width', 8, 2)->nullable();
             $table->decimal('height', 8, 2)->nullable();
             $table->decimal('weight', 8, 2)->nullable();
             $table->unsignedInteger('min_estimated_delivery')->nullable();

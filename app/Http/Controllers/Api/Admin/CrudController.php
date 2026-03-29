@@ -46,7 +46,6 @@ class CrudController extends Controller
         $studlyName = Str::studly($modelName);
       
         
-        
         $resourceClass =  "App\\Http\\Resources\\Api\\Admin\\{$studlyName}Resource";
 
         if (class_exists($resourceClass) && (!empty($this->data))) {
@@ -96,6 +95,7 @@ class CrudController extends Controller
         try {
             $service = ModelServiceFactory::make($request->model);
             $this->data = $service->view($request->id);
+          
             return $this->getResourceClass($request->model , 'main.model_details');
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);

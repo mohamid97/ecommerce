@@ -10,10 +10,10 @@ class StoreVaraintAction
 {
 
     public function storeVariant($dto){
-        $this->checkIfVariantExists($dto->product_id, $dto->optionValueIds);
-
+        $this->checkIfVariantExists($dto->productId, $dto->optionValueIds);
+          
         $productVaraint = ProductVariant::create([
-            'product_id' => $dto->product_id,
+            'product_id' => $dto->productId,
             'sale_price' => $dto->salePrice,
             'discount' => $dto->discount,
             'discount_type' => $dto->discountType,
@@ -40,6 +40,7 @@ class StoreVaraintAction
         // store variant images
         if($dto->imagesIds){
             foreach($dto->imagesIds as $imageId){
+                
                 ProductVaraintImages::create([
                     'variant_id' => $productVaraint->id,
                     'image_id' => $imageId,

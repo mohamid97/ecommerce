@@ -29,7 +29,7 @@ class VariantController extends Controller
 
     // view varaint details data
     public function viewVariant(Request $request){
-        $variant = ProductVariant::with('variants.optionValue.option')->findOrFail($request->variant_id);
+        $variant = ProductVariant::with(['variants.optionValue.option' , 'varaintImages'])->findOrFail($request->variant_id);
         return $this->success(new VarinatDetailsResource($variant)  , __('main.retreived_successfully' , ['model' => 'Variant']) );
 
 

@@ -41,6 +41,12 @@ class ProductVariant extends Model implements TranslatableContract
     {
         return $this->hasMany(VariantOptionValue::class);
     }
+
+
+    public function varaintImages()
+    {
+        return $this->hasMany(ProductVaraintImages::class, 'variant_id');
+    }
     
     
 }
