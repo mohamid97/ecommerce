@@ -63,14 +63,14 @@ class OptionService extends BaseModelService
         $this->uploadSingleImage(['option_image'], 'uploads/options'); 
         $option = parent::update($id , $this->getBasicColumn( ['option_image','code','value_type']));
         $this->processTranslations($option, $this->data, ['title' ]);
-
+                   // need to delete all value at first 
+                    $option->values()->delete();
         // Update Option Values
         if (isset($this->data['values']) && is_array($this->data['values'])) {
             foreach ($this->data['values'] as $valueData) {
                 
 
-                   // need to delete all value at first 
-                    $option->values()->delete();
+
                     if($this->data['value_type'] == 'image' && isset($valueData['value_image'])){
                         // upload image
                         $imagePath = $this->uploadSingleImage($valueData['value'], 'uploads/option_values');

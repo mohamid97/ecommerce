@@ -18,6 +18,8 @@ class UpdateProductService
         $incomingOptionIds = collect($data)->pluck('option_id')->toArray();
         
         // Delete options that are not in the incoming data
+
+        
         ProductOption::where('product_id', $this->productId)
             ->whereNotIn('option_id', $incomingOptionIds)
             ->each(function ($productOption) {
