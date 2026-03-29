@@ -15,7 +15,7 @@ class Bundel extends Model implements TranslatableContract
     public $translationForeignKey = 'bundel_id';
     public $translationModel = 'App\Models\Api\Ecommerce\BundelTranslation';
 
-    public function details()
+    public function bundelDetails()
     {
        return $this->hasMany(BundelDetails::class);
     }

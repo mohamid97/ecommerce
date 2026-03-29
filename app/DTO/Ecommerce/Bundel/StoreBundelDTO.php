@@ -5,15 +5,15 @@ class StoreBundelDTO{
 
         public function __construct(
             public float $price,
-            public int $category_id,
-            public int $brand_id,
+            public ?int $category_id,
+            public ?int $brand_id,
             public ?string $bundle_image = null,
-            public int $status,
+            public string $status,
             public array $title,
             public ?array $des = null,
             public ?array $meta_title = null,
             public ?array $meta_des = null,
-            public array $product,
+            public array $products,
 
         
     
@@ -27,12 +27,12 @@ class StoreBundelDTO{
             $data["category_id"]??null,
             $data["brand_id"]??null,
             $data["bundle_image"]??null,
-            $data["status"]??null,
+            $data["status"]??'active',
             $data["title"]??null,
             $data["des"]??null,
-            $data["meta_title"],
-            $data["meta_des"],
-            $data["product"],
+            $data["meta_title"]??null,
+            $data["meta_des"]??null,
+            $data["products"],
 
             
         );

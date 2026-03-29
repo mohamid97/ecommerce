@@ -17,9 +17,10 @@ class ValidateBundel{
                     if (empty($item['variant_ids'])) {
                         throw new \Exception("Product {$product->id} requires variant_ids");
                     }
+               ;
                     // need to check if product has varaint 
                     foreach($item['variant_ids'] as $variant_id){
-                        if(ProductVariant::where('product_id' , $product->id)->where('id' , $variant_id)->exists()){
+                        if(!ProductVariant::where('product_id' , $product->id)->where('id' , $variant_id)->exists()){
                             throw new \Exception("This Varaint Not Belong To This Product");
 
                         }

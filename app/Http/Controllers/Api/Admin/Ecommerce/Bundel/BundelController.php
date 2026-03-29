@@ -8,18 +8,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\StoreBundelRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\UpdateBundelRequest;
 use App\Http\Resources\Api\Admin\Bundel\BundeDetailsResource;
+use App\Models\Api\Ecommerce\Bundel;
 use App\Services\Admin\Ecommerce\Bundel\BundelService;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BundelController extends Controller
 {
+    use ResponseTrait;
+    public function __construct(private BundelService $service) {}
     public function storeBundel(StoreBundelRequest $request){
         try{
             DB::beginTransaction();
             $dto = StoreBundelDTO::fromRequest($request->all());
-            $service = app(BundelService::class);
-            $details = $service->storeBundel($dto); 
+            $details = $this->service->storeBundel($dto);
             DB::commit();
             return $this->success(new BundeDetailsResource($details) , __('main.stored_successfully' , ['model'=>'Bundel']));
 
@@ -34,8 +37,7 @@ class BundelController extends Controller
         try{
             DB::beginTransaction();
             $dto = UpdateBundelDTO::fromRequest($request->all());
-            $service = app(BundelService::class);
-            $details = $service->updateBundel($dto);
+            $details = $this->service->updateBundel($dto);
             DB::commit();
             return $this->success(new BundeDetailsResource($details) , __('main.updated_successfully' , ['model'=>'Bundel']));
 
@@ -51,8 +53,7 @@ class BundelController extends Controller
     public function deleteBundel(Request $request){
         try{
             DB::beginTransaction();
-            $service = app(BundelService::class);
-            $details = $service->deleteBundel($request->all());
+            $details = $this->service->deleteBundel($request->all());
             DB::commit();
             return $this->success(new BundeDetailsResource($details) , __('main.deleted_successfully' , ['model'=>'Bundel']));
 
@@ -63,7 +64,15 @@ class BundelController extends Controller
     } // delete bundel 
 
 
-    public function bundelDetails(){
+    public function bundelDetails(Request $request){
+        try{
+            $details = Bundel::with('bundelDetails')->findOrFail($request->bundel_id);
+            return $this->success(new BundeDetailsResource($details) , __('main.success') );
+
+        }catch(\Exception $e){
+            return $this->error($e->getMessage() , 500);
+        }
+
         
     }
 }

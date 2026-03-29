@@ -38,7 +38,7 @@ class RoleSeeder extends Seeder
         $managerRole = Role::firstOrCreate(['name' => 'manager' , 'guard_name' => 'sanctum']);
        
         
-        $models = ['user','productoption' , 'option','page','des','specification','certificate','faq','brand','applicant','branch', 'mediaimage', 'mediavideo','metasetting','ourteam','setting','offer' ,'product','coupon' ,'service' ,'role' , 'client' , 'event', 'feedback','achivement', 'ourwork','blog' ,'permission' ,'post', 'service' , 'lang' , 'slider' ,'message' ,'category' , 'about' , 'contact' , 'location' , 'maincontact' , 'social'];
+        $models = ['user','productoption','bundel' , 'option','page','des','specification','certificate','faq','brand','applicant','branch', 'mediaimage', 'mediavideo','metasetting','ourteam','setting','offer' ,'product','coupon' ,'service' ,'role' , 'client' , 'event', 'feedback','achivement', 'ourwork','blog' ,'permission' ,'post', 'service' , 'lang' , 'slider' ,'message' ,'category' , 'about' , 'contact' , 'location' , 'maincontact' , 'social'];
         $actions = ['view', 'create', 'update', 'delete'];
         foreach ($models as $model) {
             foreach ($actions as $action) {

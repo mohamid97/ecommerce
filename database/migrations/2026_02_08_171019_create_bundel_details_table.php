@@ -28,6 +28,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->json('variant_ids')->nullable();
+            $table->integer('quantity')->default(1);
             $table->timestamps();
 
         });

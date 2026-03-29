@@ -41,7 +41,7 @@ class StoreBundelAction{
             foreach($data->products as $item){
 
                 BundelDetails::create([
-                    'bundle_id'   => $bundel_id,
+                    'bundel_id'   => $bundel_id,
                     'product_id'  => $item['product_id'],
                     'quantity'    => $item['quantity'],
                     'variant_ids' => $item['variant_ids']??null,
