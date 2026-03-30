@@ -15,6 +15,10 @@ class BundelService {
         private UpdateBundelAction $update,
     ) {}
 
+    public function getBundels($request){
+
+    }
+
     public function storeBundel($data) {
         return $this->store->storeBundel($data);
     }

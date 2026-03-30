@@ -2,6 +2,7 @@
 
 namespace App\Models\Api\Ecommerce;
 
+use App\Models\Api\Admin\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,6 +27,11 @@ class BundelDetails extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'id', 'variant_ids');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 
 

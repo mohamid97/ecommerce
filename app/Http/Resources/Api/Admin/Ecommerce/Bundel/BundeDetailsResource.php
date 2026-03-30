@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\Admin\Bundel;
+namespace App\Http\Resources\Api\Admin\Ecommerce\Bundel;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -16,10 +16,15 @@ class BundeDetailsResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'price'=>$this->price,
-            'category_id'=>$this->category_id,
-            'brand_id'=>$this->brand_id,
-            'bundle_image'=>$this->bundle_image,
+            'bundel_price'=>$this->price,
+            'category'=>$this->whenLoaded('category', function () {
+                $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'category' , ['id']);
+
+            }),
+            'brand'=>$this->whenLoaded('brand', function () {
+                $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'brand' , ['id']);
+            }),
+            'bundle_price'=>$this->getImageUrl($this->bundle_image),
             'status'=>$this->status,
             'title'=>$this->getColumnLang('title'),
             'des'=>$this->getColumnLang('des'),
@@ -29,9 +34,9 @@ class BundeDetailsResource extends JsonResource
                 return $this->bundelDetails->map(function ($detail) {
                     return [
                         'id' => $detail->id,
-                        'product_id' => $detail->product_id,
+                        'product' => ['id'=>$detail->product->id  , 'title'=>$detail->product->title],
                         'quantity' => $detail->quantity,
-                        'variant_ids' => $detail->variant_ids,
+                        'varaints' => $detail->variants,
                     ];
                 });
             }),

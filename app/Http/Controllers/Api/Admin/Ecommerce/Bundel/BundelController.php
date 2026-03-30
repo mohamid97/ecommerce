@@ -7,7 +7,7 @@ use App\DTO\Ecommerce\Bundel\UpdateBundelDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\StoreBundelRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\UpdateBundelRequest;
-use App\Http\Resources\Api\Admin\Bundel\BundeDetailsResource;
+use App\Http\Resources\Api\Admin\Ecommerce\Bundel\BundeDetailsResource;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Services\Admin\Ecommerce\Bundel\BundelService;
 use App\Traits\ResponseTrait;
@@ -18,6 +18,18 @@ class BundelController extends Controller
 {
     use ResponseTrait;
     public function __construct(private BundelService $service) {}
+
+
+    public function getBundels(Request $request){
+        try{
+            $bundels = $this->service->getBundels($request->all());
+            return $this->success(BundelResource::collection($bundels) , __('main.success'));
+
+        }catch(\Exception $e){
+            return $this->error($e->getMessage() , 500);
+        }
+
+    }
     public function storeBundel(StoreBundelRequest $request){
         try{
             DB::beginTransaction();
