@@ -76,12 +76,12 @@ class UpdateProductService
         ProductShipement::where('product_id' , $productId)->update([
             'product_id'=>$productId,
             'variant_id'=>$data['variant_id']?? null,
-            'length'=>$data['length'],
-            'width'=>$data['width'],
-            'height'=>'height',
-            'weight'=>$data['weight'],
-            'min_estimated_delivery'=>$data['min_estimated_delivery'],
-            'max_estimated_delivery'=>$data['max_estimated_delivery']
+            'length'=>$data['length'] ?? null,
+            'width'=>$data['width'] ?? null,
+            'height'=>$data['height'] ?? null,
+            'weight'=>$data['weight'] ?? null,
+            'min_estimated_delivery'=>$data['min_estimated_delivery'] ?? null,
+            'max_estimated_delivery'=>$data['max_estimated_delivery'] ?? null
         ]);
     }
 }
