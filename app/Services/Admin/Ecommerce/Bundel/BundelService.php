@@ -16,6 +16,7 @@ class BundelService {
     ) {}
 
     public function getBundels($request){
+        return Bundel::with(['categoey' , 'brand'])->get();
 
     }
 

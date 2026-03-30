@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\StoreBundelRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\UpdateBundelRequest;
 use App\Http\Resources\Api\Admin\Ecommerce\Bundel\BundeDetailsResource;
+use App\Http\Resources\Api\Admin\Ecommerce\Bundel\BundelResource;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Services\Admin\Ecommerce\Bundel\BundelService;
 use App\Traits\ResponseTrait;
