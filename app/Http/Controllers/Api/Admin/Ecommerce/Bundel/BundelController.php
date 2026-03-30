@@ -78,8 +78,10 @@ class BundelController extends Controller
 
 
     public function bundelDetails(Request $request){
+      
         try{
-            $details = Bundel::with('bundelDetails')->findOrFail($request->bundel_id);
+              
+            $details = Bundel::with(['bundelDetails' , 'category' , 'brand'])->findOrFail($request->bundel_id);
             return $this->success(new BundeDetailsResource($details) , __('main.success') );
 
         }catch(\Exception $e){

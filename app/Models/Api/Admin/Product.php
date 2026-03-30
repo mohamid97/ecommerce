@@ -5,6 +5,7 @@ namespace App\Models\Api\Admin;
 use App\Models\Api\Ecommerce\NoOptionStock;
 use App\Models\Api\Ecommerce\ProductOption;
 use App\Models\Api\Ecommerce\ProductShipement;
+use App\Models\Api\Ecommerce\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -61,6 +62,11 @@ class Product extends Model implements TranslatableContract
         }
 
         return $this->noOption();
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
 

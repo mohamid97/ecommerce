@@ -9,6 +9,7 @@ use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\AllVarinatsRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\StoreVariantRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\UpdateVaraintRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\VariantCombinationRequest;
+use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\FilterProductVaraintResource;
 use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\ProductVaraintsResource;
 use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\VarinatDetailsResource;
 use App\Models\Api\Admin\Product;
@@ -184,6 +185,18 @@ private function generateCombinations(array $optionsArray)
 
    }
  } // end delete variant
+
+
+
+
+
+ public function filterProductaraints(Request $request){
+    $products = Product::with('variants')->whereHas('translation' , function($query) use ($request) {
+        $query->where('title', 'like', '%' . $request->search . '%');
+    })->get();
+    return $this->success( FilterProductVaraintResource::collection($products) , __('main.updated_successfully' , ['model' => 'Variant']));
+
+ }
 
 
 

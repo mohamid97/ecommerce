@@ -33,6 +33,12 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
 
+
+    // filter product with varaints
+    Route::post('filter-product-varaints' , 'VariantController@filterProductaraints')->middleware('checkPermision:view');
+
+
+
     
 
 

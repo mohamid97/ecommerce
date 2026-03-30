@@ -14,13 +14,16 @@ class UpdateBundelAction{
     ) {}
     public function updateBundel($data){
         $translation = app(TranslationService::class);
-        $bundel = Bundel::where('id' , $data->bundel_id)->update([
+        $bundel = Bundel::where('id', $data->bundel_id)->firstOrFail();
+
+        $bundel->update([
             'price' => $data->price,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
-            'bundle_image' => $this->uploadImage($data->bundle_image ,'bundel' , 'public'),
+            'bundle_image' => $this->uploadImage($data->bundle_image, 'bundel', 'public'),
             'status' => $data->status,
         ]);
+
         $translation->storeTranslations($bundel, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
         $this->validateBundel->validateBundelDetails($bundel->id, $data);
         $this->updateBundelDetails($bundel->id , $data);

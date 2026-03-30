@@ -16,7 +16,7 @@ class BundeDetailsResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'bundel_price'=>$this->price,
+            'bundel_price'=> (float) $this->price,
             'category'=>$this->whenLoaded('category', function () {
                 $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'category' , ['id']);
 
@@ -30,13 +30,24 @@ class BundeDetailsResource extends JsonResource
             'des'=>$this->getColumnLang('des'),
             'meta_title'=>$this->getColumnLang('meta_title'),
             'meta_des'=>$this->getColumnLang('meta_des'),
-            'products'=>$this->whenLoaded('bundelDetails', function () {
+            'bundle_details'=>$this->whenLoaded('bundelDetails', function () {
                 return $this->bundelDetails->map(function ($detail) {
                     return [
-                        'id' => $detail->id,
-                        'product' => ['id'=>$detail->product->id  , 'title'=>$detail->product->title],
-                        'quantity' => $detail->quantity,
-                        'varaints' => $detail->variants,
+                        // 'id' => $detail->id,
+                        'product' => [
+                            'id'=>$detail->product->id  ,
+                            'title'=>$detail->product->title,
+                            'product_varaints' => $detail->variants->map(function ($variant) {
+                                    return [
+                                        'id' => $variant->id,
+                                        'title' => $variant->title,
+                                        'full_name'=>$this->buildVariantName($variant)
+                                    ];
+                            }),
+                            'product_quantity' => $detail->quantity,
+
+                        ],
+
                     ];
                 });
             }),
@@ -44,5 +55,35 @@ class BundeDetailsResource extends JsonResource
             'updated_at'=>$this->updated_at->format('Y-m-d'),
             
         ];
+
+       
     }
+
+
+
+
+    protected function buildVariantName($variant)
+    {
+        return $variant->variants
+            ->map(function ($variantOptionValue) {
+
+                $optionTitle = optional(
+                    $variantOptionValue->optionValue?->option
+                )->title;
+
+                $valueTitle = $variantOptionValue->optionValue?->title;
+
+                if (!$optionTitle || !$valueTitle) {
+                    return null;
+                }
+
+                return $optionTitle . ' ' . $valueTitle;
+
+            })
+            ->filter()
+            ->implode(' ');
+    }
+
+
+
 }
