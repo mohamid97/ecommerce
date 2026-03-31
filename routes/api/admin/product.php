@@ -19,6 +19,8 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('update-variant','VariantController@updateVariant')->middleware('checkPermision:update');
     Route::post('/varints-product' , 'VariantController@varintsProduct')->middleware('checkPermision:view');
     Route::post('/view-variant' , 'VariantController@viewVariant')->name('checkPermision:view');
+    Route::post('/delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
+
 
 
 
@@ -47,3 +49,25 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

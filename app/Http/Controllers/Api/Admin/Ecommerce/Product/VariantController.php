@@ -174,7 +174,8 @@ private function generateCombinations(array $optionsArray)
 
  } // end update variant
 
- public function deleteVariant($id){
+ public function deleteVariant(Request $request){
+     $id = $request->id;
     try{
             $service = app(DeleteVaraintAction::class);
             $service->deleteVariant($id);
@@ -185,6 +186,8 @@ private function generateCombinations(array $optionsArray)
 
    }
  } // end delete variant
+
+
 
 
 

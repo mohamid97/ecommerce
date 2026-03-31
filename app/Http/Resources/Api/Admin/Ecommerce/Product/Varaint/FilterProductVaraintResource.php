@@ -21,14 +21,14 @@ class FilterProductVaraintResource extends JsonResource
             'title'=>$this->getColumnLang('title'),
             'slug'=>$this->getColumnLang('slug'),
             'sale_price'=>$this->sale_price,
-            'variants'=>[
+            'variants'=>
                 $this->whenLoaded('variants', function () {
                                 return $this->variants->map(function ($variant) {
                                     return $this->buildVariantName($variant);
 
                                 });
                 }),
-           ]
+           
         ];
     }
 
