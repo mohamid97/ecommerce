@@ -23,6 +23,14 @@ class VarinatDetailsResource extends JsonResource
             'discount_type' => $this->discount_type,
 
             'status' => $this->status,
+            'product'=>$this->whenLoaded('product' , function(){
+                return [
+                    'id'=>$this->product->id,
+                    'title'=>$this->product->title,
+                    'on_demand'=>$this->product->on_demand,
+                    'sale_price'=>(float)$this->product->sale_price,
+                ];
+            }),
             'shipmentDetails'=>[
                 'length' => (float)$this->length,
                 'width' => (float)$this->width,

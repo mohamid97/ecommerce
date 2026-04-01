@@ -23,6 +23,9 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
 
+    
+
+
 
 
     // general and special image for variant

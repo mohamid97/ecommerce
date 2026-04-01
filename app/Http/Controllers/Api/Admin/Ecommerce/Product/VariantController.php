@@ -30,7 +30,10 @@ class VariantController extends Controller
 
     // view varaint details data
     public function viewVariant(Request $request){
-        $variant = ProductVariant::with(['variants.optionValue.option' , 'varaintImages'])->findOrFail($request->variant_id);
+        if(!$request->id){
+            return $this->error(__('main.id_is_required') , 400);
+        }
+        $variant = ProductVariant::with(['variants.optionValue.option' , 'varaintImages' , 'product'])->findOrFail($request->id);
         return $this->success(new VarinatDetailsResource($variant)  , __('main.retreived_successfully' , ['model' => 'Variant']) );
 
 
@@ -38,9 +41,10 @@ class VariantController extends Controller
 
     // get all varaints of product 
     public function varintsProduct(AllVarinatsRequest $request){
-        $variants = ProductVariant::with('variants.optionValue.option')->where('product_id' , $request->product_id)->get();
+        $product = Product::findOrFail($request->product_id);
+        $variants = ProductVariant::with(['variants.optionValue.option'])->where('product_id' , $request->product_id)->get();
 
-        return $this->success( ProductVaraintsResource::collection($variants) , __('main.retreived_successfully' , ['model' => 'Variant'])  );
+        return $this->success( ['product'=>['id'=>$product->id,'title'=>$product->title,'on_demand'=>$product->on_demand , 'sale_price'=>(float)$product->sale_price] , 'variants'=>ProductVaraintsResource::collection($variants)] , __('main.retreived_successfully' , ['model' => 'Variant'])  );
         
 
     }

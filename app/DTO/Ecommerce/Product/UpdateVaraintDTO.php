@@ -4,7 +4,7 @@ namespace App\DTO\Ecommerce\Product;
 class UpdateVaraintDTO
 {
     public function __construct(
-        public int $variant_id,
+        public int $id,
         public string $sku,
         public float $sale_price,
         public int $stock,
@@ -31,7 +31,7 @@ class UpdateVaraintDTO
     public static function fromRequest(array $data): self
     {
         return new self(
-            $data['variant_id'],
+            $data['id'],
             $data['sku'],
             $data['sale_price'],
             $data['stock'],
