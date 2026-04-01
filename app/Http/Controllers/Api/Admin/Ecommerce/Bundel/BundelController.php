@@ -68,7 +68,7 @@ class BundelController extends Controller
             DB::beginTransaction();
             $details = $this->service->deleteBundel($request->all());
             DB::commit();
-            return $this->success(new BundeDetailsResource($details) , __('main.deleted_successfully' , ['model'=>'Bundel']));
+            return $this->success(null , __('main.deleted_successfully' , ['model'=>'Bundel']));
 
         }catch(\Exception $e){
             DB::rollBack();
@@ -80,8 +80,11 @@ class BundelController extends Controller
     public function bundelDetails(Request $request){
       
         try{
+            if(!$request->id){
+                return $this->error(__('main.id_is_required') , 400);
+            }
               
-            $details = Bundel::with(['bundelDetails' , 'category' , 'brand'])->findOrFail($request->bundel_id);
+            $details = Bundel::with(['bundelDetails' , 'category' , 'brand'])->findOrFail($request->id);
             return $this->success(new BundeDetailsResource($details) , __('main.success') );
 
         }catch(\Exception $e){

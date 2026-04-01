@@ -14,7 +14,7 @@ class UpdateBundelAction{
     ) {}
     public function updateBundel($data){
         $translation = app(TranslationService::class);
-        $bundel = Bundel::where('id', $data->bundel_id)->firstOrFail();
+        $bundel = Bundel::where('id', $data->id)->firstOrFail();
 
         $bundel->update([
             'price' => $data->price,

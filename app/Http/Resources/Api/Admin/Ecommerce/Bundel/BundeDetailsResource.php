@@ -16,7 +16,8 @@ class BundeDetailsResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'bundel_price'=> (float) $this->price,
+            'price'=> (float) $this->price,
+            'image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {
                 $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'category' , ['id']);
 

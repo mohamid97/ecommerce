@@ -29,8 +29,8 @@ class BundelService {
     }
 
     public function deleteBundel($data) {
-        if (Bundel::where('id', $data['bundel_id'])->exists()) {
-            Bundel::where('id', $data['bundel_id'])->delete();
+        if (Bundel::where('id', $data['id'])->exists()) {
+            Bundel::where('id', $data['id'])->delete();
             return true;
         }
         throw new Exception(__('main.not_found', ['model' => 'Bundel']));

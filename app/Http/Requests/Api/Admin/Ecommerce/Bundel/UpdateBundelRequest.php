@@ -26,7 +26,7 @@ class UpdateBundelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bundel_id'=>'required|exists:bundels,id',
+            'id'=>'required|exists:bundels,id',
             'price' => 'required|numeric',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',

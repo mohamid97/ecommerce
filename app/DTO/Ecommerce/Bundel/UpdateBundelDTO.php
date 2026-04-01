@@ -4,7 +4,7 @@ namespace App\DTO\Ecommerce\Bundel;
 class UpdateBundelDTO{
 
         public function __construct(
-            public int $bundel_id,
+            public int $id,
             public float $price,
             public ?int $category_id,
             public ?int $brand_id,
@@ -24,7 +24,7 @@ class UpdateBundelDTO{
     {
 
         return new self(
-            $data['bundel_id'],
+            $data['id'],
             $data["price"],
             $data["category_id"]??null,
             $data["brand_id"]??null,
