@@ -4,6 +4,12 @@ use Illuminate\Support\Facades\Route;
 // add stock for no vairant product
 Route::namespace('Ecommerce\Product')->group(function () {
 
+
+    // products 
+    Route::post('/make-featured' , 'ProductController@makeFeatured')->middleware('checkPermision:update');
+    Route::post('/update-product-varaint-status' , 'ProductController@updateStatusProductOrVaraint')->middleware('checkPermision:update');
+    Route::post('/store-related-products' , 'ProductController@storeRelatedProduct')->name('checkPermision:update');
+    Route::post('/filter-product' , 'ProductController@filterProduct')->name('checkPermision:view');
     // stocks
     Route::post('update-batch-status' , 'StockController@updateStatus')->middleware('checkPermision:update');
     Route::post('delete-batch' , 'StockController@deleteBatch')->middleware('checkPermision:delete');
@@ -18,8 +24,9 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('store-variant' , 'VariantController@storeVariant')->middleware('checkPermision:create');
     Route::post('update-variant','VariantController@updateVariant')->middleware('checkPermision:update');
     Route::post('/varints-product' , 'VariantController@varintsProduct')->middleware('checkPermision:view');
-    Route::post('/view-variant' , 'VariantController@viewVariant')->name('checkPermision:view');
+    Route::post('/view-variant' , 'VariantController@viewVariant')->middleware('checkPermision:view');
     Route::post('/delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
+    Route::post('/make-default' , 'VariantController@makeDefault')->middleware('checkPermision:update');
 
 
 

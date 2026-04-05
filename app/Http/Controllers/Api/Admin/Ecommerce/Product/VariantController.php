@@ -206,6 +206,35 @@ private function generateCombinations(array $optionsArray)
  }
 
 
+    public function makeDefault(Request $request)
+    {
+        if ($request->variant_id) {
+            $variant = ProductVariant::find($request->variant_id);
+
+            if (!$variant) {
+                return $this->error(__('main.model_not_found_id', ['model'=>'Variant' , 'id'=>$request->variant_id ]));
+            }
+
+            ProductVariant::where('product_id', $variant->product_id)
+                ->where('is_default', true)
+                ->update(['is_default' => false]);
+
+            $variant->update(['is_default' => true]);
+
+            return $this->success(__('main.updated_successfully'));
+        }
+
+        return $this->error(__('main.no_id'));
+    }
+
+
+
+    
+
+
+
+
+
 
 
 }

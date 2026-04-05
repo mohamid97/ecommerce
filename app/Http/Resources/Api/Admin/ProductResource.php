@@ -55,6 +55,7 @@ class ProductResource extends JsonResource
         'has_options'=>$this->has_options ? true :false,
         'status'=>$this->status,
         'on_demand'=>$this->on_demand ? true :false,
+        'is_featured'=> (bool) $this->is_featured,
         'created_at' => $this->created_at?->format('Y-m-d'),
         'updated_at' => $this->updated_at?->format('Y-m-d'),
     

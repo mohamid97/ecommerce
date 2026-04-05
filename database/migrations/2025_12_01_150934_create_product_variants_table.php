@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('sku')->unique()->nullable();
             $table->string('barcode')->unique()->nullable();
             $table->decimal('sale_price', 10, 2)->nullable();
-            $table->enum('status', ['published', 'pending'])->default('published');
+            $table->enum('status', ['active', 'draft','unavailable'])->default('active');
             $table->integer('stock')->default(0)->nullable();
             $table->decimal('discount_value', 10, 2)->nullable();
             $table->enum('discount_type', ['fixed', 'percentage'])->nullable();
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('delivery_time')->default(0)->nullable();
             $table->integer('max_time')->default(0)->nullable();
             $table->json('images')->nullable();
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
     }

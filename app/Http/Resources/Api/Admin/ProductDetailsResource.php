@@ -89,6 +89,8 @@ class ProductDetailsResource extends JsonResource
                         'max_estimated_delivery'=>(float) $this->shipmentDetails->max_estimated_delivery,
                     ];
             }),
+            'is_featured'=> (bool) $this->is_featured,
+
 
             'created_at' => $this->created_at?->format('Y-m-d'),
             'updated_at' => $this->updated_at?->format('Y-m-d'),

@@ -46,7 +46,7 @@ class ProductUpdateRequest extends FormRequest
             'images'=>'nullable|array',
             'images.*'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'breadcrumb'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
-            'status'=>'nullable|in:published,pending',
+            'status'=>'nullable|in:active,draft,unavailable',
             'has_options'  => 'required|boolean',
             'on_demand'    => 'nullable|boolean',
             'category_id'=>'nullable|exists:categories,id',

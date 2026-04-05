@@ -54,6 +54,8 @@ class StoreVariantRequest extends FormRequest
             'weight'=>'nullable|numeric|min:0',
             'delivery_time'=>'nullable|integer|min:0',
             'max_time'=>'nullable|integer|min:0',
+             'status'=>'nullable|in:active,draft,unavailable'
+
 
         ];
     }

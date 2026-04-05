@@ -36,7 +36,7 @@ class VarinatDetailsResource extends JsonResource
                 'width' => (float)$this->width,
                 'height' => (float)$this->height,
                 'weight' => (float)$this->weight,
-                'min_estimated_delivery' => $this->delivery_time,
+                'min_estimated_delivery' => $this->delivery_time,  
                 'max_estimated_delivery' => $this->max_time,
             ],
             'title'=>$this->getColumnLang('title'),
@@ -55,6 +55,7 @@ class VarinatDetailsResource extends JsonResource
             'variant_full_name' => $this->whenLoaded('variants', function () {
                     return $this->buildVariantName();
              }),
+             'is_default'=>(bool) $this->isDefault,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];

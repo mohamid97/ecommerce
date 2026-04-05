@@ -25,9 +25,11 @@ return new class extends Migration
             $table->decimal('discount', 10, 2)->nullable();
             $table->enum('discount_type' , ['fixed' , 'percentage'])->nullable();
             $table->boolean('has_options')->default(false);
-            $table->enum('status' , ['published' , 'pending'])->default('published');
+            $table->enum('status' , ['active', 'draft','unavailable'])->default('active');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
+            $table->boolean('is_featured')->default(false);
+            $table->json('related_products')->nullable();
 
             $table->timestamps();
         });
