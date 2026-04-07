@@ -178,6 +178,14 @@ class ModelRequestFactory
                 'store' => \App\Http\Requests\Api\Admin\Ecommerce\Option\OptionStoreRequest::class,
                 'update' => \App\Http\Requests\Api\Admin\Ecommerce\Option\OptionUpdateRequest::class,
             ],
+            'zone'=>[
+                'store'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\ZoneStoreRequest::class,
+                'update'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\ZoneUpdateRequest::class,
+            ],
+            'city'=>[
+                'store'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\CityStoreRequest::class,
+                'update'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\CityUpdateRequest::class,
+            ]
 
 
         ];

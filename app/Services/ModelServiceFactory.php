@@ -39,6 +39,8 @@ class ModelServiceFactory
         'page'=> \App\Services\Admin\Page\PageService::class,
         'des'=> \App\Services\Admin\Des\DesService::class,
         'option'=> \App\Services\Admin\Ecommerce\Option\OptionService::class,
+        'zone'=>\App\Services\Admin\Ecommerce\Shipment\ZoneService::class,
+        'city'=>\App\Services\Admin\Ecommerce\Shipment\CityService::class,
       
     ];
 
