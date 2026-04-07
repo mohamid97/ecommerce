@@ -14,7 +14,7 @@ class ProductVariant extends Model implements TranslatableContract
     public $translatedAttributes = ['title' , 'slug' , 'des' , 'meta_title' , 'meta_des'];
     public $translationForeignKey = 'product_variant_id';
     public $translationModel = 'App\Models\Api\Ecommerce\ProductVariantTranslation';
-    protected $fillable = ['product_id','isDefault', 'sku' , 'barcode'  , 'status' , 'stock' , 'sale_price' , 'discount_value' , 'discount_type' , 'length' , 'width' , 'height' , 'weight' , 'delivery_time' , 'max_time' , 'images'];
+    protected $fillable = ['product_id','is_default', 'sku' , 'barcode'  , 'status' , 'stock' , 'sale_price' , 'discount_value' , 'discount_type' , 'length' , 'width' , 'height' , 'weight' , 'delivery_time' , 'max_time' , 'images'];
     protected $casts = [
         'sale_price' => 'float',
         'discount_value' => 'float',
