@@ -90,7 +90,7 @@ public function filterProduct(Request $request)
             return $this->error(__('main.not_founded') , 404);
         }
 
-        return $this->success(__('main.data_retrieved'), $products);
+        return $this->success($products , __('main.data_retrieved'));
     }
 
     return $this->error(__('main.not_founded') ,404);
