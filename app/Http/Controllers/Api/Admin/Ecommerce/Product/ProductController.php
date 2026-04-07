@@ -21,6 +21,8 @@ class ProductController extends Controller
                 return $this->error(__('main.model_not_found_id', ['model'=>'Product' , 'id'=>$request->id ]));
             }
 
+
+
                $product->update(['is_featured' => !$product->is_featured]);
 
                return $this->success(__('main.updated_successfully'));
