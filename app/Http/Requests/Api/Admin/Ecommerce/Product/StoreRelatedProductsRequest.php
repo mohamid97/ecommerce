@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Api\Admin\Ecommerce\Product;
 
+use App\Traits\ResponseTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreRelatedProductsRequest extends FormRequest
 {
@@ -26,5 +29,16 @@ class StoreRelatedProductsRequest extends FormRequest
            'related_products'=>'required|array',
            'related_products.*'=>'required|exists:products,id'
         ];
+    }
+
+        protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            $this->error(
+                $validator->errors()->first(), 
+                422, 
+                
+            )
+        );
     }
 }

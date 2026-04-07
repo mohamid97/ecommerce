@@ -13,7 +13,7 @@ class ProductService extends BaseModelService
 {
     use StoreMultiLang , HandlesImage;
     protected string $modelClass = Product::class;
-    protected array  $relations  = ['category' , 'shipmentDetails' , 'options.option','options.values.optionValue','category','brand'];
+    protected array  $relations  = ['category' , 'shipmentDetails' , 'related' , 'options.option','options.values.optionValue','category','brand'];
 
     public function all($request){      
        

@@ -14,7 +14,7 @@ use Astrotomic\Translatable\Translatable;
 class Product extends Model implements TranslatableContract
 {
     use HasFactory,Translatable;
-    protected $fillable = ['product_image','sku','related_products','is_featured' , 'barcode','stock','sale_price','discount','discount_type','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id'];
+    protected $fillable = ['product_image','sku','is_featured' , 'barcode','stock','sale_price','discount','discount_type','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id'];
     public $translatedAttributes = ['title' , 'slug' , 'small_des' ,'des' , 'meta_title' , 'meta_des' , 'alt_image', 'title_image'];
     public $translationForeignKey = 'product_id';
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';
@@ -26,7 +26,7 @@ class Product extends Model implements TranslatableContract
         'on_demand' => 'boolean',
         'sale_price' => 'decimal:2',
         'isFeatured'=>'boolean',
-        'related_products'=>'array'
+
 
     ];
 
@@ -73,9 +73,21 @@ class Product extends Model implements TranslatableContract
 
 
 
-    public function relatedProducts(){
-        return $this->hasMany(Product::class , 'related_products');
+    public function related()
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'related_products',
+            'product_id',
+            'related_product_id'
+        );
     }
+
+
+
+
+
+
 
 
     

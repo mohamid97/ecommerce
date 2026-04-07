@@ -14,6 +14,10 @@ class ProductDetailsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+     
+    
+     
         return [      
             'id' => $this->id,
             'title' => $this->getColumnLang('title'),
@@ -90,6 +94,18 @@ class ProductDetailsResource extends JsonResource
                     ];
             }),
             'is_featured'=> (bool) $this->is_featured,
+            'related_products'=>$this->whenLoaded('related' , function(){
+                return $this->related->map(function ($related) {
+                    return[
+                          'id'=>$related->id,
+                          'title'=>$related->title,
+                    ];
+
+                    
+
+                });
+
+            }),
 
 
             'created_at' => $this->created_at?->format('Y-m-d'),

@@ -48,6 +48,7 @@ abstract class BaseModelService
     }
 
     public function view($id){
+      
       if(is_array($this->relations) && !empty($this->relations)){
         return $this->modelClass::with($this->relations)->find($id);
       }

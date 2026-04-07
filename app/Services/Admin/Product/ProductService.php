@@ -13,11 +13,13 @@ class ProductService extends BaseModelService
     protected array $relations = ['category' , 'brand'];
 
     public function all($request){
+
         $product = parent::all($request);
         return $product;
     }
 
     public function view($id){
+
         $productDetails = parent::view($id);
         return $productDetails;
     }

@@ -21,8 +21,6 @@ class ProductController extends Controller
                 return $this->error(__('main.model_not_found_id', ['model'=>'Product' , 'id'=>$request->id ]));
             }
 
-
-
                $product->update(['is_featured' => !$product->is_featured]);
 
                return $this->success(__('main.updated_successfully'));
@@ -58,7 +56,9 @@ class ProductController extends Controller
     public function storeRelatedProduct(StoreRelatedProductsRequest $request){
         try{
             $product = Product::findOrFail($request->id);
-            $product->update(['related_products' , $request->related_products]);
+            if (!empty($request->related_products)) {
+                $product->related()->sync($request->related_products);
+            }
             return $this->success(__('main.updated_successfully'));
 
         }catch(\Exception $e){
