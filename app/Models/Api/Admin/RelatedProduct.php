@@ -13,10 +13,15 @@ class RelatedProduct extends Model
     {
         return $this->belongsToMany(
             Product::class,
-            'product_related',
+            'related_products',
             'related_product_id',
             'product_id'
         );
     }
+
+        public function product(){
+        return $this->belongsTo(Product::class , 'related_product_id');
+    }
+    
 
 }

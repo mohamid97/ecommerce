@@ -9,7 +9,9 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('/make-featured' , 'ProductController@makeFeatured')->middleware('checkPermision:update');
     Route::post('/update-product-varaint-status' , 'ProductController@updateStatusProductOrVaraint')->middleware('checkPermision:update');
     Route::post('/store-related-products' , 'ProductController@storeRelatedProduct')->name('checkPermision:update');
+    Route::post('/related-products' , 'ProductController@relatedProducts')->name('checkPermision:view');
     Route::post('/filter-product' , 'ProductController@filterProduct')->name('checkPermision:view');
+    
     // stocks
     Route::post('update-batch-status' , 'StockController@updateStatus')->middleware('checkPermision:update');
     Route::post('delete-batch' , 'StockController@deleteBatch')->middleware('checkPermision:delete');

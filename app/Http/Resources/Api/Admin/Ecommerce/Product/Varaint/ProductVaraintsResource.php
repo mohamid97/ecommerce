@@ -21,7 +21,7 @@ class ProductVaraintsResource extends JsonResource
             'sale_price'=>$this->sale_price,
             'stock'=>$this->stock,
             'status'=>$this->status,
-            'is_default'=>(bool) $this->isDefault,
+            'is_default'=>(bool) $this->is_default,
             'option' => $this->variants
                     ->map(function ($variant) {
                         return $variant->optionValue->option->title . ' ' . $variant->optionValue->title;

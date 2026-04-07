@@ -55,7 +55,7 @@ class VarinatDetailsResource extends JsonResource
             'variant_full_name' => $this->whenLoaded('variants', function () {
                     return $this->buildVariantName();
              }),
-             'is_default'=>(bool) $this->isDefault,
+             'is_default'=>(bool) $this->is_default,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];

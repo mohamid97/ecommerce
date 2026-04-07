@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\StoreRelatedProductsRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductVaraintStatusRequest;
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Admin\RelatedProduct;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -94,6 +95,29 @@ public function filterProduct(Request $request)
 
     return $this->error(__('main.not_founded') ,404);
 }
+
+
+public function relatedProducts(Request $request)
+{
+    if ($request->id) {
+
+        $related = RelatedProduct::with('product') // load only id
+            ->where('product_id', $request->id)
+            ->get()
+            ->map(function ($item) {
+
+                return [
+                    'id' => $item?->product?->id,
+                    'title' => $item?->product?->title, // translatable
+                ];
+            });
+
+return $this->success($related, __('main.data_retrieved'));
+    }
+
+    return $this->error(__('main.not_founded'), 404);
+}
+
 
 
 
