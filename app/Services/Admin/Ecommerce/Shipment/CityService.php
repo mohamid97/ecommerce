@@ -10,7 +10,7 @@ class CityService extends BaseModelService{
     protected string $modelClass = ShipmentCity::class;
 
     public function all($request){
-        $city = ($this->data['zone_id']) ? ShipmentCity::where('zone_id' , $this->data['zone_id'])->get():  parent::all($request);
+        $city = isset($this->data['zone_id']) ? ShipmentCity::where('zone_id' , $this->data['zone_id'])->get():  parent::all($request);
         return $city;
     }
 
