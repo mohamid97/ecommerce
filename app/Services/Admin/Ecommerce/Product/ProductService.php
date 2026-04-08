@@ -59,6 +59,12 @@ class ProductService extends BaseModelService
 
     
     public function update($id ){
+
+        $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+
+
+
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $product = parent::update($id , $this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'sale_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
