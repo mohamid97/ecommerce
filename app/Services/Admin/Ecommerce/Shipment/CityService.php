@@ -17,7 +17,7 @@ class CityService extends BaseModelService{
     public function view($id){
         $cityDetails = parent::view($id);
         return $cityDetails;
-    }
+    } 
 
     public function store()
     {
