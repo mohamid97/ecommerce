@@ -37,7 +37,7 @@ class UpdatePromotionDTO
             $data['end_date'],
             $data['status'],
             $data['is_coupon'],
-            $data['coupon_code'],
+            $data['coupon_code']?? null,
             $data['coupon_limit'] ?? null,
             $data['type'],
             $data['type_value'],
