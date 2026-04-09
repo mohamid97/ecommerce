@@ -27,7 +27,7 @@ class StorePromotionAction
             'image' => $data->image ?? null,
             'categories' => $data->categories ?? null,
             'product_id' => $data->product_id ?? null,
-            'brand_id' => $data->brand_id ?? null,
+            'brands' => $data->brands ?? [],
             'customer_group' => $data->customer_group ?? 'all',
             'discount' => (float)($data->discount ?? null),
             'max_amount_discount' => (float)($data->max_amount_discount ?? null)  ,

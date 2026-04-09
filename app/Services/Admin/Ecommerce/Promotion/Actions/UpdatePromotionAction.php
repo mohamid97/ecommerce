@@ -25,14 +25,12 @@ class UpdatePromotionAction
             'location' => $data->location,
             'target' => $data->target,
             'image' => $data->image ?? null,
-            'categories' => $data->categories ?? null,
             'product_id' => $data->product_id ?? null,
             'brand_id' => $data->brand_id ?? null,
             'discount' => $data->discount ?? null,
             'max_amount_discount' => $data->max_amount_discount ?? null,
-            'product_id' => $data->product_id ?? null,
-            'brand_id' => $data->brand_id ?? null,
-            'category_id' => $data->category_id ?? null,
+            'brands' => $data->brands ?? [],
+            'categories' => $data->categories ?? [],
         ]);
 
         $this->translation->updateTranslations($promotion, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
