@@ -29,8 +29,10 @@ class StorePromotionAction
             'product_id' => $data->product_id ?? null,
             'brands' => $data->brands ?? [],
             'customer_group' => $data->customer_group ?? 'all',
-            'discount' => (float)($data->discount ?? null),
-            'max_amount_discount' => (float)($data->max_amount_discount ?? null)  ,
+            'discount' => $data->discount ?? null,
+            'max_amount_discount' => $data->max_amount_discount ?? null ,
+            'bundle_id' => $data->bundle_id ?? null,
+            'customer_group' => $data->customer_group ?? 'all',
         ]);
 
         $this->translation->storeTranslations($promotion, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
