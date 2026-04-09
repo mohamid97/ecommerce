@@ -45,7 +45,7 @@ class UpdatePromotionRequest extends FormRequest
             'target' => 'required|in:global,category,product,brand,order',
             'location' => 'required|in:hero,offers_section,pop_up,header_alert',
             'image' => 'nullable|image|mimes:jpeg,png,webp,gif,svg|max:2048',
-            'discount' => 'nullable|numeric|min:0',
+            'discount' => 'required|numeric|min:0',
             'max_amount_discount' => 'nullable|numeric|min:0',
             'title' => 'required|array',
             'title.*' => 'required|string|max:255',
