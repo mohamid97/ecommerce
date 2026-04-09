@@ -24,7 +24,7 @@ class StorePromotionDTO
         public ?array $meta_title,
         public ?array $meta_des,
         public ?string $customer_group = 'all',
-        public ?int $bundle_id = null
+        public ?int $bundel_id = null
 
     ) {}
     public static function fromRequest(array $data): self
@@ -50,7 +50,7 @@ class StorePromotionDTO
             $data['meta_title'] ?? null,
             $data['meta_des'] ?? null,
             $data['customer_group'] ?? 'all',
-            $data['bundle_id'] ?? null
+            $data['bundel_id'] ?? null
 
         );
     }

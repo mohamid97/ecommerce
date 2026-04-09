@@ -15,25 +15,23 @@ return new class extends Migration
             $table->id();
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('status' , ['active' , 'draft' , 'unavailable'])->default('active');
+            $table->enum('status', ['active', 'draft', 'unavailable'])->default('active');
             $table->boolean('is_coupon')->default(false);
             $table->string('coupon_code')->nullable();
             $table->enum('type',['percent','fixed' , 'bundle' , 'bulk' ,'buy-x-get-y'])->default('percent');
             $table->enum('location',['hero','offers_section','pop_up','header_alert'])->default('hero');
             $table->enum('target',['global','category','product','brand','order'])->default('global');
             $table->string('image')->nullable();
-            $table->json('categories')->nullable();
             $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('bundel_id')->nullable();
             $table->json('brands')->nullable();
             $table->foreign('bundel_id')->references('id')->on('bundels')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->decimal('discount', 10, 2)->default(0);
-            $table->decimal('max_amount_discount', 10, 2)->nullable(); 
+            $table->decimal('max_amount_discount', 10, 2)->nullable();
             $table->integer('coupon_limit')->nullable();
-            $table->enum('customer_group' , ['all', 'new_user', 'registered'])->default('all');     
+            $table->enum('customer_group', ['all', 'new_user', 'registered'])->default('all');
             $table->timestamps();
-            
         });
     }
 

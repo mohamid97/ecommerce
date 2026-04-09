@@ -59,7 +59,7 @@ class StorePromotionRequest extends FormRequest
             'customer_group' => 'nullable|in:all,new_user,registered',
             'categories' => 'nullable|array',
             'categories.*' => 'nullable|integer|exists:categories,id',
-            'bundle_id' => 'nullable|integer|exists:bundles,id',
+            'bundel_id' => 'nullable|integer|exists:bundles,id',
             'product_id' => 'nullable|integer|exists:products,id',
             'brands' => 'nullable|array',
             'brands.*' => 'nullable|integer|exists:brands,id',

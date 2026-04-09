@@ -55,7 +55,7 @@ class UpdatePromotionRequest extends FormRequest
             'meta_title.*' => 'nullable|string|max:255',
             'meta_des' => 'nullable|array',
             'meta_des.*' => 'nullable|string|max:255',
-            'bundle_id' => 'nullable|integer|exists:bundles,id',
+            'bundel_id' => 'nullable|integer|exists:bundles,id',
             'product_id' => 'nullable|integer|exists:products,id',
             'brands' => 'nullable|array',
             'brands.*' => 'nullable|integer|exists:brands,id',
