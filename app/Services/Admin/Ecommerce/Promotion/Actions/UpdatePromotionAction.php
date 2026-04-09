@@ -10,29 +10,29 @@ class UpdatePromotionAction
         private readonly TranslationService $translation,
     ) {}
 
-    public function execute(array $data)
+    public function execute( $data)
     {
         $promotion = Promotion::findOrFail($data['id']);
+        $data->is_coupon =  filter_var($data->is_coupon, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)? 1 : 0;
         $promotion->update([
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'status' => $data['status'],
-            'is_coupon' => $data['is_coupon'],
-            'coupon_code' => $data['coupon_code'],
-            'coupon_limit' => $data['coupon_limit'],
-            'type' => $data['type'],
-            'type_value' => $data['type_value'],
-            'location' => $data['location'],
-            'target' => $data['target'],
-            'image' => $data['image'] ?? null,
-            'categories' => $data['categories'] ?? null,
-            'product_id' => $data['product_id'] ?? null,
-            'brand_id' => $data['brand_id'] ?? null,
-            'discount' => $data['discount'] ?? null,
-            'max_amount_discount' => $data['max_amount_discount'] ?? null,
-            'product_id' => $data['product_id'] ?? null,
-            'brand_id' => $data['brand_id'] ?? null,
-            'category_id' => $data['category_id'] ?? null,
+            'start_date' => $data->start_date,
+            'end_date' => $data->end_date,
+            'status' => $data->status,
+            'is_coupon' => $data->is_coupon,
+            'coupon_code' => $data->coupon_code,
+            'coupon_limit' => $data->coupon_limit,
+            'type' => $data->type,
+            'location' => $data->location,
+            'target' => $data->target,
+            'image' => $data->image ?? null,
+            'categories' => $data->categories ?? null,
+            'product_id' => $data->product_id ?? null,
+            'brand_id' => $data->brand_id ?? null,
+            'discount' => $data->discount ?? null,
+            'max_amount_discount' => $data->max_amount_discount ?? null,
+            'product_id' => $data->product_id ?? null,
+            'brand_id' => $data->brand_id ?? null,
+            'category_id' => $data->category_id ?? null,
         ]);
 
         $this->translation->updateTranslations($promotion, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);

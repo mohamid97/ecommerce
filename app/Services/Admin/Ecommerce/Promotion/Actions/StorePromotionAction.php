@@ -12,6 +12,8 @@ class StorePromotionAction
 
     public function execute( $data)
     {
+
+       $data->is_coupon =  filter_var($data->is_coupon, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)? 1 : 0;
         $promotion = Promotion::create([
             'start_date' => $data->start_date,
             'end_date' => $data->end_date,
