@@ -24,8 +24,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->json('categories')->nullable();
             $table->unsignedBigInteger('product_id')->nullable();
-            $table->unsignedBigInteger('brand_id')->nullable();
-            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade');
+            $table->json('brands')->nullable();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('max_amount_discount', 10, 2)->nullable(); 

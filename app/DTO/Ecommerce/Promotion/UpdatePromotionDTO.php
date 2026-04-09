@@ -12,13 +12,12 @@ class UpdatePromotionDTO
         public ?string $coupon_code,
         public ?int $coupon_limit,
         public string $type,
-        public float $type_value,
         public string $location,
         public string $target,
         public ?string $image,
         public ?array $categories,
         public ?int $product_id,
-        public ?int $brand_id,
+        public ?array $brands,
         public ?float $discount,
         public ?float $max_amount_discount,
         public array $title,
@@ -39,14 +38,13 @@ class UpdatePromotionDTO
             $data['is_coupon']??false,
             $data['coupon_code']?? null,
             $data['coupon_limit'] ?? null,
-            $data['type'],
-            $data['type_value'],
+            $data['type'] ??'fixed',
             $data['location'],
-            $data['target'],
+            $data['target']??'hero',
             $data['image'] ?? null,
             $data['categories'],
-            $data['product_id'],
-            $data['brand_id'],
+            $data['product_id']?? null,
+            $data['brands'] ?? [],
             $data['discount'] ?? null,
             $data['max_amount_discount'] ?? null,
             $data['title'],
@@ -57,4 +55,5 @@ class UpdatePromotionDTO
 
         );
     }
+    
 }

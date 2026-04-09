@@ -27,7 +27,7 @@ class Promotion extends Model implements TranslatableContract
         'discount',
         'max_amount_discount',
         'product_id',
-        'brand_id',
+        'brands',
         'categories',
         'customer_group'
         
@@ -35,7 +35,7 @@ class Promotion extends Model implements TranslatableContract
     public $translatedAttributes = ['title' , 'des'];
     public $translationForeignKey = 'promotion_id';
     public $translationModel = 'App\Models\Api\Ecommerce\PromotionTranslation';
-    public $casts = ['categories' => 'array'];
+    public $casts = ['categories' => 'array' , 'brands' => 'array' , 'discount' => 'float' , 'max_amount_discount' => 'float'];
 
     public function categories()
     {
@@ -45,8 +45,8 @@ class Promotion extends Model implements TranslatableContract
     {
         return $this->belongsTo(Product::class);
     }
-    public function brand(){
-        return $this->belongsTo(Brand::class);
+    public function brands(){
+        return $this->belongsToMany(Brand::class, 'promotion_brand', 'promotion_id', 'brand_id');
     }
 
     
