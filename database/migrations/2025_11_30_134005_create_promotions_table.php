@@ -15,11 +15,10 @@ return new class extends Migration
             $table->id();
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('status' , ['active' , 'inactive'])->default('active');
+            $table->enum('status' , ['active' , 'draft' , 'unavailable'])->default('active');
             $table->boolean('is_coupon')->default(false);
             $table->string('coupon_code')->nullable();
             $table->enum('type',['percent','fixed' , 'bundle' , 'bulk' ,'buy-x-get-y'])->default('percent');
-            $table->decimal('type_value', 10, 2)->default(0);
             $table->enum('location',['hero','offers_section','pop_up','header_alert'])->default('hero');
             $table->enum('target',['global','category','product','brand','order'])->default('global');
             $table->string('image')->nullable();

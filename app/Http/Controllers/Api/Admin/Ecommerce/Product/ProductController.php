@@ -10,6 +10,7 @@ use App\Models\Api\Admin\RelatedProduct;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -56,13 +57,16 @@ class ProductController extends Controller
 
     public function storeRelatedProduct(StoreRelatedProductsRequest $request){
         try{
+            DB::beginTransaction();
             $product = Product::findOrFail($request->id);
             if (!empty($request->related_products)) {
                 $product->related()->sync($request->related_products);
             }
+            DB::commit();
             return $this->success(__('main.updated_successfully'));
 
         }catch(\Exception $e){
+            DB::rollBack();
           return $this->error($e->getMessage(), 500);
         }
 

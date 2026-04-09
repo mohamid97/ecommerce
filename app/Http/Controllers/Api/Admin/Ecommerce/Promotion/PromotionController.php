@@ -11,18 +11,20 @@ use App\Http\Resources\Api\Admin\Promotion\PromotionDetailsResource;
 use App\Http\Resources\Api\Admin\Promotion\PromotionsResource;
 use App\Models\Api\Ecommerce\Promotion;
 use App\Services\Admin\Ecommerce\Promotion\PromotionService;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PromotionController extends Controller
 {
+    use ResponseTrait;
 
     public function __construct(
         private readonly PromotionService $promotionService,
     ) {}
 
 
-    public function index(){
+    public function getPromotions(){
         return $this->success(PromotionsResource::collection(Promotion::all()) , __('main.retrieved_successfully' , ['model'=>'Promotions']));
     }
     // Store Promotion
@@ -64,14 +66,21 @@ class PromotionController extends Controller
     {
         try{
             DB::beginTransaction();
-            $details = $this->promotionService->deletePromotion($request->all());
+            $details = $this->promotionService->deletePromotion($request->only('id'));
             DB::commit();
-            return $this->success(new PromotionDetailsResource($details) ,  __('main.deleted_successfully' , ['model'=>'Promotion']));
+            return $this->success(null ,  __('main.deleted_successfully' , ['model'=>'Promotion']));
         }catch(\Exception $e){
             DB::rollBack();
             return $this->error($e->getMessage() , 500);
         }
     } //end delete promotion
+
+
+    public function promotionDetails(Request $request)
+    {
+        $promotion = Promotion::findOrFail($request->id);
+        return $this->success(new PromotionDetailsResource($promotion) ,  __('main.retrieved_successfully' , ['model'=>'Promotion Details']));
+    } //end promotion details   
 
 
 

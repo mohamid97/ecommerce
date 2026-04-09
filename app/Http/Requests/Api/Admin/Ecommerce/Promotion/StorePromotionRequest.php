@@ -18,6 +18,16 @@ class StorePromotionRequest extends FormRequest
         return true;
     }
 
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_coupon' => filter_var($this->is_coupon, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            // 'on_demand'   => filter_var($this->on_demand, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+        ]);
+        
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -28,7 +38,7 @@ class StorePromotionRequest extends FormRequest
         return [
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:active,draft,unavailable',
             'is_coupon' => 'required|boolean',
             'coupon_code' => 'nullable|string|unique:promotions,coupon_code',
             'coupon_limit' => 'nullable|integer|min:1|max:1000',
@@ -47,6 +57,8 @@ class StorePromotionRequest extends FormRequest
             'meta_des' => 'nullable|array',
             'meta_des.*' => 'nullable|string|max:255',
             'customer_group' => 'nullable|in:all,new_user,registered',
+            'categories' => 'nullable|array',
+            'categories.*' => 'nullable|integer|exists:categories,id',
         ];
     }
 

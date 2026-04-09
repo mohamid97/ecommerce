@@ -23,10 +23,16 @@ class PromotionService
     {
        return $this->updatePromotionAction->execute($data);
     }
-    public function deletePromotion($id)
+    public function deletePromotion($request)
     {
+   
+        if(!$request['id']) {
+            throw new \Exception(__('main.id_is_required'));
+        }
+        $id = $request['id'];
         $promotion = Promotion::findOrFail($id);
         $promotion->delete();
+
         return true;
     }
 }

@@ -31,22 +31,22 @@ class PromotionDetailsResource extends JsonResource
             'target'=>$this->target,
             'location'=>$this->location,
             'image'=>$this->getImageUrl($this->image),
-            'discount'=>$this->discount,
+            'discount'=>(float)$this->discount,
             'max_amount_discount'=>$this->max_amount_discount,
             // check if has product return product name and id else return null
-            'product'=>$this->product ? [
-                'id'=>$this->product->id,
-                'name'=>$this->product->getColumnLang('title'),
-            ] : null,
-            'category'=>$this->category ? [
-                'id'=>$this->category->id,
-                'name'=>$this->category->getColumnLang('title'),
-            ] : null,
+            // 'product'=>$this->product ? [
+            //     'id'=>$this->product->id,
+            //     'name'=>$this->product->getColumnLang('title'),
+            // ] : null,
+            // 'category'=>$this->category ? [
+            //     'id'=>$this->category->id,
+            //     'name'=>$this->category->getColumnLang('title'),
+            // ] : null,
             'brand'=>$this->brand ? [
                 'id'=>$this->brand->id,
                 'name'=>$this->brand->getColumnLang('title'),
             ] : null,
-            'cta_link'=>$this->cta_link,
+            'location'=>$this->location,
             
         ];
     }
