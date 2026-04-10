@@ -42,7 +42,7 @@ class Promotion extends Model implements TranslatableContract
         'discount' => 'float',
         'max_amount_discount' => 'float',
         'is_coupon' => 'boolean',
-        'status' => 'boolean',
+
     ];
 
     public function product()

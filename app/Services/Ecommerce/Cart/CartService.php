@@ -12,23 +12,32 @@ class CartService{
 
         // check if product exist
         $this->action->checkProductExists($dto->product_id);
-        //  check and validate if product has option and stock 
-        ($dto->product_option_id) ? $this->ValidateCartOption($dto->quantity) : $this->ValidateCart($dto->quantity);
+        if(isset($dto->varaint_id)){
+            $this->action->checkProductHasOption();
+            $this->action->checkVariantExists($dto->varaint_id);
+            $this->action->checkStockWithOption($dto->quantity);
+        }
+        $this->action->checkStock($dto->quantity);
 
-        $this->repo->createOrUpdateCard($userId , $dto);
+        return $this->repo->createOrUpdateCard($userId , $dto);
+        
           
         
 
     }
 
-    protected function ValidateCartOption($quantity){
+
+    public function RemoveFromCart($userId , $dto){
+        $this->action->checkProductExists($dto->productId);
+        if(isset($dto->variantId)){
             $this->action->checkProductHasOption();
-            $this->action->checkStockWithOption($quantity);
+            $this->action->checkVariantExists($dto->variantId);
+        }
+        $this->repo->removeFromCart($userId , $dto);
     }
 
-    protected function ValidateCart($quantity){
-          $this->action->checkStock($quantity);
-    }
+
+
 
 
 

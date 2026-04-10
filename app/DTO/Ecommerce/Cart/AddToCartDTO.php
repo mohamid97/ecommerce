@@ -1,21 +1,19 @@
 <?php
-
 namespace App\DTO\Ecommerce\Cart;
 
 class AddToCartDTO
 {
-    public function __construct(
-        public readonly int $product_id,
-        public readonly ?int $product_option_id = null,
-        public readonly int $quantity = 1
-    ) {}
+    public int $product_id;
+    public ?int $varaint_id = null;
+    public int $quantity;
 
     public static function fromRequest(array $data): self
     {
-        return new self(
-            product_id: $data['product_id'],
-            product_option_id: $data['product_option_id'] ?? null,
-            quantity: $data['quantity'] ?? 1
-        );
+        $dto = new self();
+        $dto->product_id = (int) ($data['product_id'] ?? 0);
+        $dto->varaint_id= isset($data['varaint_id']) ? (int) $data['varaint_id'] : null;
+        $dto->quantity = (int) ($data['quantity'] ?? 1);
+
+        return $dto;
     }
 }

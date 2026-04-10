@@ -21,8 +21,9 @@ class CartRepository{
             ['cart_id'=>$cart->id , 'product_id'=>$dto->product_id],
             [
                 'quantity'=>$dto->quantity, 
-                'product_option_id'=>($dto->product_option_id) ?$dto->product_option_id :null,
-                'price'=>$this->getProductPrice($dto)
+                'variant_id'=>($dto->varaint_id) ?$dto->varaint_id :null,
+                'total_before_discount'=>$this->getProductPrice($dto),
+                'total_after_discount'=>$this->getProductPrice($dto)
             ]
         );
         
@@ -50,6 +51,26 @@ class CartRepository{
 
     }
 
+
+
+    public function removeFromCart($userId , $dto){
+        $cart = Cart::where('user_id' , $userId)->first();
+        if($cart){
+            CartItem::where('cart_id' , $cart->id)
+                    ->where('product_id' , $dto->productId)
+                    ->when($dto->variantId , function($query) use ($dto){
+                        $query->where('varaint_id' , $dto->variantId);
+                    })
+                    ->delete();
+        }
+
+        // check if cart is empty then delete it
+        if($cart->items()->count() == 0){
+            $cart->delete();
+        }
+
+        
+    }
 
 
   

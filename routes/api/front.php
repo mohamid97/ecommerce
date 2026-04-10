@@ -16,12 +16,19 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('/register', 'register');
         Route::post('/login', 'login');
 
-        // start carts with authanicate 
-        Route::prefix('carts')->controller();
+
     });
 
+    Route::middleware('auth:sanctum')->group(function () {
+        // start carts with authanicate 
+        Route::prefix('carts')->controller('Ecommerce/CartController')->group(function(){
+            Route::post('/add', 'addToCart');
+            Route::post('/update', 'addToCart');
+            Route::post('/delete', 'deleteFromCart');
+            Route::get('/view', 'viewCart');
+        });
 
-
+    });
 
 
     // contact and messages

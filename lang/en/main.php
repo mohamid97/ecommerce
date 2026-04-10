@@ -16,7 +16,7 @@ return [
     'invalid_expiry_email'=>'Invalid , expired OTP , Alredy Verfied You Can Register Now',
     'email_verfied'=>'Email Verfied Successfully',
     'error_happend'=>'An Error Happend Please Try Agin',
-    'member_register'=>'User Register Successfully',
+    'member_register'=>'User Register Successfully. Please Login Now',
     'memeber_data'=>'User Data',
     'added_to_cart'=>':product Added To Cart',
     'cart_delete'=>'Cart Of :user Deleted',
@@ -32,7 +32,10 @@ return [
     'retrieved_successfully'=>'The :model has been retrieved successfully.',
     'no_data'=>'No Data Found',
     'retrieved_gallery_successfully'=>'The :model Gallery has been retrieved successfully.',
-    'model_not_found_id'=>":model with id :id not founded"
+    'model_not_found_id'=>":model with id :id not founded",
+    'product_has_no_options'=>'Product Has No Options.',
+    'insufficient_stock'=>'Insufficient stock for selected option.',
+    'insufficient_stock_for_selected_variant'=>'Insufficient stock for selected variant.',
 
 
     
