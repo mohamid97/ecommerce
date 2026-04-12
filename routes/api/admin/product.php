@@ -25,10 +25,10 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('variants-combinations' , 'VariantController@variantsCombinations')->middleware('checkPermision:view');
     Route::post('store-variant' , 'VariantController@storeVariant')->middleware('checkPermision:create');
     Route::post('update-variant','VariantController@updateVariant')->middleware('checkPermision:update');
-    Route::post('/varints-product' , 'VariantController@varintsProduct')->middleware('checkPermision:view');
-    Route::post('/view-variant' , 'VariantController@viewVariant')->middleware('checkPermision:view');
-    Route::post('/delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
-    Route::post('/make-default' , 'VariantController@makeDefault')->middleware('checkPermision:update');
+    Route::post('varints-product' , 'VariantController@varintsProduct')->middleware('checkPermision:view');
+    Route::post('view-variant' , 'VariantController@viewVariant')->middleware('checkPermision:view');
+    Route::post('delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
+    Route::post('make-default' , 'VariantController@makeDefault')->middleware('checkPermision:update');
 
 
 

@@ -83,7 +83,14 @@ class Product extends Model implements TranslatableContract
         );
     }
 
-
+    /**
+     * Scope a query to only include active products.
+     * Usage: Product::active()->get()
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 
 
 

@@ -21,7 +21,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         // start carts with authanicate 
-        Route::prefix('carts')->controller('Ecommerce/CartController')->group(function(){
+        Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function(){
             Route::post('/add', 'addToCart');
             Route::post('/update', 'addToCart');
             Route::post('/delete', 'deleteFromCart');
@@ -46,8 +46,13 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('store' , 'store');
         
     });
-    
 
+
+    Route::prefix('products')->namespace('Ecommerce')->controller('ProductController')->group(function(){
+        Route::get('get' , 'get');
+        Route::post('details' , 'productDetails');
+    });
+    
 
 
       

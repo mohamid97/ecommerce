@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint;
+namespace App\Http\Resources\Api\Front\Ecommerce;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductVaraintsResource extends JsonResource
+class CustomProductVaraintsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,10 +17,6 @@ class ProductVaraintsResource extends JsonResource
         return [
 
             'id'=>$this->id,
-            'sku'=>$this->sku,
-            'sale_price'=>$this->sale_price,
-            'stock'=>$this->stock,
-            'status'=>$this->status,
             'is_default'=>(bool) $this->is_default,
             'option_ids'=>$this->variants->pluck('option_value_id'),
             'option' => $this->variants

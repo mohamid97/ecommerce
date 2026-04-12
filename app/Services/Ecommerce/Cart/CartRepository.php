@@ -22,8 +22,8 @@ class CartRepository{
             [
                 'quantity'=>$dto->quantity, 
                 'variant_id'=>($dto->varaint_id) ?$dto->varaint_id :null,
-                'total_before_discount'=>$this->getProductPrice($dto),
-                'total_after_discount'=>$this->getProductPrice($dto)
+                'total_before_discount'=>0,
+                'total_after_discount'=>0
             ]
         );
         
@@ -31,25 +31,25 @@ class CartRepository{
         
     }
 
-    private function getProductPrice($dto){
-        $productPrice = 0;
-        $product = Product::find($dto->product->id);
-        if($product->has_options){
-            $productOptions = ProductOptions::where('product_id' , $dto->product_id)->where('id' , $dto->product_option_id)->first();
-            $productPrice = $productOptions->price;
-        }else{
-            $productNoOption = NoOptionStock::where('product_id' , $dto->product->id)->first();
-            $productPrice = $productNoOption->base_price;
+    // private function getProductPrice($dto){
+    //     $productPrice = 0;
+    //     $product = Product::find($dto->product->id);
+    //     if($product->has_options){
+    //         $productOptions = ProductOptions::where('product_id' , $dto->product_id)->where('id' , $dto->product_option_id)->first();
+    //         $productPrice = $productOptions->price;
+    //     }else{
+    //         $productNoOption = NoOptionStock::where('product_id' , $dto->product->id)->first();
+    //         $productPrice = $productNoOption->base_price;
 
-        }
+    //     }
 
 
-        return $productPrice;
+    //     return $productPrice;
         
        
         
 
-    }
+    // }
 
 
 

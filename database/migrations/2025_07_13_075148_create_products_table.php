@@ -29,6 +29,7 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
             $table->boolean('is_featured')->default(false);
+            $table->integer('stock')->default(0)->nullable();
             $table->json('related_products')->nullable();
 
             $table->timestamps();

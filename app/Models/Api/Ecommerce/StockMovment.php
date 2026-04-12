@@ -19,6 +19,8 @@ class StockMovment extends Model
         'status',
     ];
 
+    protected $casts = ['quantity' => 'integer'];
+
     // need to make relations is product and variant
     public function product()
     {
