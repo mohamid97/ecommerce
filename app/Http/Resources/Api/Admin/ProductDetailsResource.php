@@ -69,11 +69,11 @@ class ProductDetailsResource extends JsonResource
                             'title' => $productOption->option->title ?? null,
                         ] : null,
 
-                        'values' => $productOption->values->map(function ($value) {
+                        'values' => $productOption?->values->map(function ($value) {
 
                             return [
-                                'id' => $value->id,
-                                'title' => $value->optionValue->title ?? null,
+                                'id' => $value?->optionValue?->id,
+                                'title' => $value?->optionValue?->title ?? null,
                             ];
 
                         }),

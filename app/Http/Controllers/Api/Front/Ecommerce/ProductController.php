@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Front\Ecommerce;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Front\Ecommerce\ProductDetailsResource;
+use App\Http\Resources\Api\Front\Ecommerce\ProductNoOptionResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductResource;
 use App\Http\Resources\Api\Front\Ecommerce\VaraintDetailsResource;
 use App\Models\Api\Admin\Product;
@@ -54,17 +55,20 @@ class ProductController extends Controller
 
 
     public function productDetails(Request $request){
-        // need to get all options and varaints
+        $product = Product::with(['category', 'brand'])->findOrFail($request->id);
 
-        $product = Product::with(['options.option','options.values.optionValue' , 'variants'])->findOrFail($request->id);
-        if(!$product){
-            return $this->error(__('main.not_found' , ['product']));
+        if (!$product->has_options) {
+            return $this->success(new ProductNoOptionResource($product), __('main.show_successfully', ['product']));
         }
 
+        $product->load([
+            'options.option',
+            'options.values.optionValue',
+            'variants.variants.optionValue.option',
+            'variants.varaintImages.image',
+        ]);
 
-      
-
-        return $this->success(new ProductDetailsResource($product) , __('main.show_successfully' , ['product']));
+        return $this->success(new ProductDetailsResource($product), __('main.show_successfully', ['product']));
 
 
     }
