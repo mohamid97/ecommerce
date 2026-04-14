@@ -30,6 +30,14 @@ class VaraintDetailsResource extends JsonResource
                 'min_estimated_delivery' => $this->delivery_time,  
                 'max_estimated_delivery' => $this->max_time,
             ],
+            'varaint_images'=>$this->whenLoaded('varaintImages', function () {
+                return $this->varaintImages->map(function ($image) {
+                    return [
+                        'id' => $image->id,
+                        'image' => $this->getImageUrl($image->image?->image)
+                    ];
+                });
+            }),
 
             'variant_full_name' => $this->whenLoaded('variants', function () {
                     return $this->buildVariantName();

@@ -75,7 +75,7 @@ class ProductController extends Controller
 
     public function varaintDetails(Request $request){
         if($request->has('variant_id')){
-            $variant = ProductVariant::with(['optionValues.optionValue'])->findOrFail($request->variant_id);
+            $variant = ProductVariant::with(['varaintImages' , 'variants'])->findOrFail($request->variant_id);
             if(!$variant){
                 return $this->error(__('main.not_found' , ['variant']));
             }
