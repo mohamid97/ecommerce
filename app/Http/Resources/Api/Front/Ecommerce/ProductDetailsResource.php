@@ -57,7 +57,6 @@ class ProductDetailsResource extends JsonResource
 
             }),
             'varaints' => CustomProductVaraintsResource::collection($this->variants),
-            'default_varaint' => $defaultVaraintModel ? $this->productDefaultVariant($defaultVaraintModel) : null,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];
