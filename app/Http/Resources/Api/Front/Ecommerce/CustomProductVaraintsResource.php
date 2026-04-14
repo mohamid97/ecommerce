@@ -18,7 +18,7 @@ class CustomProductVaraintsResource extends JsonResource
 
             'id'=>$this->id,
             'is_default'=>(bool) $this->is_default,
-            'option_values'=>$this->varaints->map(function($variant){
+            'option_values'=>$this->variants->map(function($variant){
                 return [
                     'option_id'=>$variant->optionValue->id,
                     'option_title'=>$variant->optionValue->option?->title,

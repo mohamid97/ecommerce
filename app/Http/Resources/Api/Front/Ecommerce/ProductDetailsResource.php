@@ -65,48 +65,6 @@ class ProductDetailsResource extends JsonResource
 
 
 
-    protected function productDefaultVariant($varaints){
-
-       
-        
-        return [
-            'id' => $varaints->id,
-            'sku' => $varaints->sku,
-            'sale_price' =>  (float)$varaints->sale_price,
-            'stock' => $varaints->stock,
-            'discount' => (float) $varaints->discount_value,
-            'discount_type' => $varaints->discount_type,
-            'status' => $varaints->status,
-            'shipmentDetails'=>[
-                'length' => (float)$varaints->length,
-                'width' => (float)$varaints->width,
-                'height' => (float)$varaints->height,
-                'weight' => (float)$varaints->weight,
-                'min_estimated_delivery' => $varaints->delivery_time,  
-                'max_estimated_delivery' => $varaints->max_time,
-            ],
-
-            'varaint_images' => $varaints->relationLoaded('varaintImages')
-                ? $varaints->varaintImages->map(function ($image) {
-                    return [
-                        'id' => $image->id,
-                        'image' => $this->getImageUrl($image->image?->image)
-                    ];
-                })
-                : [],
-            'variant_full_name' => $this->buildVariantName($varaints->variants),
-            'option_values' => $varaints->variants->map(function ($variantOptionValue) {
-                return [
-                    'option_id' => $variantOptionValue->optionValue?->option?->id,
-                    'option_value_id' => $variantOptionValue->option_value_id,
-                ];
-            }),
-            'option_ids' => $varaints->variants->pluck('option_value_id'),
-            'created_at' => $varaints->created_at->format('Y-m-d'),
-            'updated_at' => $varaints->updated_at->format('Y-m-d'),
-        ];
-    }
-
 
 
 
