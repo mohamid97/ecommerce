@@ -51,6 +51,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
     Route::prefix('products')->namespace('Ecommerce')->controller('ProductController')->group(function(){
         Route::get('get' , 'get');
         Route::post('details' , 'productDetails');
+        Route::post('varaint-details' , 'varaintDetails');
     });
     
 

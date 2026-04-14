@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\Front\Ecommerce;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Front\Ecommerce\ProductDetailsResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductResource;
+use App\Http\Resources\Api\Front\Ecommerce\VaraintDetailsResource;
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\ProductVariant;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
@@ -64,6 +66,17 @@ class ProductController extends Controller
 
         return $this->success(new ProductDetailsResource($product) , __('main.show_successfully' , ['product']));
 
+
+    }
+
+    public function varaintDetails(Request $request){
+        if($request->has('variant_id')){
+            $variant = ProductVariant::with(['optionValues.optionValue'])->findOrFail($request->variant_id);
+            if(!$variant){
+                return $this->error(__('main.not_found' , ['variant']));
+            }
+            return $this->success(new VaraintDetailsResource($variant) , __('main.show_successfully' , ['variant']));
+        }
 
     }
 
