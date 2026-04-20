@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\Admin\Ecommerce\Bundel;
+namespace App\Http\Resources\Api\Front\Ecommerce;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -26,12 +26,9 @@ class BundelResource extends JsonResource
             'brand'=>$this->whenLoaded('brand', function () {
                 $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'brand' , ['id']);
             }),
-            'status'=>$this->status,
             'title'=>$this->getColumnLang('title'),
             'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),
-
-
         ];
     }
 }

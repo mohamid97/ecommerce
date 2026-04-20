@@ -1,62 +1,126 @@
 <?php
+
 namespace App\Services\Ecommerce\Cart;
+
 use App\Models\Api\Admin\Product;
-use App\Models\Api\Ecommerce\ProductOption;
-use App\Models\Api\Ecommerce\ProductOptions;
+use App\Models\Api\Ecommerce\Bundel;
+use App\Models\Api\Ecommerce\BundelDetails;
 use App\Models\Api\Ecommerce\ProductVariant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class CartAction{
-    
-    public $product;
-    public $variant;
-        // used method 
-    public  function checkProductExists($productId){
+class CartAction
+{
+    public ?Product        $product       = null;
+    public ?Bundel         $bundel        = null;
+    public ?BundelDetails  $bundelDetail  = null;
+    public ?ProductVariant $variant       = null;
+
+    // ── Existence checks ────────────────────────────────────────────────────
+
+    public function checkProductExists(int $productId): Product
+    {
         $this->product = Product::active()->find($productId);
-        if(!$this->product) {
-            throw new ModelNotFoundException(__('main.model_not_founded', ['model' => 'Product']));
+
+        if (!$this->product) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Product'])
+            );
         }
 
         return $this->product;
     }
 
-    public function checkVariantExists($variantId){
-        if($variantId){
-            $this->variant = ProductVariant::find($variantId);
-            if(!$this->variant) {
-                throw new ModelNotFoundException(__('main.model_not_founded', ['model' => 'Product Variant']));
-            }
+    public function checkBundelExists(int $bundelId): Bundel
+    {
+        $this->bundel = Bundel::find($bundelId);
+
+        if (!$this->bundel) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Bundle'])
+            );
+        }
+
+        return $this->bundel;
+    }
+
+    public function checkVariantExists(int $variantId): void
+    {
+        $this->variant = ProductVariant::find($variantId);
+
+        if (!$this->variant) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Product Variant'])
+            );
         }
     }
 
-    // check if user has product option 
-    public function checkProductHasOption(){
-        if($this->product->has_options){
+    // ── Bundle-specific checks ───────────────────────────────────────────────
+
+    /**
+     * Verify that the given product is listed inside this bundle's details.
+     * Stores the matching BundelDetails row for further variant checks.
+     */
+    public function checkProductBelongsToBundle(int $productId): void
+    {
+        $this->bundelDetail = BundelDetails::where('bundel_id', $this->bundel->id)
+            ->where('product_id', $productId)
+            ->first();
+
+        if (!$this->bundelDetail) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Product in Bundle'])
+            );
+        }
+    }
+
+    /**
+     * Verify that the variant is among the allowed variant_ids for this bundle detail.
+     */
+    public function checkVariantBelongsToBundle(int $variantId): void
+    {
+        $allowedVariants = $this->bundelDetail->variant_ids ?? [];
+
+        if (!in_array($variantId, $allowedVariants, true)) {
+            throw new \Exception(
+                __('main.model_not_founded', ['model' => 'Variant in Bundle'])
+            );
+        }
+
+        // Also confirm the variant record exists
+        $this->checkVariantExists($variantId);
+    }
+
+    // ── Options / variant checks ─────────────────────────────────────────────
+
+    /**
+     * Throws if the product does NOT support options/variants.
+     */
+    public function checkProductHasOption(): void
+    {
+        if (!$this->product->has_options) {
             throw new \Exception(__('main.product_has_no_options'));
         }
-
-        
     }
 
+    // ── Stock checks ─────────────────────────────────────────────────────────
 
-    // check stock amount 
-    public function checkStockWithOption($quantity){
-       $productOption = ProductVariant::where('product_id' , $this->product->id)->where('id' , $this->variant->id)->first();
-       if($productOption->stock < $quantity){
-          throw new \Exception(__('main.insufficient_stock_for_selected_variant'));
-       }
-       
+    public function checkStockWithOption(int $quantity): void
+    {
+        $productVariant = ProductVariant::where('product_id', $this->product->id)
+            ->where('id', $this->variant->id)
+            ->first();
 
+        if (!$productVariant || $productVariant->stock < $quantity) {
+            throw new \Exception(__('main.insufficient_stock_for_selected_variant'));
+        }
     }
 
-    public function checkStock($quantity){
-        if($this->product->stock < $quantity){
+    public function checkStock(int $quantity): void
+    {
+        if ($this->product->stock < $quantity) {
             throw new \Exception(__('main.insufficient_stock'));
         }
     }
 
-
-
-
-
+    
 }

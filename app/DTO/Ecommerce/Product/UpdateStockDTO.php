@@ -11,8 +11,7 @@ class UpdateStockDTO
         public ?string $note,
         public ?float $cost_price,
         public float $sale_price,
-        public ?float $discount = null,
-        public ?string $discount_type = null,
+
         
     ) {}
 

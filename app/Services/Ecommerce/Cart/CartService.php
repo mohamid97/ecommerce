@@ -1,59 +1,47 @@
 <?php
+
 namespace App\Services\Ecommerce\Cart;
 
+use App\DTO\Ecommerce\Cart\AddToCartDTO;
+use App\Services\Ecommerce\Cart\Strategies\CartStrategyResolver;
 
-class CartService{
-
+class CartService
+{
     public function __construct(
-        protected CartRepository $repo,
-        protected CartAction $action
+        protected CartRepository     $repo,
+        protected CartAction         $action,
+        protected CartStrategyResolver $resolver
     ) {}
-    public function StoreToCart($userId , $dto){
 
-        // check if product exist
-        $this->action->checkProductExists($dto->product_id);
-        if(isset($dto->varaint_id)){
-            $this->action->checkProductHasOption();
-            $this->action->checkVariantExists($dto->varaint_id);
-            $this->action->checkStockWithOption($dto->quantity);
-        }
-        $this->action->checkStock($dto->quantity);
+    /**
+     * Add / update a cart item using the appropriate strategy.
+     *
+     * Strategies resolved from the DTO:
+     *   • bundel_id only            → BundleStrategy
+     *   • product_id + variant_id   → ProductWithOptionStrategy
+     *   • product_id only           → SimpleProductStrategy
+     */
+    public function StoreToCart(int $userId, AddToCartDTO $dto): mixed
+    {
+        $strategy = $this->resolver->resolve($dto);
 
-        return $this->repo->createOrUpdateCard($userId , $dto);
-        
-          
-        
+        $strategy->validate($dto);
 
+        return $strategy->store($userId, $dto);
     }
 
-
-    public function RemoveFromCart($userId , $dto){
+    /**
+     * Remove a cart item. Keeps the existing plain logic – no strategy needed here.
+     */
+    public function RemoveFromCart(int $userId, $dto): void
+    {
         $this->action->checkProductExists($dto->productId);
-        if(isset($dto->variantId)){
+
+        if (isset($dto->variantId)) {
             $this->action->checkProductHasOption();
             $this->action->checkVariantExists($dto->variantId);
         }
-        $this->repo->removeFromCart($userId , $dto);
+
+        $this->repo->removeFromCart($userId, $dto);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-    
 }

@@ -23,7 +23,7 @@ class StoreVaraintAction
             'weight' => $dto->weight,
             'width' => $dto->width,
             'height' => $dto->height,
-            'stock' => $dto->stock,
+            // 'stock' => $dto->stock,
             'delivery_time' => $dto->deliveryTime,
             'max_time' => $dto->maxTime,
         ]);

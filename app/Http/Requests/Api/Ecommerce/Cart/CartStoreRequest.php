@@ -10,40 +10,53 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 class CartStoreRequest extends FormRequest
 {
     use ResponseTrait;
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+
     public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * product_id  → always required (plain product, product+variant, and bundle all need it)
+     * variant_id  → nullable; required at the strategy layer ONLY if the product actually has options
+     * bundel_id   → nullable; its presence switches to BundleStrategy
+     * quantity    → always required
      */
     public function rules(): array
     {
         return [
-            'product_id'        => 'required|integer|exists:products,id',
-            'varaint_id'        => 'nullable|integer|exists:product_variants,id',
-            'quantity'          => 'required|integer|min:1|max:50',
+            'product_id' => 'required|integer|exists:products,id',
+            'variant_id' => 'nullable|integer|exists:product_variants,id',
+            'bundel_id'  => 'nullable|integer|exists:bundels,id',
+            'quantity'   => 'required|integer|min:1|max:50',
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    public function withValidator(Validator $validator): void
     {
-        throw new HttpResponseException(
-            $this->error(
-                $validator->errors()->first(), 
-                422, 
-                
-            )
-        );
+        $validator->after(function (Validator $validator) {
+            $data = $validator->validated();
+
+            $hasProduct = !empty($data['product_id']);
+            $hasVariant = !empty($data['variant_id']);
+
+            // variant_id without product_id makes no sense
+            if ($hasVariant && !$hasProduct) {
+                $validator->errors()->add(
+                    'variant_id',
+                    __('validation.required_with', [
+                        'attribute' => 'variant_id',
+                        'values'    => 'product_id',
+                    ])
+                );
+            }
+        });
     }
 
-    
-
-    
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            $this->error($validator->errors()->first(), 422)
+        );
+    }
 }

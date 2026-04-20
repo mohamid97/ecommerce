@@ -44,11 +44,12 @@ class ProductController extends Controller
             $products = $products->paginate(10);
         }
 
-        
-
-        return $this->success(ProductResource::collection($products) , __('main.list_successfully' , ['products']));
-
-
+        return $this->successPaginated(
+            $products,
+            ProductResource::collection($products),
+            'products',
+            __('main.list_successfully', ['products' => 'Products'])
+        );
 
     } // end get products
 

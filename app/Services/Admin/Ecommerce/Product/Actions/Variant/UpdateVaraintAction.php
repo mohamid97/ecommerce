@@ -18,7 +18,7 @@ class UpdateVaraintAction
             'weight' => $dto->weight,
             'width' => $dto->width,
             'height' => $dto->height,
-            'stock' => $dto->stock,
+            // 'stock' => $dto->stock,
             'price' => $dto->price,
             'delivery_time' => $dto->delivery_time,
             'max_time' => $dto->max_time,

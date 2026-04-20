@@ -34,4 +34,30 @@ trait ResponseTrait
         ],$code);
         
     }
+
+    /**
+     * Return a success response with pagination data.
+     *
+     * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator
+     * @param mixed $resourceCollection
+     * @param string $key
+     * @param string $message
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function successPaginated($paginator, $resourceCollection, string $key = 'items', string $message = 'Operation successful')
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => [
+                $key => $resourceCollection,
+                'paginate' => [
+                    'total' => $paginator->total(),
+                    'per_page' => $paginator->perPage(),
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                ]
+            ],
+        ]);
+    }
 }

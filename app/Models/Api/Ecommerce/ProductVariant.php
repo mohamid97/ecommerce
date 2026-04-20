@@ -47,6 +47,16 @@ class ProductVariant extends Model implements TranslatableContract
     {
         return $this->hasMany(ProductVaraintImages::class, 'variant_id');
     }
+
+    public function getDiscountPrice(){
+        // return discount and calculate percenatge or value
+        if($this->discount_type == 'percentage'){
+            return $this->sale_price - ($this->sale_price * ($this->discount_value / 100));
+        }
+        return $this->sale_price - $this->discount_value;
+    }
+
+
     
     
 }

@@ -53,6 +53,20 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('details' , 'productDetails');
         Route::post('varaint-details' , 'varaintDetails');
     });
+
+
+    // bundel 
+
+    Route::prefix('bundles')->namespace('Ecommerce')->controller('BundleController')->group(function(){
+        Route::get('get' , 'get');
+        Route::post('details' , 'bundleDetails');
+    });
+
+
+
+
+
+
     
 
 
