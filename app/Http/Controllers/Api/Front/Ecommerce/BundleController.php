@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Front\Ecommerce\BundelDetailsResourc;
 use App\Http\Resources\Api\Front\Ecommerce\BundelResource;
 use App\Models\Api\Ecommerce\Bundel;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
 class BundleController extends Controller
 {
+    use ResponseTrait;
     public function get(Request $request){
 
         $bundles = Bundel::query();
