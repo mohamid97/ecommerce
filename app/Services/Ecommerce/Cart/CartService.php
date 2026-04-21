@@ -35,11 +35,15 @@ class CartService
      */
     public function RemoveFromCart(int $userId, $dto): void
     {
-        $this->action->checkProductExists($dto->productId);
+        if (isset($dto->bundelId)) {
+            $this->action->checkBundelExists($dto->bundelId);
+        } else {
+            $this->action->checkProductExists($dto->productId);
 
-        if (isset($dto->variantId)) {
-            $this->action->checkProductHasOption();
-            $this->action->checkVariantExists($dto->variantId);
+            if (isset($dto->variantId)) {
+                $this->action->checkProductHasOption();
+                $this->action->checkVariantExists($dto->variantId);
+            }
         }
 
         $this->repo->removeFromCart($userId, $dto);

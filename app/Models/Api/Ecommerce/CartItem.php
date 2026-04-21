@@ -14,6 +14,7 @@ class CartItem extends Model
         'cart_id',
         'product_id',
         'variant_id',
+        'bundel_id',
         'quantity',
         'total_before_discount',
         'total_after_discount',
@@ -43,6 +44,16 @@ class CartItem extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id');       
 
+    }
+
+    public function bundel()
+    {
+        return $this->belongsTo(Bundel::class, 'bundel_id');
+    }
+
+    public function cartBundelItems()
+    {
+        return $this->hasMany(CartBundelItem::class);
     }
 
 

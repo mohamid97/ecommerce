@@ -16,7 +16,7 @@ class BundelDetailsResourc extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'bundle_price'=>$this->price??null,
+            'price'=>(float) $this->getBundlePrice(),
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {
@@ -40,6 +40,7 @@ class BundelDetailsResourc extends JsonResource
                             'sale_price'=>$detail->product->sale_price,
                             'discount_price'=>$detail->product->discount_price,
                             'discount_type'=>$detail->product->discount_type,
+                            'product_image'=>$this->getImageUrl($detail->product->image),
                             'price_after_discount'=>$detail->product->getDiscountPrice(),
                             'options'=>$detail->product?->variants?->variants?->map(function ($option) {
                                 return [
@@ -60,6 +61,7 @@ class BundelDetailsResourc extends JsonResource
                                         'sale_price'=>$variant->sale_price,
                                         'discount_price'=>$variant->discount_price,
                                         'discount_type'=>$variant->discount_type,
+                                        // 'image'=>$this->getImageUrl($variant->image),
                                         'option_values'=>$variant->variants->map(function($variant){
                                             return [
                                                 'option_id'=>$variant->optionValue->option?->id,

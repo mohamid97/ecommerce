@@ -7,6 +7,7 @@ use App\DTO\Ecommerce\Cart\RemoveFromCartDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Ecommerce\Cart\CartStoreRequest;
 use App\Http\Requests\Api\Ecommerce\Cart\DeleteFromCartRequest;
+use App\Http\Resources\Api\Front\Ecommerce\CartResource;
 use App\Services\Ecommerce\Cart\CartService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -26,11 +27,20 @@ class CartController extends Controller
 
     public function view(Request $request){
         $userId = $request->user()->id;
-        $cart = CartModel::with('items')->where('user_id' , $userId)->first();
+        
+        $cart = CartModel::with([
+            'items.product',
+            'items.variant.variants.optionValue.option',
+            'items.bundel',
+            'items.cartBundelItems.product',
+            'items.cartBundelItems.variant.variants.optionValue.option'
+        ])->where('user_id' , $userId)->first();
+        
         if(!$cart){
             return $this->success(null , 200);
         }
-        return $this->success($cart , 200);
+        
+        return $this->success(new CartResource($cart) , 200);
 
     }
 
@@ -66,7 +76,8 @@ class CartController extends Controller
 
         
 
-    }
+    } // delete from cart
+
 
 
 

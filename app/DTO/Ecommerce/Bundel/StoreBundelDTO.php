@@ -4,7 +4,7 @@ namespace App\DTO\Ecommerce\Bundel;
 class StoreBundelDTO{
 
         public function __construct(
-            public float $price,
+            public ?float $price,
             public ?int $category_id,
             public ?int $brand_id,
             public ?string $bundle_image = null,
@@ -23,7 +23,7 @@ class StoreBundelDTO{
     {
 
         return new self(
-            $data["price"],
+            $data["price"]??null,
             $data["category_id"]??null,
             $data["brand_id"]??null,
             $data["bundle_image"]??null,

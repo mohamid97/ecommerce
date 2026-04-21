@@ -25,32 +25,53 @@ class BundleStrategy implements CartStrategyInterface
         // 1. Bundle must exist
         $this->action->checkBundelExists($dto->bundel_id);
 
-        // 2. Product must exist and be active
-        $this->action->checkProductExists($dto->product_id);
-
-        // 3. Product must belong to this bundle
-        $this->action->checkProductBelongsToBundle($dto->product_id);
-
-        // 4. Require variant if product has options
-        if ($this->action->product->has_options && !isset($dto->variant_id)) {
+        if (empty($dto->bundle_items)) {
             throw ValidationException::withMessages([
-                'variant_id' => __('main.variant_is_required_for_this_product')
+                'bundle_items' => __('main.bundle_items_are_required')
             ]);
         }
 
-        // 5. Validation specific to whether variant_id is present
-        if (isset($dto->variant_id)) {
-            $this->action->checkVariantBelongsToBundle($dto->variant_id);
-            $this->action->checkStockWithOption($dto->quantity);
-        } else {
-            $this->action->checkStock($dto->quantity);
+        foreach ($dto->bundle_items as $item) {
+            $productId = $item['product_id'];
+            $variantId = $item['variant_id'] ?? null;
+
+            // 2. Product must exist and be active
+            $this->action->checkProductExists($productId);
+
+            // 3. Product must belong to this bundle
+            $this->action->checkProductBelongsToBundle($productId);
+
+            // 4. Require variant if product has options
+            if ($this->action->product->has_options && !$variantId) {
+                throw ValidationException::withMessages([
+                    'variant_id' => __('main.variant_is_required_for_this_product') . " (Product ID: $productId)"
+                ]);
+            }
+
+            // 5. Validation specific to whether variant_id is present
+            if ($variantId) {
+                $this->action->checkVariantBelongsToBundle($variantId);
+                $this->action->checkStockWithOption($dto->quantity);
+            } else {
+                $this->action->checkStock($dto->quantity);
+            }
         }
     }
 
     public function store(int $userId, AddToCartDTO $dto): mixed
     {
-        return $this->repo->createOrUpdateCard($userId, $dto);
+        $priceData = $this->action->getBundlePriceWithData($dto);
+        return $this->repo->createOrUpdateCard($userId, $dto , $priceData);
     }
+
+
+
+
+
+
+
+
+
 
     
 }

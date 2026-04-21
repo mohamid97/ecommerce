@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bundels', function (Blueprint $table) {
             $table->id();
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 10, 2)->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->unsignedBigInteger('brand_id')->nullable();

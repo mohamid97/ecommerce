@@ -14,35 +14,53 @@ class CartItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if ($this->bundel_id) {
+            return [
+                'id' => $this->id,
+                'cart_id' => $this->cart_id,
+                'type' => 'bundle',
+                'bundel_id' => $this->bundel_id,
+                'bundel_title' => $this->bundel?->title,
+                'bundle_items' => $this->cartBundelItems->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'product_id' => $item->product_id,
+                        'product' => $item->product?->title,
+                        'variant_id' => $item->variant_id,
+                        'variant' => $item->variant?->title,
+                        'varaint_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,
+                    ];
+                }),
+                'total_before_discount' => $this->total_before_discount,
+                'total_after_discount' => $this->total_after_discount,
+                'quantity' => $this->quantity,
+                'created_at' => $this->created_at->format('Y-m-d'),
+                'updated_at' => $this->updated_at->format('Y-m-d'),
+            ];
+        }
 
         return [
             'id' => $this->id,
             'cart_id' => $this->cart_id,
+            'type' => 'product',
+            'product_id' => $this->product_id,
             'product' => $this->product?->title,
             'has_options'=>(bool) $this->product?->has_options,
+            'variant_id' => $this->variant_id,
             'variant' => $this->variant?->title,
-            'varaint_name' => ($this->varaint_id) ? $this->buildVariantName($this->variant) : null,
+            'varaint_name' => ($this->variant_id) ? $this->buildVariantName($this->product, $this->variant) : null,
             'total_before_discount' => $this->total_before_discount,
             'total_after_discount' => $this->total_after_discount,
             'quantity' => $this->quantity,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];
-
-
-
-
     }
 
-
-
-
-
-
-    protected function buildVariantName()
+    protected function buildVariantName($product, $variant)
     {
-        if($this->product?->has_options && $this->variant) {
-            return $this->variant?->variants
+        if($product?->has_options && $variant) {
+            return $variant->variants
                 ->map(function ($variantOptionValue) {
                     $optionTitle = optional(
                         $variantOptionValue->optionValue?->option

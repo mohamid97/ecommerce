@@ -5,7 +5,7 @@ class UpdateBundelDTO{
 
         public function __construct(
             public int $id,
-            public float $price,
+            public ?float $price,
             public ?int $category_id,
             public ?int $brand_id,
             public ?string $bundle_image = null,
@@ -25,7 +25,7 @@ class UpdateBundelDTO{
 
         return new self(
             $data['id'],
-            $data["price"],
+            $data["price"]??null,
             $data["category_id"]??null,
             $data["brand_id"]??null,
             $data["bundle_image"]??null,

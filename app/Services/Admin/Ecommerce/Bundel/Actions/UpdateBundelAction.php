@@ -17,7 +17,7 @@ class UpdateBundelAction{
         $bundel = Bundel::where('id', $data->id)->firstOrFail();
 
         $bundel->update([
-            'price' => $data->price,
+            'price' => null,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
             'bundle_image' => $this->uploadImage($data->bundle_image, 'bundel', 'public'),

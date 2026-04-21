@@ -27,7 +27,7 @@ class StoreBundelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price' => 'required|numeric',
+            'price' => 'nullable|numeric',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'bundle_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

@@ -122,5 +122,65 @@ class CartAction
         }
     }
 
+
+
+
+    // get bundle price data
+    public function getBundlePriceWithData($dto): array
+    {
+        $bundle = Bundel::with('bundelDetails')->find($dto->bundel_id);
+
+        if (!$bundle) {
+            return [
+                'total_price'          => 0.0,
+                'total_discount_price' => 0.0,
+            ];
+        }
+
+        $totalPrice         = 0.0;
+        $totalDiscountPrice = 0.0;
+
+        foreach ($dto->bundle_items as $item) {
+            $productId = $item['product_id'];
+            $variantId = $item['variant_id'] ?? null;
+
+            // Find the matching bundle detail scoped to this bundle
+            if ($variantId) {
+
+
+                $bundleDetail = $bundle->bundelDetails
+                    ->where('product_id', $productId)
+                    ->first(fn($d) => in_array($variantId, $d->variant_ids ?? []));
+
+                $variant           = ProductVariant::find($variantId);
+                $price             = $variant?->sale_price         ?? 0;
+                $discountPrice     = $variant?->getDiscountPrice() ?? 0;
+            } else {
+                $bundleDetail = $bundle->bundelDetails
+                    ->where('product_id', $productId)
+                    ->first();
+
+                $product           = Product::find($productId);
+                $price             = $product?->sale_price         ?? 0;
+                $discountPrice     = $product?->getDiscountPrice() ?? 0;
+            }
+
+            if (!$bundleDetail) {
+                continue; // skip if this product isn't part of the bundle
+            }
+
+            $qty                = $bundleDetail->quantity;
+            $totalPrice         += $price         * $qty;
+            $totalDiscountPrice += $discountPrice * $qty;
+        }
+
+        return [
+            'total_price'          => $totalPrice,
+            'total_discount_price' => $totalDiscountPrice,
+        ];
+        
+    }
+
+
     
 }

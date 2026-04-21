@@ -17,7 +17,7 @@ class StoreBundelAction{
     public function storeBundel($data){
         $translation = app(TranslationService::class);
         $bundel = Bundel::create([
-            'price' => $data->price,
+            'price' => null,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
             'bundle_image' => $this->uploadImage($data->bundle_image ,'bundel' , 'public'),

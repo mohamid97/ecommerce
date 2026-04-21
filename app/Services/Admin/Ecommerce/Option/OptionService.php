@@ -59,35 +59,68 @@ class OptionService extends BaseModelService
         
     }
     
-    public function update($id){
-        $this->uploadSingleImage(['option_image'], 'uploads/options'); 
-        $option = parent::update($id , $this->getBasicColumn( ['option_image','code','value_type']));
-        $this->processTranslations($option, $this->data, ['title' ]);
-                   // need to delete all value at first 
-                    $option->values()->delete();
-        // Update Option Values
+    public function update($id)
+    {
+        // =========================================================
+        // STEP 1: Update the Option itself (image, code, value_type)
+        // =========================================================
+        $this->uploadSingleImage(['option_image'], 'uploads/options');
+        $option = parent::update($id, $this->getBasicColumn(['option_image', 'code', 'value_type']));
+
+        // =========================================================
+        // STEP 2: Update the Option title translation
+        // =========================================================
+        $this->processTranslations($option, $this->data, ['title']);
+
+        // =========================================================
+        // STEP 3: Sync Option Values
+        // =========================================================
         if (isset($this->data['values']) && is_array($this->data['values'])) {
+
+            $incomingIds = collect($this->data['values'])
+                ->filter(fn($value) => isset($value['id']))
+                ->pluck('id')
+                ->toArray();
+            $option->values()
+                ->whereNotIn('id', $incomingIds)
+                ->delete();
             foreach ($this->data['values'] as $valueData) {
-                
+                if ($this->data['value_type'] === 'image' && isset($valueData['value_image'])) {
+                    $valueData['value'] = $this->uploadSingleImage($valueData['value'], 'uploads/option_values');
+                } else {
+                    $valueData['value'] = $valueData['value'] ?? null;
+                }
 
+                if (isset($valueData['id'])) {
 
-                    if($this->data['value_type'] == 'image' && isset($valueData['value_image'])){
-                        // upload image
-                        $imagePath = $this->uploadSingleImage($valueData['value'], 'uploads/option_values');
-                        $valueData['value'] = $imagePath;
-                    } else {
-                        $valueData['value'] = $valueData['value'] ?? null;
+                    $optionValue = $option->values()->find($valueData['id']);
+
+                    if ($optionValue) {
+                        $optionValue->update([
+                            'value' => $valueData['value'],
+                        ]);
+
+                        // Update its translations (title in ar/en)
+                        $this->processTranslations($optionValue, $valueData, ['title']);
                     }
+
+                } else {
+
                     $optionValue = $option->values()->create([
-                        'value' => $valueData['value'] ?? null,
+                        'value' => $valueData['value'],
                     ]);
-                    // Process translations for OptionValue
+
+                    // Save its translations (title in ar/en)
                     $this->processTranslations($optionValue, $valueData, ['title']);
-              
-            }
-        }
-        return $option;        
-    } // update option   
+                }
+
+            } // end foreach values
+
+        } // end if values
+
+        return $option;
+
+    } // end update option  
      
     public function delete($id){
         $option = parent::delete($id);
