@@ -38,14 +38,27 @@ class BundelDetails extends Model
 
 
     // get all varaints
-    public function getVariants(): Collection
-    {
-        if (empty($this->variant_ids)) {
-            return collect();
-        }
+public function getVariants()
+{
+    $ids = $this->variant_ids;
 
-        return ProductVariant::whereIn('id', $this->variant_ids)->get();
+    // Normalize: handle null, empty, or bad string values
+    if (empty($ids)) {
+        return collect();
     }
+
+    // If cast failed and it's still a string, decode manually
+    if (is_string($ids)) {
+        $ids = json_decode($ids, true);
+    }
+
+    // Final safety check
+    if (!is_array($ids) || empty($ids)) {
+        return collect();
+    }
+
+    return ProductVariant::whereIn('id', $ids)->get();
+}
 
 
     // get only first varaint

@@ -16,7 +16,7 @@ class BundelService {
     ) {}
 
     public function getBundels($request){
-        return Bundel::with(['category' , 'brand'])->get();
+        return Bundel::with(['category' , 'brand'])->latest()->get();
 
     }
 

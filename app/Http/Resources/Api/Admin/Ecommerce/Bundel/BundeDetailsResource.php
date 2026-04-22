@@ -19,11 +19,19 @@ class BundeDetailsResource extends JsonResource
             'price'=> (float) $this->getBundlePrice(),
             'image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {
-                $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'category' , ['id']);
+                return [
+                    'title'=>$this->category->title,
+                    'slug'=>$this->category->slug,
+                    'id'=>$this->category->id,
+                ];
 
             }),
             'brand'=>$this->whenLoaded('brand', function () {
-                $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'brand' , ['id']);
+                return [
+                    'title'=>$this->brand->title,
+                    'slug'=>$this->brand->slug,
+                    'id'=>$this->brand->id,
+                ];
             }),
             'status'=>$this->status,
             'title'=>$this->getColumnLang('title'),

@@ -14,19 +14,28 @@ class BundelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+   
+    
         return [
             'id'=>$this->id,
             'price'=>(float) $this->getBundlePrice(),
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {
-                $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'category' , ['id']);
+               return [
+                'title'=>$this->category->title,
+                'slug'=>$this->category->slug,
+                'id'=>$this->category->id,
+               ];
 
             }),
             'brand'=>$this->whenLoaded('brand', function () {
-                $this->getColumnsLangWithArrayRelation(['slug' , 'title'] , 'brand' , ['id']);
+                return [
+                    'title'=>$this->brand->title,
+                    'slug'=>$this->brand->slug,
+                    'id'=>$this->brand->id,
+                ];
             }),
-            'status'=>$this->status,
             'title'=>$this->getColumnLang('title'),
             'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),

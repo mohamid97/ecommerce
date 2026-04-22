@@ -8,7 +8,8 @@ use App\Models\Api\Ecommerce\ProductVariant;
 use App\Services\Admin\Common\TranslationService;
 use App\Traits\HandlesImage;
 
-class StoreBundelAction{
+class 
+StoreBundelAction{
     use HandlesImage;
 
     public function __construct(

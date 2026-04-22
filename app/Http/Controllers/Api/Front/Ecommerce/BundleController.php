@@ -34,8 +34,14 @@ class BundleController extends Controller
 
 
 
-    public function details(Request $request){
-        $bundle = Bundel::with(['category', 'brand'])->where('status' , 'active')->findOrFail($request->id);
+    public function bundleDetails(Request $request){
+      
+        try{
+        $bundle = Bundel::with(['category', 'brand' , 'bundelDetails.product.variants.variants.optionValue.option'])->where('status' , 'active')->findOrFail($request->id);
         return $this->success(new BundelDetailsResourc($bundle) , __('main.show_successfully' , ['bundle']));
+        }catch(\Exception $e){
+            dd($e->getLine() , $e->getMessage());
+        }
+
     }
 }
