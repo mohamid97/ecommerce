@@ -4,6 +4,7 @@ namespace App\Services\Admin\Ecommerce\Product;
 use App\Models\Api\Ecommerce\ProductOption;
 use App\Models\Api\Ecommerce\ProductOptionValue;
 use App\Models\Api\Ecommerce\ProductShipement;
+use App\Models\Api\Ecommerce\OptionValue;
 
 class StoreProductService
 {
@@ -31,22 +32,28 @@ class StoreProductService
     public function addProductOption($data , $id):void{
 
         foreach ($data as $option) {
-            
-            $productOption = ProductOption::create(
+
+
+            $productOption = ProductOption::firstOrCreate(
                 [
                     'product_id' => $id,
                     'option_id' => $option['option_id'],
                 ]
             );
-            foreach($option['value_ids'] as $value_id){
-                ProductOptionValue::create(
-                    [
-                        'product_option_id' => $productOption->id,
-                        'option_value_id' => $value_id,
-                    ]
-                );
 
-                
+            foreach ($option['value_ids'] ?? [] as $value_id) {
+                $isValid = OptionValue::where('id', $value_id)
+                    ->where('option_id', $option['option_id'])
+                    ->exists();
+
+                if (! $isValid) {
+                    continue;
+                }
+
+                ProductOptionValue::firstOrCreate([
+                    'product_option_id' => $productOption->id,
+                    'option_value_id' => $value_id,
+                ]);
             } // end store product option value
 
 

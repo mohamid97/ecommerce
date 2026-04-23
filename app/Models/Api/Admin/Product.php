@@ -98,8 +98,10 @@ class Product extends Model implements TranslatableContract
         if($this->discount_type == 'percentage'){
             return $this->sale_price - ($this->sale_price * ($this->discount_value / 100));
         }
-        return $this->sale_price - $this->discount_value;
+        return $this->sale_price - $this->discount;
+
     }
+
 
 
 

@@ -36,7 +36,6 @@ class VariantController extends Controller
         $variant = ProductVariant::with(['variants.optionValue.option' , 'varaintImages' , 'product'])->findOrFail($request->id);
         return $this->success(new VarinatDetailsResource($variant)  , __('main.retreived_successfully' , ['model' => 'Variant']) );
 
-
     }
 
     // get all varaints of product 

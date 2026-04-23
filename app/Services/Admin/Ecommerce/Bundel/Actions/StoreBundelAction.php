@@ -16,6 +16,7 @@ StoreBundelAction{
         public ValidateBundel $validateBundel
     ) {}
     public function storeBundel($data){
+        
         $translation = app(TranslationService::class);
         $bundel = Bundel::create([
             'price' => null,
@@ -26,9 +27,11 @@ StoreBundelAction{
         ]);
 
         $translation->storeTranslations($bundel, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
-
+ 
         $this->validateBundel->validateBundelDetails($bundel->id, $data);
+        
         $this->StoreBundelDetails($bundel->id , $data);
+        
         return $bundel;
 
 

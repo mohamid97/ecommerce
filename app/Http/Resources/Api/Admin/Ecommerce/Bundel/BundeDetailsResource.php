@@ -16,21 +16,24 @@ class BundeDetailsResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'price'=> (float) $this->getBundlePrice(),
+            'price'=>(float) $this->getBundlePrice()['total_price'],
+            'price_after_discount'=>(float) $this->getBundlePrice()['price_after_discount'],
             'image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {
                 return [
+                    'id'=>$this->category->id,
                     'title'=>$this->category->title,
                     'slug'=>$this->category->slug,
-                    'id'=>$this->category->id,
+                    
                 ];
 
             }),
             'brand'=>$this->whenLoaded('brand', function () {
                 return [
+                    'id'=>$this->brand->id,
                     'title'=>$this->brand->title,
                     'slug'=>$this->brand->slug,
-                    'id'=>$this->brand->id,
+                    
                 ];
             }),
             'status'=>$this->status,
@@ -45,7 +48,7 @@ class BundeDetailsResource extends JsonResource
                         'product' => [
                             'id'=>$detail->product->id  ,
                             'title'=>$detail->product->title,
-                            'product_varaints' => $detail->variants->map(function ($variant) {
+                            'product_varaints' => $detail->getVariants()->map(function ($variant) {
                                     return [
                                         'id' => $variant->id,
                                         'title' => $variant->title,

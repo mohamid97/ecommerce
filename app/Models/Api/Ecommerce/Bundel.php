@@ -35,26 +35,35 @@ class Bundel extends Model implements TranslatableContract
 
 
     // get price of bundel sum of product or varaint after thes discount
-    public function getBundlePrice(): float
+    public function getBundlePrice(): array
     {
-        $total = 0.0;
+        $totalPrice = 0.0;
+        $totalDiscountPrice = 0.0;
 
         // Eager load products to avoid N+1 queries
         $details = $this->bundelDetails()->with('product')->get();
 
         foreach ($details as $detail) {
             if (!empty($detail->variant_ids)) {
-                // Fetch only the first variant from the JSON array
-                $variant = ProductVariant::find($detail->variant_ids[0]);
-                $price   = $variant?->getDiscountPrice() ?? 0;
+               if(!is_array($detail->variant_ids)){
+                $varaintsIds = json_decode($detail->variant_ids, true);
+               }else{
+                $varaintsIds = $detail->variant_ids;
+               }
+                $variant = ProductVariant::find($varaintsIds[0]);
+
+                $discountPrice   = $variant?->getDiscountPrice() ?? 0;
+                $price           = $variant?->sale_price ?? 0;
             } else {
-                $price = $detail->product?->getDiscountPrice() ?? 0;
+                $discountPrice = $detail->product?->getDiscountPrice() ?? 0;
+                $price = $detail->product?->sale_price ?? 0;
             }
 
-            $total += $price * $detail->quantity;
+            $totalDiscountPrice += $discountPrice * $detail->quantity;
+            $totalPrice += $price * $detail->quantity;
         }
 
-        return $total;
+        return ['total_price' => $totalPrice, 'price_after_discount' => $totalDiscountPrice];
     }
 
 

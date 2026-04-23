@@ -26,7 +26,7 @@ class BundleController extends Controller
             $bundles,
             BundelResource::collection($bundles),
             'bundles',
-            __('main.list_successfully', ['bundles' => 'Bundles'])
+            __('main.list_successfully', ['model' => 'Bundles'])
         );
 
     }
@@ -38,7 +38,7 @@ class BundleController extends Controller
       
         try{
         $bundle = Bundel::with(['category', 'brand' , 'bundelDetails.product.variants.variants.optionValue.option'])->where('status' , 'active')->findOrFail($request->id);
-        return $this->success(new BundelDetailsResourc($bundle) , __('main.show_successfully' , ['bundle']));
+        return $this->success(new BundelDetailsResourc($bundle) , __('main.show_successfully' , ["model"=>'bundle']));
         }catch(\Exception $e){
             dd($e->getLine() , $e->getMessage());
         }

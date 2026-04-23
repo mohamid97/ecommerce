@@ -18,7 +18,8 @@ class BundelResource extends JsonResource
     
         return [
             'id'=>$this->id,
-            'price'=>(float) $this->getBundlePrice(),
+            'price'=>(float) $this->getBundlePrice()['total_price'],
+            'price_after_discount'=>(float) $this->getBundlePrice()['price_after_discount'],
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {

@@ -36,6 +36,13 @@ return [
     'product_has_no_options'=>'Product Has No Options.',
     'insufficient_stock'=>'Insufficient stock for selected option.',
     'insufficient_stock_for_selected_variant'=>'Insufficient stock for selected variant.',
+    'retreived_successfully'=>':model retrieved successfully.',
+    'updated_successfully'=>':model updated successfully.',
+    'deleted_successfully'=>':model deleted successfully.',
+    'restored_successfully'=>':model restored successfully.',
+    'show_successfully'=>':model details retrieved successfully.',
+    'not_found'=>':model not found.',
+    
 
 
     

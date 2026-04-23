@@ -136,8 +136,10 @@ class EcommerceDataSeeder extends Seeder
         $variantRedSmall->translateOrNew('ar')->slug = 'cotton-tshirt-red-small-ar';
         $variantRedSmall->save();
 
-        VariantOptionValue::create(['product_variant_id' => $variantRedSmall->id, 'option_value_id' => $colorRed->id]);
-        VariantOptionValue::create(['product_variant_id' => $variantRedSmall->id, 'option_value_id' => $sizeSmall->id]);
+        VariantOptionValue::create(['product_variant_id' => $variantRedSmall->id,
+         'option_id' => $colorRed->option_id,
+         'option_value_id' => $colorRed->id]);
+        VariantOptionValue::create(['product_variant_id' => $variantRedSmall->id, 'option_id' => $sizeSmall->option_id, 'option_value_id' => $sizeSmall->id]);
 
         $variantBlueLarge = ProductVariant::create([
             'product_id' => $variableProduct->id,
@@ -155,8 +157,8 @@ class EcommerceDataSeeder extends Seeder
         $variantBlueLarge->translateOrNew('ar')->slug = 'cotton-tshirt-blue-large-ar';
         $variantBlueLarge->save();
 
-        VariantOptionValue::create(['product_variant_id' => $variantBlueLarge->id, 'option_value_id' => $colorBlue->id]);
-        VariantOptionValue::create(['product_variant_id' => $variantBlueLarge->id, 'option_value_id' => $sizeLarge->id]);
+        VariantOptionValue::create(['product_variant_id' => $variantBlueLarge->id, 'option_id' => $colorBlue->option_id, 'option_value_id' => $colorBlue->id]);
+        VariantOptionValue::create(['product_variant_id' => $variantBlueLarge->id, 'option_id' => $sizeLarge->option_id, 'option_value_id' => $sizeLarge->id]);
 
         // 6. Create Bundle
         $bundle = Bundel::create([

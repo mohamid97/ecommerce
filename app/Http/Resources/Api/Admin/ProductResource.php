@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
         'slug' => $this->getColumnLang('slug'),
         // 'cost_price' => (float) $this->cost_price,
         'sale_price' => (float) $this->sale_price,
+        'price_after_discount' => $this->getDiscountPrice(),
         'discount' =>  (float) $this->discount,
         'discount_type' => $this->discount_type,
         'sku' => $this->sku,

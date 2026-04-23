@@ -29,8 +29,10 @@ class ProductService extends BaseModelService
     
     public function store()
     {
-            $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-            $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+
+        $this->validateDiscount($this->data['discount_type'], $this->data['discount'] , $this->data['sale_price']);
+        $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $this->data['slug']  = $this->createSlug($this->data); 
@@ -59,6 +61,9 @@ class ProductService extends BaseModelService
 
     
     public function update($id ){
+
+        $this->validateDiscount($this->data['discount_type'], $this->data['discount'] , $this->data['sale_price']);
+            
 
         $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
         $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
@@ -89,6 +94,15 @@ class ProductService extends BaseModelService
         return $product;
     }
 
+
+    private function validateDiscount($type, $value, $salePrice){
+        if($type == 'percentage' && ($value < 0 || $value > 100)){
+            throw new \Exception('Invalid discount percentage value');
+        }
+        if($type == 'fixed' && ($value < 0 || $value > $salePrice)){
+            throw new \Exception('Invalid fixed discount value');
+        }
+    }
 
     // public function applySearch(Builder $query, string $search ){
     //     return $query->where(function ($q) use ($search) {

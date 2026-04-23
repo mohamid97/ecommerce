@@ -56,8 +56,10 @@ class ProductController extends Controller
 
 
     public function productDetails(Request $request){
-        $product = Product::with(['category', 'brand'])->findOrFail($request->id);
-
+        $product = Product::with(['category', 'brand'])->where('status', 'active')->first($request->id);
+        if(!$product){
+            return $this->error(__('main.not_found' , ['product']));
+        }
         if (!$product->has_options) {
             return $this->success(new ProductNoOptionResource($product), __('main.show_successfully', ['product']));
         }
@@ -76,7 +78,7 @@ class ProductController extends Controller
 
     public function varaintDetails(Request $request){
         if($request->has('variant_id')){
-            $variant = ProductVariant::with(['varaintImages' , 'variants'])->findOrFail($request->variant_id);
+            $variant = ProductVariant::with(['varaintImages' , 'variants'])->where('status', 'active')->first($request->variant_id);
             if(!$variant){
                 return $this->error(__('main.not_found' , ['variant']));
             }

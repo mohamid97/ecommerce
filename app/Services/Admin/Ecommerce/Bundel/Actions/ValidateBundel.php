@@ -30,7 +30,7 @@ class ValidateBundel{
 
 
 
-                $variantIds = $item['variant_ids'];
+                // $variantIds = $item['variant_ids'];
             }
 
         
