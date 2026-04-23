@@ -4,17 +4,10 @@ namespace App\DTO\Ecommerce\Cart;
 
 class AddToCartDTO
 {
-    /** Optional — can be null when a bundle is added without a single root product. */
     public ?int $product_id = null;
-
-    /** Optional — only sent when the product has options/variants. */
     public ?int $variant_id = null;
-
-    /** Optional — triggers the BundleStrategy when present. */
     public ?int $bundel_id = null;
-
     public int $quantity = 1;
-
     public array $bundle_items = [];
 
     public static function fromRequest(array $data): self

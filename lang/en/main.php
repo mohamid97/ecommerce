@@ -42,6 +42,7 @@ return [
     'restored_successfully'=>':model restored successfully.',
     'show_successfully'=>':model details retrieved successfully.',
     'not_found'=>':model not found.',
+    'bundle_items_are_required'=>'Bundle items are required when adding a bundle to the cart.',
     
 
 

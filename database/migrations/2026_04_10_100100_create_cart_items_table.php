@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('variant_id')->nullable();
             $table->unsignedBigInteger('bundel_id')->nullable();
+            $table->enum('type', ['product', 'variant', 'bundel'])->default('product');
             $table->integer('quantity')->default(1);
             $table->decimal('total_before_discount', 10, 2)->nullable();
             $table->decimal('total_after_discount', 10, 2)->nullable();

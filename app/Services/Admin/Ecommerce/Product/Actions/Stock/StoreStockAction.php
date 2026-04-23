@@ -13,13 +13,18 @@ class StoreStockAction
         // get product
         $product = Product::findOrFail($dto->product_id);
         // check if front sent variant id and this variant belong to this product
-        if(isset($dto->variant_id) && !$product->checkHasVariantId($dto->variant_id)){
+        if(isset($dto->variant_id) && !$this->checkHasVariantId($dto->variant_id , $dto->product_id)){
             throw new \Exception('Variant not found');
         }
 
+  
         return $this->storeStock($dto , $product->has_options);
         
     } 
+
+    private function checkHasVariantId($variant_id , $product_id){
+        return ProductVariant::where('id' , $variant_id)->where('product_id' , $product_id)->exists();
+    }
 
 
 
@@ -46,7 +51,7 @@ class StoreStockAction
 
      private function UpdateMainStock($dto){
         if($dto->variant_id){
-            ProductVariant::where('product_id' , $dto->product_id)->where('variant_id' , $dto->variant_id)
+            ProductVariant::where('product_id' , $dto->product_id)->where('id' , $dto->variant_id)
                             ->update([
                                 'stock' => $dto->quantity + $this->getVariantStock($dto->product_id , $dto->variant_id),
                                 // 'sale_price' => $dto->sale_price,
@@ -66,7 +71,7 @@ class StoreStockAction
 
 
      private function getVariantStock($product_id , $variant_id){
-        return ProductVariant::where('product_id' , $product_id)->where('variant_id' , $variant_id)->value('stock');
+        return ProductVariant::where('product_id' , $product_id)->where('id' , $variant_id)->value('stock');
      }
 
 

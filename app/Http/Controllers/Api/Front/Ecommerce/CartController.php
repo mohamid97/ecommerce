@@ -22,9 +22,6 @@ class CartController extends Controller
         private CartService $cartService  
     ) {}
 
-
-
-
     public function view(Request $request){
         $userId = $request->user()->id;
         
@@ -46,6 +43,7 @@ class CartController extends Controller
 
     public function addToCart(CartStoreRequest $request)    
     {
+       
         try {
             DB::beginTransaction();
             $dto = AddToCartDTO::fromRequest($request->validated());

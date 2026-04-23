@@ -22,18 +22,15 @@ class CartStrategyResolver
 
     public function resolve(AddToCartDTO $dto): CartStrategyInterface
     {
-        // ── Bundle ──────────────────────────────────────────────────────────
-        // If bundel_id is sent, it's a bundle item.
+   
         if (isset($dto->bundel_id)) {
             return new BundleStrategy($this->action, $this->repo);
         }
 
-        // ── Product + Variant (with option) ─────────────────────────────────
         if (isset($dto->variant_id)) {
             return new ProductWithOptionStrategy($this->action, $this->repo);
         }
 
-        // ── Plain product (no option) ────────────────────────────────────────
         return new SimpleProductStrategy($this->action, $this->repo);
     }
 }
