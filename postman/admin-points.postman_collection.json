@@ -1,0 +1,105 @@
+{
+  "info": {
+    "name": "Admin Points API",
+    "_postman_id": "points-admin-collection",
+    "description": "Postman collection for admin Points endpoints (tiers + conversion)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost", "type": "string" },
+    { "key": "authToken", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Get Points Settings",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [] },
+        "url": { "raw": "{{baseUrl}}/api/admin/get-points-tiers", "host": ["{{baseUrl}}"], "path": ["api","admin","get-points-tiers"] }
+      }
+    },
+    {
+      "name": "Store/Update Points Settings",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "min_order_amount", "value": "600", "type": "text" },
+            { "key": "points", "value": "10", "type": "text" },
+            { "key": "pound_per_point", "value": "0.05", "type": "text" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/admin/store-points-tier", "host": ["{{baseUrl}}"], "path": ["api","admin","store-points-tier"] }
+      }
+    },
+    {
+      "name": "Update Points Settings",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "min_order_amount", "value": "1000", "type": "text" },
+            { "key": "points", "value": "20", "type": "text" },
+            { "key": "pound_per_point", "value": "0.05", "type": "text" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/admin/update-points-tier", "host": ["{{baseUrl}}"], "path": ["api","admin","update-points-tier"] }
+      }
+    },
+    {
+      "name": "Delete Points Settings",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [] },
+        "url": { "raw": "{{baseUrl}}/api/admin/delete-points-tier", "host": ["{{baseUrl}}"], "path": ["api","admin","delete-points-tier"] }
+      }
+    },
+    {
+      "name": "Get Points Conversion",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [] },
+        "url": { "raw": "{{baseUrl}}/api/admin/get-points-conversion", "host": ["{{baseUrl}}"], "path": ["api","admin","get-points-conversion"] }
+      }
+    },
+    {
+      "name": "Update Points Conversion",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{authToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "pound_per_point", "value": "0.05", "type": "text" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/admin/update-points-conversion", "host": ["{{baseUrl}}"], "path": ["api","admin","update-points-conversion"] }
+      }
+    }
+  ]
+}

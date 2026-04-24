@@ -1,0 +1,94 @@
+{
+  "info": {
+    "name": "Admin - Cart Endpoints",
+    "_postman_id": "admin-cart-collection",
+    "description": "Postman collection for admin cart endpoints (list, view, delete, clear)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Carts (paginated)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": null,\n  \"page\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/carts/all",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","carts","all"]
+        }
+      }
+    },
+    {
+      "name": "View Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/carts/view",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","carts","view"]
+        }
+      }
+    },
+    {
+      "name": "Delete Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/carts/delete",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","carts","delete"]
+        }
+      }
+    },
+    {
+      "name": "Clear Carts By User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 3\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/carts/clear",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","carts","clear"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ]
+}

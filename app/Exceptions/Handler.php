@@ -8,6 +8,7 @@ use Throwable;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
+use Spatie\Permission\Exceptions\UnauthorizedException as SpatieUnauthorizedException;
 
 class Handler extends ExceptionHandler
 {
@@ -41,6 +42,9 @@ class Handler extends ExceptionHandler
         if ($exception instanceof AuthenticationException) {
         
             return $this->error( __('main.unauthenticated') , JsonResponse::HTTP_UNAUTHORIZED);
+        }
+        if ($exception instanceof SpatieUnauthorizedException) {
+            return $this->error($exception->getMessage() ?: __('main.forbidden'), JsonResponse::HTTP_FORBIDDEN);
         }
         if ($exception instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) { 
             return $this->error( __('main.many_request') , 429);
