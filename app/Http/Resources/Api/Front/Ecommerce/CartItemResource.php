@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Api\Front\Ecommerce;
 
+use App\Models\Api\Ecommerce\Bundel;
+use App\Models\Api\Ecommerce\BundelDetails;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,7 +16,7 @@ class CartItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if ($this->bundel_id) {
+        if ($this->bundel_id && $this->type === 'bundle') {
             return [
                 'id' => $this->id,
                 'cart_id' => $this->cart_id,
@@ -22,6 +24,7 @@ class CartItemResource extends JsonResource
                 'bundel_id' => $this->bundel_id,
                 'bundel_title' => $this->bundel?->title,
                 'bundle_items' => $this->cartBundelItems->map(function($item) {
+                   
                     return [
                         'id' => $item->id,
                         'product_id' => $item->product_id,
@@ -29,11 +32,14 @@ class CartItemResource extends JsonResource
                         'variant_id' => $item->variant_id,
                         'variant' => $item->variant?->title,
                         'varaint_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,
+                        'quantity' => BundelDetails::where('bundel_id', $this->bundel_id)
+                            ->where('product_id', $item->product_id)
+                            ->value('quantity') ?? 1,
                     ];
                 }),
-                'total_before_discount' => $this->total_before_discount,
-                'total_after_discount' => $this->total_after_discount,
-                'quantity' => $this->quantity,
+                'total_before_discount' => (float) $this->total_before_discount,
+                'total_after_discount' => (float) $this->total_after_discount,
+                'quantity' => (float) $this->quantity,
                 'created_at' => $this->created_at->format('Y-m-d'),
                 'updated_at' => $this->updated_at->format('Y-m-d'),
             ];

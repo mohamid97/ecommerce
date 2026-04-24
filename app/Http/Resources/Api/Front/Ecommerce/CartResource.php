@@ -19,6 +19,8 @@ class CartResource extends JsonResource
             'user_id' => $this->user_id,
             'status' => $this->status,
             'items' => CartItemResource::collection($this->whenLoaded('items')),
+            'total_before_discount' => (float) $this->items->sum('total_before_discount'),
+            'total_after_discount' => (float) $this->items->sum('total_after_discount'),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];

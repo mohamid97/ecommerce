@@ -13,19 +13,5 @@ use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
     use ResponseTrait;
-    public function addToCart(CartStoreRequest $request , CartService $cart){
-        try {
-            DB::beginTransaction();
-            $dto = AddToCartDTO::fromRequest($request->validated());
-            $userId = $request->user()->id;
-            $cart->StoreToCart($userId , $dto);
-            DB::commit();
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-           return  $this->error($e->getMessage() , 422);
-
-        }
-
-    }
 }

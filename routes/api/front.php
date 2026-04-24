@@ -23,8 +23,8 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         // start carts with authanicate 
         Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function(){
             Route::post('/add', 'addToCart');
-            Route::post('/update', 'addToCart');
-            Route::post('/delete', 'deleteFromCart');
+            Route::post('/delete-all', 'deleteAllFromCart');
+            Route::post('/delete-item', 'deleteFromCart');
             Route::get('/view', 'viewCart');
         });
 

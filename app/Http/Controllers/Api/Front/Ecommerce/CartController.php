@@ -12,7 +12,7 @@ use App\Services\Ecommerce\Cart\CartService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Api\Ecommerce\Cart as CartModel;
+use App\Models\Api\Ecommerce\Cart;
 use App\Models\Api\Ecommerce\CartItem;
 
 class CartController extends Controller
@@ -22,20 +22,22 @@ class CartController extends Controller
         private CartService $cartService  
     ) {}
 
-    public function view(Request $request){
+    public function viewCart(Request $request){
+        // dd('dsds');
         $userId = $request->user()->id;
         
-        $cart = CartModel::with([
+        $cart = Cart::with([
             'items.product',
-            'items.variant.variants.optionValue.option',
-            'items.bundel',
-            'items.cartBundelItems.product',
-            'items.cartBundelItems.variant.variants.optionValue.option'
+            // 'items.variant.variants.optionValue.option',
+            // 'items.bundel',
+            // 'items.cartBundelItems.product',
+            // 'items.cartBundelItems.variant.variants.optionValue.option'
         ])->where('user_id' , $userId)->first();
         
         if(!$cart){
             return $this->success(null , 200);
         }
+
         
         return $this->success(new CartResource($cart) , 200);
 
@@ -75,6 +77,15 @@ class CartController extends Controller
         
 
     } // delete from cart
+
+
+
+    public function deleteAllFromCart(Request $request){
+        $userId = $request->user()->id;
+        // need to delete car also 
+        Cart::where('user_id', $userId)->delete();
+        return $this->success(null , 200);
+     }
 
 
 
