@@ -8,6 +8,8 @@ use App\Http\Resources\Api\Front\Ecommerce\ProductNoOptionResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductResource;
 use App\Http\Resources\Api\Front\Ecommerce\VaraintDetailsResource;
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\LastPiece;
+use App\Models\Api\Ecommerce\NewProduct;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -76,6 +78,16 @@ class ProductController extends Controller
 
     }
 
+    public function lastPiece(Request $request)
+    {
+        return $this->sectionProducts($request, LastPiece::query()->select('product_id'), 'last_piece_products');
+    }
+
+    public function newest(Request $request)
+    {
+        return $this->sectionProducts($request, NewProduct::query()->select('product_id'), 'newest_products');
+    }
+
     public function varaintDetails(Request $request){
         if($request->has('variant_id')){
             $variant = ProductVariant::with(['varaintImages' , 'variants'])->where('status', 'active')->first($request->variant_id);
@@ -89,5 +101,25 @@ class ProductController extends Controller
 
 
 
+
+    private function sectionProducts(Request $request, $productsSubQuery, string $responseKey)
+    {
+        $products = Product::query()
+            ->where('status', 'active')
+            ->whereIn('id', $productsSubQuery);
+
+        if($request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)){
+            $products = $products->paginate($request->paginate);
+        }else{
+            $products = $products->paginate(10);
+        }
+
+        return $this->successPaginated(
+            $products,
+            ProductResource::collection($products),
+            $responseKey,
+            __('main.list_successfully', ['model' => 'Products'])
+        );
+    }
 
 }

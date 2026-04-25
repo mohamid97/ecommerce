@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\Admin\Ecommerce\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\StoreRelatedProductsRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductSectionRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductVaraintStatusRequest;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Admin\RelatedProduct;
+use App\Models\Api\Ecommerce\LastPiece;
+use App\Models\Api\Ecommerce\NewProduct;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -55,6 +58,27 @@ class ProductController extends Controller
 
 
 
+    public function addLastPiece(UpdateProductSectionRequest $request)
+    {
+        return $this->addSectionProduct($request->id, LastPiece::class);
+    }
+
+    public function deleteLastPiece(UpdateProductSectionRequest $request)
+    {
+        return $this->deleteSectionProduct($request->id, LastPiece::class);
+    }
+
+    public function addNewest(UpdateProductSectionRequest $request)
+    {
+        return $this->addSectionProduct($request->id, NewProduct::class);
+    }
+
+    public function deleteNewest(UpdateProductSectionRequest $request)
+    {
+        return $this->deleteSectionProduct($request->id, NewProduct::class);
+    }
+
+
     public function storeRelatedProduct(StoreRelatedProductsRequest $request){
         try{
             DB::beginTransaction();
@@ -99,6 +123,18 @@ public function filterProduct(Request $request)
 
     return $this->error(__('main.not_founded') ,404);
 }
+
+    private function addSectionProduct(int $productId, string $modelClass)
+    {
+        $modelClass::firstOrCreate(['product_id' => $productId]);
+        return $this->success(__('main.stored_successfully', ['model' => 'Product']));
+    }
+
+    private function deleteSectionProduct(int $productId, string $modelClass)
+    {
+        $modelClass::where('product_id', $productId)->delete();
+        return $this->success(__('main.updated_successfully'));
+    }
 
 
 public function relatedProducts(Request $request)

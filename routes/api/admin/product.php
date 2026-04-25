@@ -7,6 +7,10 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
     // products 
     Route::post('/make-featured' , 'ProductController@makeFeatured')->middleware('checkPermision:update');
+    Route::post('/add-last-piece' , 'ProductController@addLastPiece')->middleware('checkPermision:update');
+    Route::post('/delete-last-piece' , 'ProductController@deleteLastPiece')->middleware('checkPermision:update');
+    Route::post('/add-newest-product' , 'ProductController@addNewest')->middleware('checkPermision:update');
+    Route::post('/delete-newest-product' , 'ProductController@deleteNewest')->middleware('checkPermision:update');
     Route::post('/update-product-varaint-status' , 'ProductController@updateStatusProductOrVaraint')->middleware('checkPermision:update');
     Route::post('/store-related-products' , 'ProductController@storeRelatedProduct')->name('checkPermision:update');
     Route::post('/related-products' , 'ProductController@relatedProducts')->name('checkPermision:view');
@@ -61,8 +65,6 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
 });
-
-
 
 
 
