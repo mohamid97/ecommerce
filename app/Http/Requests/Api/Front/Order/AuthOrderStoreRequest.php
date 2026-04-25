@@ -11,7 +11,7 @@ class AuthOrderStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,13 @@ class AuthOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'shipment_city_id' => 'required|exists:shipment_cities,id',
+            'shipment_zone_id' => 'required|exists:shipment_zones,id',
+            'shipment_address' => 'required|string|max:255',
+            'payment_method' => 'required|string|max:255',
+            'use_points' => 'nullable|boolean',
+            'points_to_use' => 'nullable|integer|min:0|max:1000',
+            
         ];
     }
 }

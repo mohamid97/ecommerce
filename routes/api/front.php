@@ -28,6 +28,11 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
             Route::get('/view', 'viewCart');
         });
 
+        // orders
+        Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
+            Route::post('/store', 'store');
+        });
+
     });
 
 

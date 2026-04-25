@@ -43,6 +43,9 @@ return [
     'show_successfully'=>':model details retrieved successfully.',
     'not_found'=>':model not found.',
     'bundle_items_are_required'=>'Bundle items are required when adding a bundle to the cart.',
+    'user_cart_not_found'=>'User cart not found.',
+    'empty_cart'=>'Your cart is empty.',
+
     
 
 

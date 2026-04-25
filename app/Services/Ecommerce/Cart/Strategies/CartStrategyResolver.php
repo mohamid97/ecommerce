@@ -6,13 +6,6 @@ use App\DTO\Ecommerce\Cart\AddToCartDTO;
 use App\Services\Ecommerce\Cart\CartAction;
 use App\Services\Ecommerce\Cart\CartRepository;
 
-/**
- * Resolves the correct CartStrategy based on the DTO payload:
- *
- *   bundel_id presence         →  BundleStrategy
- *   variant_id presence        →  ProductWithOptionStrategy
- *   Neither                    →  SimpleProductStrategy
- */
 class CartStrategyResolver
 {
     public function __construct(

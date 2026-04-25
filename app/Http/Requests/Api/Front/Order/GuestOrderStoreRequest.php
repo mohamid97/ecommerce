@@ -11,7 +11,7 @@ class GuestOrderStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class GuestOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'shipment_city_id' => 'required|exists:shipment_cities,id',
+            'shipment_address' => 'required|string',
+            'payment_method' => 'required|string',
+            'cart_id' => 'nullable|exists:carts,id',
         ];
     }
 }

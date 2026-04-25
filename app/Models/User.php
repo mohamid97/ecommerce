@@ -28,6 +28,7 @@ class User extends Authenticatable
         'first_name', 
         'last_name',
         'type',
+        'points',
     ];
 
     protected $guard_name = 'sanctum';
@@ -49,7 +50,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        
+        'points' => 'integer',
     ];
 
     protected function serializeDate(\DateTimeInterface $date)
