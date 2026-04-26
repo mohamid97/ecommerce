@@ -19,7 +19,7 @@ class ProductVaraintsResource extends JsonResource
             'id'=>$this->id,
             'sku'=>$this->sku,
             'sale_price'=>$this->sale_price,
-            'price_after_discount' => $this->getPriceAfterDiscount(),
+            'price_after_discount' => $this->getDiscountPrice(),
             'stock'=>$this->stock,
             'status'=>$this->status,
             'is_default'=>(bool) $this->is_default,
