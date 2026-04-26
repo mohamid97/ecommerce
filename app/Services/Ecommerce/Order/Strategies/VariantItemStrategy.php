@@ -13,6 +13,7 @@ class VariantItemStrategy implements CartItemStrategyInterface
 {
     public function handle(CartItem $cartItem, Order $order, OrderRepository $repo): array
     {
+        
         // get qty and product/variant details
         $qty = (int) $cartItem->quantity;
         $product = $cartItem->product;
@@ -60,7 +61,7 @@ class VariantItemStrategy implements CartItemStrategyInterface
         if ($remaining > 0) {
             throw new \Exception(__('main.out_of_stock', ['product' => $product->id]));
         }
-
+  
         return [(float) $orderItem->total_price, (float) $orderItem->total_price_after_discount];
     }
 

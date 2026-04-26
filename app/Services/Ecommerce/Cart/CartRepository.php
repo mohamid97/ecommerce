@@ -33,7 +33,7 @@ class CartRepository
                 'product_id'            => null,
                 'variant_id'            => null,
                 'quantity'              => $dto->quantity,
-                'type'                  =>'bundle',
+                'type'                  =>'bundel',
                 'total_before_discount' => $priceData['total_price'] * $dto->quantity,
                 'total_after_discount'  => $priceData['total_discount_price'] * $dto->quantity,
             ];
@@ -63,7 +63,7 @@ class CartRepository
                 'bundel_id'             => null,
                 'type'                  =>'variant',
                 'total_before_discount' => ProductVariant::find($dto->variant_id)->sale_price * $dto->quantity,
-                'total_after_discount'  => ProductVariant::find($dto->variant_id)->getDiscountedPrice() * $dto->quantity,
+                'total_after_discount'  => ProductVariant::find($dto->variant_id)->getDiscountPrice() * $dto->quantity,
             ];
 
             CartItem::updateOrCreate($matchKey, $attributes);
@@ -80,7 +80,7 @@ class CartRepository
                 'quantity'              => $dto->quantity,
                 'type'                  =>'product',
                 'total_before_discount' => Product::find($dto->product_id)->sale_price * $dto->quantity,
-                'total_after_discount'  => Product::find($dto->product_id)->getDiscountedPrice() * $dto->quantity,
+                'total_after_discount'  => Product::find($dto->product_id)->getDiscountPrice() * $dto->quantity,
             ];
 
             CartItem::updateOrCreate($matchKey, $attributes);

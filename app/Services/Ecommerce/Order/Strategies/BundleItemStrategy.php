@@ -15,10 +15,14 @@ class BundleItemStrategy implements CartItemStrategyInterface
 {
     public function handle(CartItem $cartItem, Order $order, OrderRepository $repo): array
     {
+
         // get qty and bundle details   
         $qty = (int) $cartItem->quantity;
         $bundle = Bundel::with('bundelDetails')->find($cartItem->bundel_id);
-        [$sale_price , $price_after_discount] = $bundle?->getBundlePrice();
+      
+        [$sale_price , $price_after_discount] = $this->getBundlePrice($cartItem ,  $bundle);
+      
+      
 
         $orderItem = $repo->createOrderItem([
             'order_id' => $order->id,
@@ -129,6 +133,7 @@ class BundleItemStrategy implements CartItemStrategyInterface
                 throw new \Exception(__('main.out_of_stock', ['product' => $subProduct->id]));
             }
         }
+    
 
         return [(float) $orderItem->total_price, (float) $orderItem->total_price_after_discount];
     }
@@ -136,5 +141,40 @@ class BundleItemStrategy implements CartItemStrategyInterface
     public function supports(CartItem $cartItem): bool
     {
         return !empty($cartItem->bundel_id);
+    }
+
+
+
+
+    private function getBundlePrice(CartItem $cartItem , Bundel $bundle): array
+    {
+        // can not use  getBundlePrice as this take first varaint price without checking user selection in cart
+        // need to calculate price based on user selection in cart for each bundel detail
+        $sale_price = 0;
+        $price_after_discount = 0;
+        foreach ($bundle->bundelDetails as $d) {
+            //
+            $selected = $cartItem->cartBundelItems->firstWhere('product_id', $d->product_id);
+
+            if($selected->variant_id){
+                if(!in_array($selected->variant_id , $d->variant_ids)){
+                    throw new \Exception(__('main.invalid_bundle_selection'));
+                }
+                $v = $d->getVariants()->where('id', $selected->variant_id)->first();
+                $sale_price += ($v->sale_price ?? 0) * ($d->quantity ?? 1);
+                $price_after_discount += ($v->getDiscountPrice() ?? $v->sale_price ?? 0) * ($d->quantity ?? 1);
+            }else{
+                $p = $d->product;
+                $sale_price += ($p->sale_price ?? 0) * ($d->quantity ?? 1);
+                $price_after_discount += ($p->getDiscountPrice() ?? $p->sale_price ?? 0) * ($d->quantity ?? 1);
+            }
+
+
+        }
+
+        return [$sale_price, $price_after_discount];
+
+
+
     }
 }

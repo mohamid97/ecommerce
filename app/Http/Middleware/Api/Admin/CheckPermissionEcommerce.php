@@ -24,6 +24,6 @@ class CheckPermissionEcommerce
                 
                 return $next($request);
             }
-            return $this->error("You do not have permission to $action $permission", 403);
+            return $this->error("You do not have permission to $permission", 403);
     }
 }

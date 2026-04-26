@@ -36,16 +36,21 @@ class OrderService
 
             // create main order record
             $order = $this->repo->createOrder($user, $data);
+            
 
             $total = 0;
             $totalAfterDiscount = 0;
 
             foreach ($cart->items as $cartItem) {
+               
                 $strategy = $this->resolver->resolve($cartItem);
                 [$itemTotal, $itemTotalAfterDiscount] = $strategy->handle($cartItem, $order, $this->repo);
                 $total += $itemTotal;
                 $totalAfterDiscount += $itemTotalAfterDiscount;
             }
+
+          
+           
 
             // points handling (optional)
             if (!empty($data['use_points']) && !empty($data['points_to_use'])) {
@@ -53,16 +58,19 @@ class OrderService
                 // compute points_amount using conversion table if exists
                 $order->points_amount = 0; // implement conversion as needed
             }
+           
 
             // $order->total = $total;
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
+            //  dd($order);
 
             // mark cart closed via repository
-            $this->repo->markCartConverted($cart);
+            // $this->repo->markCartConverted($cart);
 
+            $this->action->deleteCart($user->id);
             return $order->load([
                 'items.batches.stockMovment',
                 'items.product',

@@ -23,7 +23,8 @@ class CartStrategyResolver
         if (isset($dto->variant_id)) {
             return new ProductWithOptionStrategy($this->action, $this->repo);
         }
-
+ 
+      
         return new SimpleProductStrategy($this->action, $this->repo);
     }
 }

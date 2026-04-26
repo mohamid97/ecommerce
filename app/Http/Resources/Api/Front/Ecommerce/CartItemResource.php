@@ -16,7 +16,7 @@ class CartItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if ($this->bundel_id && $this->type === 'bundle') {
+        if ($this->bundel_id && $this->type === 'bundel') {
             return [
                 'id' => $this->id,
                 'cart_id' => $this->cart_id,
@@ -48,16 +48,16 @@ class CartItemResource extends JsonResource
         return [
             'id' => $this->id,
             'cart_id' => $this->cart_id,
-            'type' => 'product',
             'product_id' => $this->product_id,
+            'type' => 'product',
             'product' => $this->product?->title,
             'has_options'=>(bool) $this->product?->has_options,
             'variant_id' => $this->variant_id,
             'variant' => $this->variant?->title,
             'varaint_name' => ($this->variant_id) ? $this->buildVariantName($this->product, $this->variant) : null,
-            'total_before_discount' => $this->total_before_discount,
-            'total_after_discount' => $this->total_after_discount,
-            'quantity' => $this->quantity,
+            'total_before_discount' =>(float) $this->total_before_discount,
+            'total_after_discount' => (float) $this->total_after_discount,
+            'quantity' => (float) $this->quantity,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];

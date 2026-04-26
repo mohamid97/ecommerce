@@ -103,6 +103,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
          require __DIR__.'/admin/promotion.php';
          require __DIR__.'/admin/cart.php';
          require __DIR__.'/admin/points.php';
+         require __DIR__.'/admin/order.php';
 
 
 

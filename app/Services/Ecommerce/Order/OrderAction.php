@@ -2,7 +2,7 @@
 
 namespace App\Services\Ecommerce\Order;
 
-use App\Models\Api\Admin\Product as AdminProduct;
+use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\Cart;
@@ -13,7 +13,7 @@ class OrderAction
 {
     public function checkProductExists(int $id): void
     {
-        if (!AdminProduct::find($id)) {
+        if (!Product::find($id)) {
             throw new \RuntimeException(__('main.product_not_found'));
         }
     }
@@ -53,5 +53,14 @@ class OrderAction
         }
 
         return $cart;
+    }
+
+
+
+
+
+    public function deleteCart(int $userId): void
+    {
+        Cart::where('user_id', $userId)->delete();
     }
 }

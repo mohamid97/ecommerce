@@ -22,7 +22,7 @@ class ProductResource extends JsonResource
             'slug'=>$this->getColumnLang('slug'),
             'des' => $this->des,
             'sale_price' => $this->sale_price,
-            'discount_price' => $this->discount_price,
+            'discount_price' =>(float) $this->discount,
             'discount_type' => $this->discount_type,
             'on_demand' => $this->on_demand,
             'sku' => $this->sku,

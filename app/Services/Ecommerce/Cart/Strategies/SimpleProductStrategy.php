@@ -28,12 +28,13 @@ class SimpleProductStrategy implements CartStrategyInterface
                 'variant_id' => __('main.variant_is_required_for_this_product')
             ]);
         }
-        
+       
         $this->action->checkStock($dto->quantity);
     }
 
     public function store(int $userId, AddToCartDTO $dto): mixed
     {
+    
         return $this->repo->createOrUpdateCard($userId, $dto);
     }
 }

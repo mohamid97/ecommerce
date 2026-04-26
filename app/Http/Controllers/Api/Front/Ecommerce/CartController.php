@@ -52,7 +52,7 @@ class CartController extends Controller
             $userId = $request->user()->id;
             $this->cartService->StoreToCart($userId , $dto);
             DB::commit();
-            return $this->success( null , 200);
+            return $this->success( null , __('main.stored_successfully' , ['model' => 'Item']) , 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error($e->getMessage() , 422);
@@ -67,7 +67,7 @@ class CartController extends Controller
             $dto = RemoveFromCartDTO::fromRequest($request->validated());
             $this->cartService->RemoveFromCart($userId , $dto);
             DB::commit();
-            return $this->success(null , 200);
+            return $this->success(null , __('main.deleted_successfully' , ['model' => 'Item']) , 200);
        }catch (\Exception $e) {
             DB::rollBack();
             return $this->error($e->getMessage() , 422);
