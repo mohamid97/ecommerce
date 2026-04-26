@@ -54,9 +54,10 @@ class OrderService
                 $order->points_amount = 0; // implement conversion as needed
             }
 
-            $order->total = $total;
+            // $order->total = $total;
             $order->total_after_discount = $totalAfterDiscount;
-            $order->total = $totalAfterDiscount + $order->shipping_cost + $order->tax - ($order->points_amount ?? 0);
+            $order->total_before_discount = $total;
+            $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
 
             // mark cart closed via repository

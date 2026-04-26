@@ -18,9 +18,6 @@ use App\Models\Api\Ecommerce\BundelDetails;
 use App\Models\Api\Ecommerce\StockMovment;
 use App\Models\Api\Ecommerce\ShipmentZone;
 use App\Models\Api\Ecommerce\ShipmentCity;
-use App\Models\Api\Ecommerce\Cart;
-use App\Models\Api\Ecommerce\CartBundelItem;
-use App\Models\Api\Ecommerce\Order;
 use App\Models\Api\Ecommerce\LastPiece;
 use App\Models\Api\Ecommerce\NewProduct;
 use Illuminate\Support\Facades\DB;
@@ -215,16 +212,7 @@ class EcommerceDataSeeder extends Seeder
             NewProduct::firstOrCreate(['product_id' => $simpleKeyboard->id]);
             NewProduct::firstOrCreate(['product_id' => $poloProduct->id]);
 
-            [$zone, $city] = $this->seedShipmentZoneAndCity();
-            $this->seedCartsAndOrders(
-                $bundle,
-                $simpleMouse,
-                $simpleKeyboard,
-                $tshirtProduct,
-                $tshirtBlueMedium,
-                $zone->id,
-                $city->id
-            );
+            $this->seedShipmentZoneAndCity();
         });
     }
 
@@ -566,7 +554,7 @@ class EcommerceDataSeeder extends Seeder
         );
     }
 
-    private function seedShipmentZoneAndCity(): array
+    private function seedShipmentZoneAndCity(): void
     {
         $zone = ShipmentZone::firstOrCreate(
             ['price' => 25],
@@ -587,241 +575,5 @@ class EcommerceDataSeeder extends Seeder
         $city->translateOrNew('ar')->title = 'مدينة نصر';
         $city->translateOrNew('ar')->des = 'مدينة شحن سريع';
         $city->save();
-
-        return [$zone, $city];
-    }
-
-    private function seedCartsAndOrders(
-        Bundel $bundle,
-        Product $simpleMouse,
-        Product $simpleKeyboard,
-        Product $tshirtProduct,
-        ProductVariant $tshirtBlueMedium,
-        int $zoneId,
-        int $cityId
-    ): void {
-        $user = User::where('type', 'user')->first() ?? User::first();
-
-        $cartOpen = Cart::firstOrCreate(
-            ['user_id' => $user?->id, 'status' => 'open']
-        );
-
-        $productItemId = $this->upsertCartItem(
-            $cartOpen->id,
-            ['type' => 'product', 'product_id' => $simpleMouse->id, 'variant_id' => null, 'bundel_id' => null],
-            ['quantity' => 2, 'total_before_discount' => 40, 'total_after_discount' => 40]
-        );
-
-        $variantItemId = $this->upsertCartItem(
-            $cartOpen->id,
-            ['type' => 'variant', 'product_id' => $tshirtProduct->id, 'variant_id' => $tshirtBlueMedium->id, 'bundel_id' => null],
-            [
-                'quantity' => 1,
-                'total_before_discount' => $tshirtBlueMedium->sale_price,
-                'total_after_discount' => $tshirtBlueMedium->getDiscountPrice(),
-            ]
-        );
-
-        $bundleItemId = $this->upsertCartItem(
-            $cartOpen->id,
-            ['type' => 'bundel', 'product_id' => null, 'variant_id' => null, 'bundel_id' => $bundle->id],
-            ['quantity' => 1, 'total_before_discount' => $bundle->price, 'total_after_discount' => $bundle->price]
-        );
-
-        CartBundelItem::firstOrCreate([
-            'cart_item_id' => $bundleItemId,
-            'product_id' => $simpleMouse->id,
-            'variant_id' => null,
-        ]);
-        CartBundelItem::firstOrCreate([
-            'cart_item_id' => $bundleItemId,
-            'product_id' => $tshirtProduct->id,
-            'variant_id' => $tshirtBlueMedium->id,
-        ]);
-
-        $stockSimple = StockMovment::where('product_id', $simpleMouse->id)->whereNull('variant_id')->first();
-        $stockVariant = StockMovment::where('variant_id', $tshirtBlueMedium->id)->first();
-
-        $subtotal = 40 + (float) $tshirtBlueMedium->getDiscountPrice() + (float) $bundle->price;
-        $shipping = 25;
-        $tax = round($subtotal * 0.14, 2);
-        $total = $subtotal + $shipping + $tax;
-
-        $order = Order::firstOrCreate(
-            ['user_id' => $user?->id, 'status' => 'completed', 'shipment_address' => 'Test Street 123'],
-            [
-                'subtotal' => $subtotal,
-                'shipping_cost' => $shipping,
-                'tax' => $tax,
-                'total' => $total,
-                'points_used' => 20,
-                'points_amount' => 10,
-                'shipment_zone_id' => $zoneId,
-                'shipment_city_id' => $cityId,
-                'payment_method' => 'cash',
-            ]
-        );
-
-        $this->upsertOrderItem(
-            $order->id,
-            ['product_id' => $simpleMouse->id, 'variant_id' => null, 'bundel_id' => null],
-            [
-                'quantity' => 2,
-                'sale_price' => 20,
-                'price_after_discount' => 20,
-                'total_price' => 40,
-                'total_price_after_discount' => 40,
-                'unit_cost_price' => 12,
-                'bundel_snapshot' => null,
-            ],
-            $stockSimple?->id
-        );
-
-        $this->upsertOrderItem(
-            $order->id,
-            ['product_id' => $tshirtProduct->id, 'variant_id' => $tshirtBlueMedium->id, 'bundel_id' => null],
-            [
-                'quantity' => 1,
-                'sale_price' => $tshirtBlueMedium->sale_price,
-                'price_after_discount' => $tshirtBlueMedium->getDiscountPrice(),
-                'total_price' => $tshirtBlueMedium->sale_price,
-                'total_price_after_discount' => $tshirtBlueMedium->getDiscountPrice(),
-                'unit_cost_price' => 28,
-                'bundel_snapshot' => null,
-            ],
-            $stockVariant?->id
-        );
-
-        $this->upsertOrderItem(
-            $order->id,
-            ['product_id' => null, 'variant_id' => null, 'bundel_id' => $bundle->id],
-            [
-                'quantity' => 1,
-                'sale_price' => $bundle->price,
-                'price_after_discount' => $bundle->price,
-                'total_price' => $bundle->price,
-                'total_price_after_discount' => $bundle->price,
-                'unit_cost_price' => 75,
-                'bundel_snapshot' => [
-                    'bundel_id' => $bundle->id,
-                    'title' => $bundle->title,
-                    'items' => [
-                        ['product_id' => $simpleMouse->id, 'quantity' => 1],
-                        ['product_id' => $tshirtProduct->id, 'variant_id' => $tshirtBlueMedium->id, 'quantity' => 2],
-                    ],
-                ],
-            ],
-            null
-        );
-
-        Order::firstOrCreate(
-            ['status' => 'pending', 'shipment_address' => 'Guest Address 77'],
-            [
-                'user_id' => null,
-                'subtotal' => $simpleKeyboard->sale_price,
-                'shipping_cost' => 15,
-                'tax' => round($simpleKeyboard->sale_price * 0.14, 2),
-                'total' => round($simpleKeyboard->sale_price * 1.14 + 15, 2),
-                'shipment_zone_id' => $zoneId,
-                'shipment_city_id' => $cityId,
-                'payment_method' => 'card',
-            ]
-        );
-
-        $this->upsertCartItem(
-            $cartOpen->id,
-            ['type' => 'product', 'product_id' => $simpleMouse->id, 'variant_id' => null, 'bundel_id' => null],
-            ['quantity' => 2, 'total_before_discount' => 40, 'total_after_discount' => 40]
-        );
-        $this->upsertCartItem(
-            $cartOpen->id,
-            ['type' => 'variant', 'product_id' => $tshirtProduct->id, 'variant_id' => $tshirtBlueMedium->id, 'bundel_id' => null],
-            [
-                'quantity' => 1,
-                'total_before_discount' => $tshirtBlueMedium->sale_price,
-                'total_after_discount' => $tshirtBlueMedium->getDiscountPrice(),
-            ]
-        );
-        $this->upsertCartItem(
-            $cartOpen->id,
-            ['type' => 'bundel', 'product_id' => null, 'variant_id' => null, 'bundel_id' => $bundle->id],
-            ['quantity' => 1, 'total_before_discount' => $bundle->price, 'total_after_discount' => $bundle->price]
-        );
-    }
-
-    private function upsertCartItem(int $cartId, array $where, array $data): int
-    {
-        $query = DB::table('cart_items')->where('cart_id', $cartId)->where('type', $where['type']);
-        foreach (['product_id', 'variant_id', 'bundel_id'] as $key) {
-            if (is_null($where[$key])) {
-                $query->whereNull($key);
-            } else {
-                $query->where($key, $where[$key]);
-            }
-        }
-
-        $existing = $query->first();
-        if ($existing) {
-            DB::table('cart_items')->where('id', $existing->id)->update(array_merge($data, ['updated_at' => now()]));
-            return (int) $existing->id;
-        }
-
-        return (int) DB::table('cart_items')->insertGetId(array_merge(
-            ['cart_id' => $cartId, 'type' => $where['type']],
-            $where,
-            $data,
-            ['created_at' => now(), 'updated_at' => now()]
-        ));
-    }
-
-    private function upsertOrderItem(int $orderId, array $where, array $data, ?int $stockMovementId): void
-    {
-        $query = DB::table('order_items')->where('order_id', $orderId);
-        foreach (['product_id', 'variant_id', 'bundel_id'] as $key) {
-            if (is_null($where[$key])) {
-                $query->whereNull($key);
-            } else {
-                $query->where($key, $where[$key]);
-            }
-        }
-
-        $existing = $query->first();
-        if ($existing) {
-            DB::table('order_items')->where('id', $existing->id)->update(array_merge($data, ['updated_at' => now()]));
-            $orderItemId = $existing->id;
-        } else {
-            $orderItemId = DB::table('order_items')->insertGetId(array_merge(
-                $where,
-                $data,
-                ['order_id' => $orderId, 'created_at' => now(), 'updated_at' => now()]
-            ));
-        }
-
-        $batchQuery = DB::table('order_item_batches')->where('order_item_id', $orderItemId);
-        if (is_null($stockMovementId)) {
-            $batchQuery->whereNull('stock_movment_id');
-        } else {
-            $batchQuery->where('stock_movment_id', $stockMovementId);
-        }
-
-        $existingBatch = $batchQuery->first();
-        if ($existingBatch) {
-            DB::table('order_item_batches')->where('id', $existingBatch->id)->update([
-                'quantity' => $data['quantity'],
-                'sale_price' => $data['price_after_discount'],
-                'cost_price' => $data['unit_cost_price'],
-                'updated_at' => now(),
-            ]);
-        } else {
-            DB::table('order_item_batches')->insert([
-                'order_item_id' => $orderItemId,
-                'stock_movment_id' => $stockMovementId,
-                'quantity' => $data['quantity'],
-                'sale_price' => $data['price_after_discount'],
-                'cost_price' => $data['unit_cost_price'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
     }
 }

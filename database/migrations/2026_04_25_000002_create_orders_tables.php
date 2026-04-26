@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('status')->default('pending');
-            $table->decimal('subtotal', 12, 2)->default(0);
+            $table->decimal('total_after_discount', 12, 2)->default(0);
+            $table->decimal('total_before_discount', 12, 2)->default(0);
             $table->decimal('shipping_cost', 12, 2)->default(0);
             $table->decimal('tax', 12, 2)->default(0);
             $table->decimal('total', 12, 2)->default(0);
