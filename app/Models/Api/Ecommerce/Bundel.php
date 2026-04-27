@@ -33,6 +33,51 @@ class Bundel extends Model implements TranslatableContract
         return $this->belongsTo(Brand::class);
     }
 
+    public function hasOnlyAvailableItems(): bool
+    {
+        return $this->detailsMatchAvailabilityRule(false);
+    }
+
+    public function hasOnlyActiveItems(): bool
+    {
+        return $this->detailsMatchAvailabilityRule(true);
+    }
+
+    protected function detailsMatchAvailabilityRule(bool $strictActive): bool
+    {
+        $details = $this->relationLoaded('bundelDetails')
+            ? $this->bundelDetails
+            : $this->bundelDetails()->with('product.variants')->get();
+
+        if ($details->isEmpty()) {
+            return false;
+        }
+
+        return $details->every(function ($detail) {
+            $product = $detail->relationLoaded('product')
+                ? $detail->product
+                : $detail->product()->with('variants')->first();
+
+            if (!$product) {
+                return false;
+            }
+
+            if ($strictActive) {
+                if ($product->status !== 'active') {
+                    return false;
+                }
+
+                return $detail->hasAtLeastOneStrictlyActiveVariant();
+            }
+
+            if ($product->status === 'draft') {
+                return false;
+            }
+
+            return $detail->hasAtLeastOneActiveVariant();
+        });
+    }
+
 
     // get price of bundel sum of product or varaint after thes discount
     public function getBundlePrice(): array

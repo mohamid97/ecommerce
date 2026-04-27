@@ -32,9 +32,11 @@ class CartAction
 
     public function checkBundelExists(int $bundelId): Bundel
     {
-        $this->bundel = Bundel::find($bundelId);
+        $this->bundel = Bundel::with('bundelDetails.product.variants')
+            ->where('status', 'active')
+            ->find($bundelId);
 
-        if (!$this->bundel) {
+        if (!$this->bundel || !$this->bundel->hasOnlyActiveItems()) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Bundle'])
             );
@@ -45,7 +47,7 @@ class CartAction
 
     public function checkVariantExists(int $variantId): void
     {
-        $this->variant = ProductVariant::find($variantId);
+        $this->variant = ProductVariant::where('status', 'active')->find($variantId);
 
         if (!$this->variant) {
             throw new ModelNotFoundException(

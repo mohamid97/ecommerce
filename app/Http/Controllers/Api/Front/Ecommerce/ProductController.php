@@ -39,7 +39,7 @@ class ProductController extends Controller
 
 
         // status 
-        $products->where('status' , 'active');
+        $products->where('status', '!=', 'draft');
         if($request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)){
             $products = $products->paginate($request->paginate);
         }else{
@@ -58,7 +58,7 @@ class ProductController extends Controller
 
 
     public function productDetails(Request $request){
-        $product = Product::with(['category', 'brand'])->where('status', 'active')->where('id', $request->id)->first();
+        $product = Product::with(['category', 'brand'])->where('status', '!=', 'draft')->where('id', $request->id)->first();
         if(!$product){
             return $this->error(__('main.not_found' , ['product']));
         }
@@ -90,7 +90,7 @@ class ProductController extends Controller
 
     public function varaintDetails(Request $request){
         if($request->has('variant_id')){
-            $variant = ProductVariant::with(['varaintImages' , 'variants'])->where('status', 'active')->first($request->variant_id);
+            $variant = ProductVariant::with(['varaintImages' , 'variants'])->where('status', '!=', 'draft')->where('id', $request->variant_id)->first();
             if(!$variant){
                 return $this->error(__('main.not_found' , ['variant']));
             }
@@ -105,7 +105,7 @@ class ProductController extends Controller
     private function sectionProducts(Request $request, $productsSubQuery, string $responseKey)
     {
         $products = Product::query()
-            ->where('status', 'active')
+            ->where('status', '!=', 'draft')
             ->whereIn('id', $productsSubQuery);
 
         if($request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)){

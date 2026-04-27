@@ -35,21 +35,77 @@ class BundelDetails extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function selectedVariantIds(): array
+    {
+        $ids = $this->variant_ids;
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        if (is_string($ids)) {
+            $ids = json_decode($ids, true);
+        }
+
+        if (!is_array($ids)) {
+            return [];
+        }
+
+        return array_values(array_filter($ids));
+    }
+
+    public function hasVariantSelection(): bool
+    {
+        return !empty($this->selectedVariantIds());
+    }
+
+    public function hasAtLeastOneActiveVariant(): bool
+    {
+        return $this->hasAtLeastOneVariantWithStatus('!=', 'draft');
+    }
+
+    public function hasAtLeastOneStrictlyActiveVariant(): bool
+    {
+        return $this->hasAtLeastOneVariantWithStatus('=', 'active');
+    }
+
+    protected function hasAtLeastOneVariantWithStatus(string $operator, string $status): bool
+    {
+        $selectedVariantIds = $this->selectedVariantIds();
+
+        if (empty($selectedVariantIds)) {
+            return true;
+        }
+
+        $product = $this->relationLoaded('product')
+            ? $this->product
+            : $this->product()->with('variants')->first();
+
+        if (!$product) {
+            return false;
+        }
+
+        $variants = $product->relationLoaded('variants')
+            ? $product->variants
+            : $product->variants()->get();
+
+        return $variants
+            ->whereIn('id', $selectedVariantIds)
+            ->contains(fn ($variant) => $operator === '='
+                ? $variant->status === $status
+                : $variant->status !== $status);
+    }
+
 
 
     // get all varaints
 public function getVariants()
 {
-    $ids = $this->variant_ids;
+    $ids = $this->selectedVariantIds();
 
     // Normalize: handle null, empty, or bad string values
     if (empty($ids)) {
         return collect();
-    }
-
-    // If cast failed and it's still a string, decode manually
-    if (is_string($ids)) {
-        $ids = json_decode($ids, true);
     }
 
     // Final safety check
@@ -64,11 +120,13 @@ public function getVariants()
     // get only first varaint
     public function getFirstVariant(): ?ProductVariant
     {
-        if (empty($this->variant_ids)) {
+        $variantIds = $this->selectedVariantIds();
+
+        if (empty($variantIds)) {
             return null;
         }
 
-        return ProductVariant::find($this->variant_ids[0]);
+        return ProductVariant::find($variantIds[0]);
     }
 
 
