@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Front\Member\EmailRequest;
 use App\Http\Requests\Api\Front\Member\LoginMemeberRequest;
 use App\Http\Requests\Api\Front\Member\RegisterMemberRequest;
+use App\Http\Requests\Api\Front\Member\UpdateMemberRequest;
 use App\Http\Requests\Api\Front\Member\VerfiyOtpRequest;
 use App\Http\Resources\Api\Front\Memeber\LoginMemeberResource;
+use App\Http\Resources\Api\Front\Memeber\MemeberResource;
 use App\Services\Front\Memeber\CheckEmailExist;
 use App\Services\Front\Memeber\LoginService;
 use App\Services\Front\Memeber\RegisterMemberService;
@@ -99,15 +101,29 @@ class MemberController extends Controller
         }
     }
 
-        
-        
+    public function getUserData(Request $request)
+    {
+        return $this->success(
+            new MemeberResource($request->user()),
+            __('main.retrieved_successfully', ['model' => 'User'])
+        );
+    }
 
+    public function updateUserData(UpdateMemberRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $user = $request->user();
+            $user->update($request->validated());
+            DB::commit();
 
-
-
-    
-
-
-
-    
+            return $this->success(
+                new MemeberResource($user->fresh()),
+                __('main.updated_successfully', ['model' => 'User'])
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage(), 500);
+        }
+    }
 }
