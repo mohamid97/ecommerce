@@ -15,6 +15,7 @@ class CartItem extends Model
         'product_id',
         'variant_id',
         'bundel_id',
+        'type',
         'quantity',
         'total_before_discount',
         'total_after_discount',
