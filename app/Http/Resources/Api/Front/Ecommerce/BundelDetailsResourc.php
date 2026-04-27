@@ -50,6 +50,8 @@ class BundelDetailsResourc extends JsonResource
                             'id'=>$detail->product->id,
                             'title'=>$detail->product->title,
                             'sale_price'=>(float) $detail->product->sale_price,
+                            'status'=>$detail->product->status,
+                            'stock'=>$detail->product->stock,
                             'price_afte_discount'=>(float) $detail->product->getDiscountPrice(),
                             'discount'=>(float) $detail->product->discount,
                             'discount_type'=> $detail->product->discount_type,
