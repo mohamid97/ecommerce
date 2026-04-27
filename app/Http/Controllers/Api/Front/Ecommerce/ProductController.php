@@ -58,7 +58,7 @@ class ProductController extends Controller
 
 
     public function productDetails(Request $request){
-        $product = Product::with(['category', 'brand'])->where('status', 'active')->first($request->id);
+        $product = Product::with(['category', 'brand'])->where('status', 'active')->where('id', $request->id)->first();
         if(!$product){
             return $this->error(__('main.not_found' , ['product']));
         }
