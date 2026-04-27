@@ -53,7 +53,7 @@ class Bundel extends Model implements TranslatableContract
             return false;
         }
 
-        return $details->every(function ($detail) {
+        return $details->every(function ($detail) use ($strictActive) {
             $product = $detail->relationLoaded('product')
                 ? $detail->product
                 : $detail->product()->with('variants')->first();
