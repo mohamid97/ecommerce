@@ -12,14 +12,14 @@ class GuestCartItemResource extends JsonResource
     {
         if ($this->bundel_id && $this->type === 'bundel') {
             return [
-                'id' => $this->id,
-                'cart_id' => $this->cart_id,
+                // 'id' => $this->id,
+                // 'cart_id' => $this->cart_id,
                 'type' => 'bundle',
                 'bundel_id' => $this->bundel_id,
                 'bundel_title' => $this->bundel?->title,
                 'bundle_items' => $this->cartBundelItems->map(function ($item) {
                     return [
-                        'id' => $item->id,
+                        // 'id' => $item->id,
                         'product_id' => $item->product_id,
                         'product' => $item->product?->title,
                         'variant_id' => $item->variant_id,
@@ -39,10 +39,10 @@ class GuestCartItemResource extends JsonResource
         }
 
         return [
-            'id' => $this->id,
-            'cart_id' => $this->cart_id,
+            // 'id' => $this->id,
+            // 'cart_id' => $this->cart_id,
             'product_id' => $this->product_id,
-            'type' => 'product',
+            'type' => $this->type,
             'product' => $this->product?->title,
             'has_options' => (bool) $this->product?->has_options,
             'variant_id' => $this->variant_id,

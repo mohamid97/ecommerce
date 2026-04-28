@@ -49,7 +49,7 @@ class CartItemResource extends JsonResource
             'id' => $this->id,
             'cart_id' => $this->cart_id,
             'product_id' => $this->product_id,
-            'type' => 'product',
+            'type' =>$this->type,
             'product' => $this->product?->title,
             'has_options'=>(bool) $this->product?->has_options,
             'variant_id' => $this->variant_id,
