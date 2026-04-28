@@ -43,18 +43,27 @@ class CartService
      */
     public function RemoveFromCart(int $userId, $dto): void
     {
-        if (isset($dto->bundelId)) {
-            $this->action->checkBundelExists($dto->bundelId);
-        } else {
-            $this->action->checkProductExists($dto->productId);
+        if(isset($dto->cartItemId)){
+            $this->action->checkCartItemExists($userId ,  $dto->cartItemId);
+            $this->repo->removeFromCartWiteItem($dto->cartItemId);
 
-            if (isset($dto->variantId)) {
-                $this->action->checkProductHasOption();
-                $this->action->checkVariantExists($dto->variantId);
+
+        }else{
+            if (isset($dto->bundelId)) {
+                $this->action->checkBundelExists($dto->bundelId);
+            } else {
+                    $this->action->checkProductExists($dto->productId);
+
+                    if (isset($dto->variantId)) {
+                        $this->action->checkProductHasOption();
+                        $this->action->checkVariantExists($dto->variantId);
+                    }
             }
-        }
+            $this->repo->removeFromCart($userId, $dto);
 
-        $this->repo->removeFromCart($userId, $dto);
+        } 
+
+       
     }
 
     public function updateCartItemQuantity(int $userId, UpdateCartItemQuantityDTO $dto): Cart

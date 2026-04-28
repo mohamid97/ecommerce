@@ -23,6 +23,7 @@ class ProductDetailsResource extends JsonResource
             'slug'=>$this->getColumnLang('slug'),
             'des' => $this->des,
             'sale_price' => (float) $defaultVaraintModel?->sale_price,
+            'price_after_discount' => (float)$this->getDiscountPrice(),
             'price_after_discount' => (float) $defaultVaraintModel?->getDiscountPrice(),
             'discount' =>  (float) $defaultVaraintModel?->discount_value,
             'discount_type' => $defaultVaraintModel?->discount_type,

@@ -26,6 +26,7 @@ class DeleteFromCartRequest extends FormRequest
     public function rules(): array
     {
         return [
+           'cart_item_id'      => 'nullable|integer|exists:cart_items,id',
            'product_id'        => 'nullable|integer|exists:products,id',
            'variant_id'        => 'nullable|integer|exists:product_variants,id',
            'bundel_id'         => 'nullable|integer|exists:bundels,id',

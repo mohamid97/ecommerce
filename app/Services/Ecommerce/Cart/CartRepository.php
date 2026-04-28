@@ -197,4 +197,22 @@ class CartRepository
             'total_discount_price' => $totalDiscountPrice,
         ];
     }
+
+
+
+    public function removeFromCartWiteItem(int $cartItemId): void
+    {
+        $cartItem = CartItem::find($cartItemId);
+
+        if (!$cartItem) {
+            return;
+        }
+
+        $cartItem->delete();
+
+        $cart = Cart::find($cartItem->cart_id);
+        if ($cart && $cart->items()->count() === 0) {
+            $cart->delete();
+        }
+    }
 }

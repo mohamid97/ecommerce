@@ -203,5 +203,26 @@ class CartAction
     }
 
 
+    // check cart item exists
+    public function checkCartItemExists($userId ,  $cartItemId): void
+    {
+        $cartItem = CartItem::with('cart')->find($cartItemId);
+        if (!$cartItem) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Cart Item'])
+            );
+        }
+        if ($cartItem->cart->user_id !== $userId) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Cart Item'])
+            );
+        }
+
+        
+
+
+    }
+
+
     
 }
