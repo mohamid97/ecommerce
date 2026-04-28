@@ -4,6 +4,7 @@ namespace App\Services\Ecommerce\Cart;
 
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\Bundel;
+use App\Models\Api\Ecommerce\CartItem;
 use App\Models\Api\Ecommerce\BundelDetails;
 use App\Models\Api\Ecommerce\ProductVariant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -122,6 +123,24 @@ class CartAction
         if ($this->product->stock < $quantity) {
             throw new \Exception(__('main.insufficient_stock'));
         }
+    }
+
+    public function getUserCartItem(int $userId, int $cartItemId): CartItem
+    {
+        $cartItem = CartItem::with(['cartBundelItems'])
+            ->where('id', $cartItemId)
+            ->whereHas('cart', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->first();
+
+        if (!$cartItem) {
+            throw new ModelNotFoundException(
+                __('main.model_not_founded', ['model' => 'Cart Item'])
+            );
+        }
+
+        return $cartItem;
     }
 
 

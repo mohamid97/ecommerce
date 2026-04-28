@@ -43,6 +43,10 @@ return [
     'show_successfully'=>':model details retrieved successfully.',
     'not_found'=>':model not found.',
     'bundle_items_are_required'=>'Bundle items are required when adding a bundle to the cart.',
+    'duplicate_products_in_bundle_items' => 'Bundle items contain duplicate products.',
+    'missing_products_in_bundle_items' => 'Some required bundle products are missing.',
+    'invalid_products_in_bundle_items' => 'Bundle items contain products that do not belong to this bundle.',
+    'variant_is_required_for_this_product' => 'Variant is required for this product.',
     'user_cart_not_found'=>'User cart not found.',
     'empty_cart'=>'Your cart is empty.',
 
