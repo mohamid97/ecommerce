@@ -102,6 +102,9 @@ class BundelDetailsResourc extends JsonResource
                                         'sale_price'=>$variant->sale_price,
                                         'price_after_discount'=>$variant->getDiscountPrice(),
                                         'discount_type'=>$variant->discount_type,
+                                        'discount'=>$variant->discount_value,
+                                        'stock'=>$variant->stock,
+                                        'status'=>$variant->status,
                                         // 'image'=>$this->getImageUrl($variant->image),
                                         'option_values'=>$variant->variants->map(function($variant){
                                             return [

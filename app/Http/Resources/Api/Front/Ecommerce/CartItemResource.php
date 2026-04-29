@@ -23,12 +23,15 @@ class CartItemResource extends JsonResource
                 'type' => 'bundle',
                 'bundel_id' => $this->bundel_id,
                 'bundel_title' => $this->bundel?->title,
+                'bundle_image' => $this->getImageUrl($this->bundel?->bundle_image),
                 'bundle_items' => $this->cartBundelItems->map(function($item) {
                    
                     return [
                         'id' => $item->id,
                         'product_id' => $item->product_id,
                         'product' => $item->product?->title,
+                        'product_image' => $this->getImageUrl($item->product?->product_image),
+                        'has_options' => (bool) $item->product?->has_options,
                         'variant_id' => $item->variant_id,
                         'variant' => $item->variant?->title,
                         'varaint_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,

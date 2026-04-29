@@ -16,12 +16,14 @@ class ProductNoOptionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
+            'title' => $this->getColumnLang('title'),
             'slug' => $this->getColumnLang('slug'),
             'des' => $this->des,
-            'sale_price' => $this->sale_price,
-            'discount_price' => $this->discount_price,
+            'sale_price' => (float) $this->sale_price,
+            'price_after_discount'=>(float) $this->getDiscountPrice(),
+            'discount' => (float) $this->discount,
             'discount_type' => $this->discount_type,
+    
             'on_demand' => $this->on_demand,
             'sku' => $this->sku,
             'has_options' => false,
