@@ -36,6 +36,7 @@ class BundelDetailsResourc extends JsonResource
                 ];
             }),
             'title'=>$this->getColumnLang('title'),
+            'slug'=>$this->getColumnLang('slug'),
             'des'=>$this->getColumnLang('des'),
             'meta_title'=>$this->getColumnLang('meta_title'),
             'meta_des'=>$this->getColumnLang('meta_des'),
