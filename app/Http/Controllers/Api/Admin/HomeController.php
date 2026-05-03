@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Models\Api\Admin\{Category,Slider,Blog, Product, Service , Mediaimage , Mediavideo , Ourwork , Client };
 use App\Http\Controllers\Controller;
+use App\Models\Api\Ecommerce\Wishlist;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,7 @@ class HomeController extends Controller
             return [
                 "slider"    => ["value" => Slider::count()],
                 "product"   => ["value" => Product::count()],
+                "wishlist"  => ["value" => Wishlist::count()],
                 "user"      => ["value" => User::count()],
                 "category"  => ["value" => Category::count()],
                 "blog"      => ["value" => Blog::count()],

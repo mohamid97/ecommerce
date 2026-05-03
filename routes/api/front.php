@@ -38,6 +38,14 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
             Route::get('/view', 'viewCart');
         });
 
+        // wishlists
+        Route::prefix('wishlists')->namespace('Ecommerce')->controller('WishlistController')->group(function(){
+            Route::post('/add', 'add');
+            Route::post('/toggle', 'toggle');
+            Route::post('/delete-item', 'remove');
+            Route::get('/view', 'view');
+        });
+
         // orders
         Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
             Route::post('/store', 'store');
