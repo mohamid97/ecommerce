@@ -16,6 +16,8 @@ use App\Http\Requests\Api\Admin\Category\CategoryStoreRequest;
 use App\Http\Requests\Api\Admin\Category\CategoryUpdateRequest;
 use App\Http\Requests\Api\Admin\Certificate\CertificateStoreRequest;
 use App\Http\Requests\Api\Admin\Certificate\CertificateUpdateRequest;
+use App\Http\Requests\Api\Admin\Industry\IndustryStoreRequest;
+use App\Http\Requests\Api\Admin\Industry\IndustryUpdateRequest;
 use App\Http\Requests\Api\Admin\Client\ClientStoreRequest;
 use App\Http\Requests\Api\Admin\Client\ClientUpdateRequest;
 use App\Http\Requests\Api\Admin\Contact\ContactStoreRequest;
@@ -79,6 +81,10 @@ class ModelRequestFactory
             'category'=>[
                 'store'=> CategoryStoreRequest::class,
                 'update'=> CategoryUpdateRequest::class
+            ],
+            'industry'=>[
+                'store'=> IndustryStoreRequest::class,
+                'update'=> IndustryUpdateRequest::class
             ],
             'about'=>[
                 'store'=>AboutStoreRequest::class,

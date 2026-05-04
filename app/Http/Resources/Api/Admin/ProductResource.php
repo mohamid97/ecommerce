@@ -44,6 +44,15 @@ class ProductResource extends JsonResource
                     'slug'=>$this->getColumnLang('slug','brand'),
                 ];
         }),
+        'industries' => $this->whenLoaded('industries', function () {
+            return $this->industries->map(function ($industry) {
+                return [
+                    'id' => $industry->id,
+                    'title' => $industry->title,
+                    'slug' => $industry->slug,
+                ];
+            });
+        }),
         'order' => $this->order,
         'small_des' => $this->getColumnLang('small_des'),
         'des' => $this->getColumnLang('des'),

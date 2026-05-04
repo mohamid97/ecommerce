@@ -10,6 +10,7 @@ class ModelServiceFactory
         'lang' => \App\Services\Admin\Lang\LangService::class,
         'slider'=>\App\Services\Admin\Slider\SliderService::class,
         'category'=>\App\Services\Admin\Category\CategoryService::class,
+        'industry'=>\App\Services\Admin\Industry\IndustryService::class,
         'about'=>\App\Services\Admin\About\AboutService::class,
         'contact'=>\App\Services\Admin\Contact\ContactService::class,
         'location'=>\App\Services\Admin\Location\LocationService::class,

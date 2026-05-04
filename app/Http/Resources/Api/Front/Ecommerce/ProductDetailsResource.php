@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources\Api\Front\Ecommerce;
 
+use App\Traits\HandlesUpload;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductDetailsResource extends JsonResource
 {
+    use HandlesUpload;
+
     /**
      * Transform the resource into an array.
      *
@@ -21,7 +24,9 @@ class ProductDetailsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug'=>$this->getColumnLang('slug'),
-            'des' => $this->des,
+            'meta_title' => $this->getColumnLang('meta_title'),
+            'meta_des' => $this->getColumnLang('meta_des'),
+            'des' =>$this->getColumnLang('des'),
             'sale_price' => (float) $defaultVaraintModel?->sale_price,
             'price_after_discount' => (float) $defaultVaraintModel?->getDiscountPrice(),
             'discount' =>  (float) $defaultVaraintModel?->discount_value,
@@ -35,6 +40,15 @@ class ProductDetailsResource extends JsonResource
             'stock' => (float) $defaultVaraintModel?->stock,
             'category' => $this->category?->title,
             'brand'    => $this->brand?->title,
+            'industries' => $this->whenLoaded('industries', function () {
+                return $this->industries->map(function ($industry) {
+                    return [
+                        'id' => $industry->id,
+                        'title' => $industry->title,
+                        'slug' => $industry->slug,
+                    ];
+                });
+            }),
             'varaint_images'=> $defaultVaraintModel->varaintImages->map(function ($image) {
                 return [
                     'id' => $image->id,

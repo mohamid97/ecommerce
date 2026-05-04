@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources\Api\Admin;
 
+use App\Traits\HandlesImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductDetailsResource extends JsonResource
 {
+    use HandlesImage;
+
     /**
      * Transform the resource into an array.
      *
@@ -44,6 +47,15 @@ class ProductDetailsResource extends JsonResource
                         'title'=>$this->getColumnLang('title','brand'),
                         'slug'=>$this->getColumnLang('slug','brand'),
                     ];
+            }),
+            'industries' => $this->whenLoaded('industries', function () {
+                return $this->industries->map(function ($industry) {
+                    return [
+                        'id' => $industry->id,
+                        'title' => $industry->title,
+                        'slug' => $industry->slug,
+                    ];
+                });
             }),
             'order' => $this->order,
             'small_des' => $this->getColumnLang('small_des'),

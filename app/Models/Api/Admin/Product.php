@@ -50,6 +50,11 @@ class Product extends Model implements TranslatableContract
         return $this->belongsTo(Brand::class, 'brand_id');
     }
 
+    public function industries()
+    {
+        return $this->belongsToMany(Industry::class, 'industry_product');
+    }
+
     public function options()
     {
         return $this->hasMany(ProductOption::class, 'product_id');

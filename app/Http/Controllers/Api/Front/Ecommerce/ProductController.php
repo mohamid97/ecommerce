@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Front\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Admin\IndustryResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductDetailsResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductNoOptionResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductResource;
 use App\Http\Resources\Api\Front\Ecommerce\VaraintDetailsResource;
+use App\Models\Api\Admin\Industry;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\LastPiece;
 use App\Models\Api\Ecommerce\NewProduct;
@@ -22,7 +24,7 @@ class ProductController extends Controller
     public function get(Request $request){
       
 
-        $products = Product::query();
+        $products = Product::with(['category', 'brand', 'industries']);
         if($request->has('search')){
             $products->whereHas('translations', function($query) use ($request){
                 $query->where('title', 'like', '%' . $request->search . '%');
@@ -31,6 +33,12 @@ class ProductController extends Controller
 
         if($request->has('category_id')){
             $products->where('category_id', $request->category_id);
+        }
+
+        if($request->has('industry_id')){
+            $products->whereHas('industries', function ($query) use ($request) {
+                $query->where('industries.id', $request->industry_id);
+            });
         }
 
         if($request->has('sort') && in_array($request->sort , ['asc' , 'desc'])){
@@ -58,7 +66,7 @@ class ProductController extends Controller
 
 
     public function productDetails(Request $request){
-        $product = Product::with(['category', 'brand'])->where('status', '!=', 'draft')->where('id', $request->id)->first();
+        $product = Product::with(['category', 'brand', 'industries'])->where('status', '!=', 'draft')->where('id', $request->id)->first();
         if(!$product){
             return $this->error(__('main.not_found' , ['product']));
         }
@@ -88,6 +96,69 @@ class ProductController extends Controller
         return $this->sectionProducts($request, NewProduct::query()->select('product_id'), 'newest_products');
     }
 
+    public function industries(Request $request)
+    {
+        $industries = Industry::query();
+
+        if ($request->has('search')) {
+            $industries->whereHas('translations', function ($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('sort') && in_array($request->sort, ['asc', 'desc'])) {
+            $industries->orderBy('created_at', $request->sort);
+        }
+
+        if ($request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)) {
+            $industries = $industries->paginate($request->paginate);
+        } else {
+            $industries = $industries->paginate(10);
+        }
+
+        return $this->successPaginated(
+            $industries,
+            IndustryResource::collection($industries),
+            'industries',
+            __('main.list_successfully', ['model' => 'Industries'])
+        );
+    }
+
+    public function productsByIndustry(Request $request)
+    {
+        if (!$request->has('id')) {
+            return $this->error(__('main.no_id'), 404);
+        }
+
+        $industry = Industry::find($request->id);
+        if (!$industry) {
+            return $this->error(__('main.not_found', ['model' => 'Industry']), 404);
+        }
+
+        $products = Product::with(['category', 'brand', 'industries'])
+            ->where('status', '!=', 'draft')
+            ->whereHas('industries', function ($query) use ($request) {
+                $query->where('industries.id', $request->id);
+            });
+
+        if ($request->has('sort') && in_array($request->sort, ['asc', 'desc'])) {
+            $products->orderBy('created_at', $request->sort);
+        }
+
+        if ($request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)) {
+            $products = $products->paginate($request->paginate);
+        } else {
+            $products = $products->paginate(10);
+        }
+
+        return $this->successPaginated(
+            $products,
+            ProductResource::collection($products),
+            'products',
+            __('main.list_successfully', ['model' => 'Products'])
+        );
+    }
+
     public function varaintDetails(Request $request){
         if($request->has('variant_id')){
             $variant = ProductVariant::with(['varaintImages' , 'variants'])->where('status', '!=', 'draft')->where('id', $request->variant_id)->first();
@@ -105,6 +176,7 @@ class ProductController extends Controller
     private function sectionProducts(Request $request, $productsSubQuery, string $responseKey)
     {
         $products = Product::query()
+            ->with(['category', 'brand', 'industries'])
             ->where('status', '!=', 'draft')
             ->whereIn('id', $productsSubQuery);
 

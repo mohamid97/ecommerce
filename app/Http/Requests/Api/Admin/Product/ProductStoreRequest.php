@@ -46,6 +46,8 @@ class ProductStoreRequest extends FormRequest
             'status'=>'nullable|in:active,draft,unavailable',
             'category_id'=>'nullable|exists:categories,id',
             'brand_id'=>'nullable|exists:brands,id',
+            'industries' => 'nullable|array',
+            'industries.*' => 'exists:industries,id',
             'order'=>'nullable|integer|unique:products,order',
             'has_options'  => 'required|boolean',
             'on_demand'    => 'nullable|boolean',

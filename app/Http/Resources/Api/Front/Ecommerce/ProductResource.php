@@ -34,6 +34,15 @@ class ProductResource extends JsonResource
             'stock'=>$this->stock,
             'category' => $this->category?->title,
             'brand'    => $this->brand?->title,
+            'industries' => $this->whenLoaded('industries', function () {
+                return $this->industries->map(function ($industry) {
+                    return [
+                        'id' => $industry->id,
+                        'title' => $industry->title,
+                        'slug' => $industry->slug,
+                    ];
+                });
+            }),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];

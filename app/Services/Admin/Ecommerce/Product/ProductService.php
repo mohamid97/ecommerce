@@ -13,7 +13,7 @@ class ProductService extends BaseModelService
 {
     use StoreMultiLang , HandlesImage;
     protected string $modelClass = Product::class;
-    protected array  $relations  = ['category' , 'shipmentDetails' , 'related' , 'options.option','options.values.optionValue','category','brand'];
+    protected array  $relations  = ['category' , 'shipmentDetails' , 'related' , 'options.option','options.values.optionValue','category','brand', 'industries'];
 
     public function all($request){      
        
@@ -43,6 +43,7 @@ class ProductService extends BaseModelService
   
             $storeProductService->addProductOption($this->data['product_options'] , $product->id);
              
+        $this->syncIndustries($product);
 
 
         $storeProductService->storeProductShipment($this->data , $product->id);
@@ -80,6 +81,7 @@ class ProductService extends BaseModelService
             
            $updateProductService->updateProductOption($this->data['product_options'],$product->id);
 
+        $this->syncIndustries($product);
 
 
         $updateProductService->updateProductShipment($this->data , $product->id);
@@ -102,6 +104,11 @@ class ProductService extends BaseModelService
         if($type == 'fixed' && ($value < 0 || $value > $salePrice)){
             throw new \Exception('Invalid fixed discount value');
         }
+    }
+
+    private function syncIndustries(Product $product): void
+    {
+        $product->industries()->sync($this->data['industries'] ?? []);
     }
 
     // public function applySearch(Builder $query, string $search ){

@@ -75,8 +75,15 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::get('get' , 'get');
         Route::get('last-piece' , 'lastPiece');
         Route::get('newest' , 'newest');
+        Route::get('industries' , 'industries');
+        Route::get('industry-products' , 'productsByIndustry');
         Route::post('details' , 'productDetails');
         Route::post('varaint-details' , 'varaintDetails');
+    });
+
+    Route::prefix('industries')->namespace('Ecommerce')->controller('ProductController')->group(function(){
+        Route::get('get' , 'industries');
+        Route::post('products' , 'productsByIndustry');
     });
 
 

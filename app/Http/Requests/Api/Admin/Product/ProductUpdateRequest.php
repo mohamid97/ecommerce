@@ -51,6 +51,8 @@ class ProductUpdateRequest extends FormRequest
             'on_demand'    => 'nullable|boolean',
             'category_id'=>'nullable|exists:categories,id',
             'brand_id'=>'nullable|exists:brands,id',
+            'industries' => 'nullable|array',
+            'industries.*' => 'exists:industries,id',
             'order' => 'nullable|integer|unique:products,order,' . $this->id,
             'cost_price' => 'nullable|numeric|min:0',
             'sale_price'=>'nullable|numeric|min:0',
