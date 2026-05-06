@@ -157,7 +157,7 @@ class BundleItemStrategy implements CartItemStrategyInterface
             $selected = $cartItem->cartBundelItems->firstWhere('product_id', $d->product_id);
 
             if($selected->variant_id){
-                if(!in_array($selected->variant_id , $d->variant_ids)){
+                if(!in_array($selected->variant_id, $d->selectedVariantIds(), true)){
                     throw new \Exception(__('main.invalid_bundle_selection'));
                 }
                 $v = $d->getVariants()->where('id', $selected->variant_id)->first();

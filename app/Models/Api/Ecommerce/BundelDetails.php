@@ -51,7 +51,26 @@ class BundelDetails extends Model
             return [];
         }
 
-        return array_values(array_filter($ids));
+        $flatten = function (array $items) use (&$flatten): array {
+            $result = [];
+            foreach ($items as $item) {
+                if (is_array($item)) {
+                    $result = array_merge($result, $flatten($item));
+                    continue;
+                }
+                $result[] = $item;
+            }
+            return $result;
+        };
+
+        $normalized = [];
+        foreach ($flatten($ids) as $id) {
+            if (is_numeric($id)) {
+                $normalized[] = (int) $id;
+            }
+        }
+
+        return array_values(array_unique(array_filter($normalized)));
     }
 
     public function hasVariantSelection(): bool
