@@ -71,14 +71,9 @@ class OrderService
             // $this->repo->markCartConverted($cart);
 
             $this->action->deleteCart($user->id);
-            return $order->load([
-                'items.batches.stockMovment',
-                'items.product',
-                'items.variant',
-                'items.bundel.bundelDetails.product',
-                'items.bundel.bundelDetails.variants',
-            ]);
+           return $order;  
         });
+
     }
 
     // Resolver removed - strategies now use repository via handle signature
