@@ -26,6 +26,22 @@ class OrderController extends Controller
         
     }
 
+    public function show(Request $request, \App\Models\Api\Ecommerce\Order $order)
+    {
+        try {
+            $user = $request->user();
+            if ($order->user_id !== $user->id) {
+                return $this->error(__('main.not_found', ['model' => 'Order']), 404);
+            }
+
+            $order->load(['items.product', 'items.variant', 'items.bundel.bundelDetails.product']);
+
+            return $this->success(new OrderResource($order), __('main.retrieved_successfully', ['model' => 'Order']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 400);
+        }
+    }
+
 
 
 }

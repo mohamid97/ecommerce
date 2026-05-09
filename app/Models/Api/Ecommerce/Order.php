@@ -10,7 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'status', 'total_after_discount', 'total_before_discount', 'shipping_cost', 'tax', 'total', 'points_used', 'points_amount', 'shipment_zone_id', 'shipment_city_id', 'shipment_address', 'payment_method'
+        'user_id', 'status', 'total_after_discount', 'total_before_discount', 'shipping_cost', 'tax', 'total', 'points_used', 'points_amount', 'shipment_zone_id', 'shipment_city_id', 'shipment_address', 'payment_method', 'order_number', 'discount', 'discount_type', 'delivered_at'
     ];
 
     public function items()

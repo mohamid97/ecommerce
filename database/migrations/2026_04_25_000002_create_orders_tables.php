@@ -37,7 +37,6 @@ return new class extends Migration
             $table->decimal('price_after_discount', 12, 2)->default(0);
             $table->decimal('total_price', 12, 2)->default(0);
             $table->decimal('total_price_after_discount', 12, 2)->default(0);
-            $table->decimal('unit_cost_price', 12, 2)->nullable();
             $table->timestamps();
         });
 
