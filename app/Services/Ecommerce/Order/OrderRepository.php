@@ -6,7 +6,6 @@ use App\Models\Api\Ecommerce\Cart;
 use App\Models\Api\Ecommerce\Order as OrderModel;
 use App\Models\Api\Ecommerce\OrderItem;
 use App\Models\Api\Ecommerce\OrderItemBatch;
-use App\Models\Api\Ecommerce\ShipmentZone;
 use App\Models\Api\Ecommerce\Order;
 
 class OrderRepository
@@ -24,12 +23,47 @@ class OrderRepository
         $order->status = 'pending';
         $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
         $order->shipment_city_id = $data['shipment_city_id'] ?? null;
+        $order->government = $data['government'] ?? null;
         $order->shipment_address = $data['shipment_address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
-        $order->shipping_cost = ShipmentZone::find($order->shipment_zone_id)->price ?? 0;
+        // shipping cost is static (front will send government + full address)
+        $order->shipping_cost = 70;
         $order->total= 0;
         $order->tax = 0;
         $order->total_after_discount = 0;
+        $order->save();
+
+        // generate human-friendly order number based on id
+        $order->order_number = 'ORD-' . str_pad($order->id ?? 0, 6, '0', STR_PAD_LEFT);
+        $order->save();
+
+        return $order;
+    }
+
+    /**
+     * Create a guest order (no user_id) from provided data.
+     */
+    public function createGuestOrder(array $data): OrderModel
+    {
+        $order = new Order();
+        $order->user_id = null;
+        $order->status = 'pending';
+        $order->guest_name = $data['name'] ?? null;
+        $order->guest_email = $data['email'] ?? null;
+        $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
+        $order->shipment_city_id = $data['shipment_city_id'] ?? null;
+        $order->government = $data['government'] ?? null;
+        $order->shipment_address = $data['shipment_address'] ?? null;
+        $order->payment_method = $data['payment_method'] ?? null;
+        // shipping cost is static
+        $order->shipping_cost = 70;
+        $order->total = 0;
+        $order->tax = 0;
+        $order->total_after_discount = 0;
+        $order->save();
+
+        // generate human-friendly order number based on id
+        $order->order_number = 'ORD-' . str_pad($order->id ?? 0, 6, '0', STR_PAD_LEFT);
         $order->save();
 
         return $order;

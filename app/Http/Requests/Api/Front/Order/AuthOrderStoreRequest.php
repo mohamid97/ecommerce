@@ -22,9 +22,8 @@ class AuthOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shipment_city_id' => 'required|exists:shipment_cities,id',
-            'shipment_zone_id' => 'required|exists:shipment_zones,id',
-            'shipment_address' => 'required|string|max:255',
+            'government' => 'required|string|max:255',
+            'shipment_address' => 'required|string|max:500',
             'payment_method' => 'nullable|string|max:255',
             'use_points' => 'nullable|boolean',
             'points_to_use' => 'nullable|integer|min:0|max:1000',

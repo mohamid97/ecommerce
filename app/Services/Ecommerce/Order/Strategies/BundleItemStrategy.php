@@ -9,6 +9,7 @@ use App\Models\Api\Ecommerce\OrderItem;
 use App\Models\Api\Ecommerce\OrderItemBatch;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\Bundel;
+use App\Models\Api\Ecommerce\OrderItemBundelItem;
 use App\Services\Ecommerce\Order\OrderRepository;
 
 class BundleItemStrategy implements CartItemStrategyInterface
@@ -70,6 +71,23 @@ class BundleItemStrategy implements CartItemStrategyInterface
                 'details' => $details,
             ];
             $orderItem->save();
+        }
+
+        // persist selected bundle items for this order item
+        foreach ($bundle?->bundelDetails ?? [] as $detail) {
+            $selected = $cartItem->cartBundelItems->firstWhere('product_id', $detail->product_id);
+
+            $productId = $detail->product_id;
+            $variantId = $selected?->variant_id ?? null;
+            $perBundleQty = $detail->quantity ?? 1;
+
+            // Store only the per-bundle quantity (quantity of this product inside one bundle)
+            OrderItemBundelItem::create([
+                'order_item_id' => $orderItem->id,
+                'product_id' => $productId,
+                'variant_id' => $variantId,
+                'quantity' => $perBundleQty,
+            ]);
         }
 
         // allocate stock for each bundel detail

@@ -41,4 +41,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(\App\Models\Api\Ecommerce\Bundel::class, 'bundel_id');
     }
+
+    public function orderBundelItems()
+    {
+        return $this->hasMany(\App\Models\Api\Ecommerce\OrderItemBundelItem::class);
+    }
 }

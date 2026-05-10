@@ -5,57 +5,68 @@ namespace App\Http\Controllers\Api\Admin\Ecommerce;
 use App\Http\Controllers\Controller;
 use App\Models\Api\Ecommerce\Order;
 use App\Http\Resources\Api\Admin\Ecommerce\OrderResource;
+use App\Http\Resources\Api\Admin\Ecommerce\OrderListResource;
+use App\Http\Resources\Api\Admin\UserOrderSummaryResource;
 use App\Traits\ResponseTrait;
-use Illuminate\Http\Request;
+use App\Http\Requests\Api\Admin\Ecommerce\OrderAllRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\OrderViewRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\OrderUpdateStatusRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\OrderUserSummaryRequest;
+use App\Services\Ecommerce\Order\PointsService;
+use App\Services\Admin\User\UserService;
 
 class OrderController extends Controller
 {
     use ResponseTrait;
 
-    public function all(Request $request)
+    public function __construct(
+        protected PointsService $pointsService,
+        protected UserService $userService
+    ) {}
+
+    public function all(OrderAllRequest $request)
     {
         try {
-            $query = Order::with(['user']);
+            $query = Order::with(['user'])->withCount('items');
 
-            if ($request->has('status') && $request->status) {
-                $query->where('status', $request->status);
-            }
-            
-            if ($request->has('user_id') && $request->user_id) {
-                $query->where('user_id', $request->user_id);
+            $data = $request->validated();
+
+            if (!empty($data['status'])) {
+                $query->where('status', $data['status']);
             }
 
-            $orders = $query->latest()->paginate($request->per_page ?? 15);
+            if (!empty($data['user_id'])) {
+                $query->where('user_id', $data['user_id']);
+            }
 
-            return $this->success([
-                'orders' => OrderResource::collection($orders),
-                'meta' => [
-                    'current_page' => $orders->currentPage(),
-                    'last_page' => $orders->lastPage(),
-                    'total' => $orders->total(),
-                    'per_page' => $orders->perPage(),
-                ]
-            ], __('main.orders'));
+            $orders = $query->latest()->paginate($data['per_page'] ?? 15);
+            $collection = OrderListResource::collection($orders->getCollection());
+
+            return $this->successPaginated($orders, $collection, 'orders', __('main.orders'));
 
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
     }
 
-    public function view(Request $request)
+    public function view(OrderViewRequest $request)
     {
         try {
-            $request->validate([
-                'id' => 'required|exists:orders,id'
-            ]);
+            $data = $request->validated();
 
-            $order = Order::with([
+            $query = Order::with([
                 'user',
                 'items.batches.stockMovment',
                 'items.product',
-                'items.variant',
-                'items.bundel.bundelDetails.product'
-            ])->findOrFail($request->id);
+                'items.variant.variants.optionValue.option',
+                'items.orderBundelItems.product',
+                'items.orderBundelItems.variant.variants.optionValue.option',
+                'items.bundel.bundelDetails.product',
+            ]);
+
+            $order = !empty($data['order_number'])
+                ? $query->where('order_number', $data['order_number'])->firstOrFail()
+                : $query->findOrFail($data['id']);
 
             return $this->success(new OrderResource($order), __('main.order_details'));
 
@@ -63,4 +74,41 @@ class OrderController extends Controller
             return $this->error($e->getMessage(), 500);
         }
     }
+
+    public function userSummary(OrderUserSummaryRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            $summary = $this->userService->orderSummary($data['user_id']);
+
+            return $this->success(new UserOrderSummaryResource($summary), __('main.retrieved_successfully', ['model' => 'user order summary']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    public function updateStatus(OrderUpdateStatusRequest $request)
+    {
+        try {
+            $data = $request->validated();
+
+            $order = !empty($data['order_number'])
+                ? Order::where('order_number', $data['order_number'])->firstOrFail()
+                : Order::findOrFail($data['id']);
+
+            $order->status = $data['status'];
+            $order->payment_status = $data['payment_status'];
+
+            if ($order->status === 'delivered' && !$order->delivered_at) {
+                $order->delivered_at = now();
+            }
+            $order->save();
+            $this->pointsService->awardPointsForCompletedPaidOrder($order);
+
+            return $this->success(new OrderResource($order->fresh('user')), __('main.updated_successfully', ['model' => 'Order']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
 }

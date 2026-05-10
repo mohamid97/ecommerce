@@ -9,12 +9,19 @@ class OrderResource extends JsonResource
     public function toArray($request): array
     {
         return [
+            'order_number' => $this->order_number ?? null,
             'id' => $this->id,
+            'guest_name' => $this->guest_name ?? null,
+            'guest_email' => $this->guest_email ?? null,
             'status' => $this->status,
             'subtotal' => (float) $this->total_before_discount,
             'shipping_cost' => (float) $this->shipping_cost,
             'tax' => (float) $this->tax,
+            'discount' => (float) ($this->discount ?? 0),
+            'discount_type' => $this->discount_type ?? null,
+            'coupon_code' => $this->coupon_code ?? null,
             'total' => (float) $this->total_after_discount,
+            'payment_status' => $this->payment_status ?? 'unpaid',
             'items' => $this->items->map(function ($item) {
                 $payload = [
                     'id' => $item->id,
@@ -35,33 +42,57 @@ class OrderResource extends JsonResource
                 ];
 
                 if ($item->bundel_id) {
-                    $payload['type'] = 'bundle';
                     // fallback to live relation if snapshot missing
                     $payload['type'] = 'bundle';
-                    $payload['bundel'] = $item->bundel ? [
-                        'id' => $item->bundel->id,
-                        'price' => (float) $item->bundel->price,
-                        'details' => $item->bundel->bundelDetails->map(function ($d) {
+                    $payload['image'] = $this->getImageUrl($item->bundel?->image);
+                    // flatten bundle data onto the item for easier frontend consumption
+                    if ($item->orderBundelItems && $item->orderBundelItems->count() > 0) {
+                        $payload['bundle_id'] = $item->bundel?->id ?? null;
+                        // $payload['bundle_price'] = (float) ($item->bundel?->price ?? $item->sale_price);
+                        $payload['bundle_details'] = $item->orderBundelItems->map(function ($obi) use ($item) {
+                            $product = $obi->product;
+                            $variant = $obi->variant;
+                            $perBundleQty = $obi->quantity ?? 1;
+
+                            return [
+                                'product_id' => $obi->product_id,
+                                'product' => $product ? [
+                                    'id' => $product->id,
+                                    'title' => $product->title ?? null,
+                                ] : null,
+                                'selected_variant_id' => $obi->variant_id,
+                                'selected_variant' => $variant ? [
+                                    'id' => $variant->id,
+                                    'variant_name' => $this->buildVariantName($product, $variant),
+                                ] : null,
+                                'per_bundle_quantity' => $perBundleQty,
+                                'total_quantity' => $perBundleQty * $item->quantity,
+                            ];
+                        });
+                    } else {
+                        $payload['bundle_id'] = $item->bundel?->id ?? null;
+                        $payload['bundle_price'] = (float) ($item->bundel?->price ?? $item->sale_price);
+                        $payload['bundle_details'] = $item->bundel?->bundelDetails->map(function ($d) {
                             return [
                                 'product_id' => $d->product_id,
                                 'product' => $d->product ? [
                                     'id' => $d->product->id,
-                                    'title' => $d->product->translate(app()->getLocale())->title ?? null,
+                                    'title' => $d->product->title ?? null,
                                 ] : null,
-                                // here need to check if has varaint get varaint name that choosed in the bundle
-                                
-                                'quantity' => $d->quantity,
+                                'per_bundle_quantity' => $d->quantity,
+                                'total_quantity' => $d->quantity, // frontend can multiply by order item qty
                             ];
-                        }),
-                    ] : null;
+                        }) ?? null;
+                    }
                 } else {
                     $payload['type'] = ($item->variant_id) ? 'variant' : 'product';
+                    $payload['image'] = $this->getImageUrl($item->variant?->image ?? $item->product?->image);
                     $payload['product_id'] = $item->product_id;
                     $payload['product'] = $item->product ? [
                         'id' => $item->product->id,
                         'title' => $item->product->translate(app()->getLocale())->title ?? null,
                         'sale_price' => (float) ($item->product->sale_price ?? 0),
-                        'stock' => $item->product->stock ?? null,
+                        // 'stock' => $item->product->stock ?? null,
                     ] : null;
 
                     if ($item->variant_id) {

@@ -1,0 +1,134 @@
+{
+  "info": {
+    "name": "Admin - Order Endpoints",
+    "_postman_id": "admin-orders-collection",
+    "description": "Postman collection for admin order endpoints: paginated list, detail view, status update, and payment update.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Orders (paginated main data)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"per_page\": 15,\n  \"page\": 1,\n  \"status\": null,\n  \"user_id\": null\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/v1/order/all",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "v1", "order", "all"]
+        }
+      }
+    },
+    {
+      "name": "View Order By ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/v1/order/view",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "v1", "order", "view"]
+        }
+      }
+    },
+    {
+      "name": "View Order By Order Number",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_number\": \"ORD-000001\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/v1/order/view",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "v1", "order", "view"]
+        }
+      }
+    },
+    {
+      "name": "User Order Summary",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/v1/order/user-summary",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "v1", "order", "user-summary"]
+        }
+      }
+    },
+    {
+      "name": "Update Order Status",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1,\n  \"status\": \"delivered\",\n  \"payment_status\": \"paid\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/v1/order/update-status",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "v1", "order", "update-status"]
+        }
+      }
+    },
+    {
+      "name": "Update Order Status By Order Number",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_number\": \"ORD-000001\",\n  \"status\": \"finished\",\n  \"payment_status\": \"paid\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/v1/order/update-status",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "v1", "order", "update-status"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ]
+}

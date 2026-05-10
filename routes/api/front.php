@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Front\MessageController;
 
@@ -48,10 +47,16 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
         // orders
         Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
+            Route::get('/', 'index');
             Route::post('/store', 'store');
-            Route::get('/{order}', 'show');
+            Route::get('/{order_number}', 'show');
         });
 
+    });
+
+    // guest order (no auth)
+    Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
+        Route::post('/guest/store', 'storeGuest');
     });
 
 

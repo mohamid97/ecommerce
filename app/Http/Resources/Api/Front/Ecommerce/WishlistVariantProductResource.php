@@ -28,7 +28,7 @@ class WishlistVariantProductResource extends JsonResource
             'product' => $product ? [
                 'id' => $product->id,
                 'title' => $product->title,
-                'slug' => $product->getColumnLang('slug'),
+                'slug' => $product->slug,
                 'des' => $product->des,
                 'has_options' => (bool) $product->has_options,
                 'product_image' => $this->getImageUrl($product->product_image),

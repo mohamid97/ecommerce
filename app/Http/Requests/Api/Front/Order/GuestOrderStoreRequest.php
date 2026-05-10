@@ -6,28 +6,28 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class GuestOrderStoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'shipment_city_id' => 'required|exists:shipment_cities,id',
-            'shipment_address' => 'required|string',
-            'payment_method' => 'required|string',
-            'cart_id' => 'nullable|exists:carts,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'government' => 'required|string|max:255',
+            'shipment_address' => 'required|string|max:1000',
+            'payment_method' => 'required|string|max:255',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'nullable|integer|exists:products,id',
+            'items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
+            'items.*.bundel_id' => 'nullable|integer|exists:bundels,id',
+            'items.*.quantity' => 'required|integer|min:1|max:50',
+            'items.*.bundle_items' => 'nullable|array',
+            'items.*.bundle_items.*.product_id' => 'required_with:items.*.bundel_id|integer|exists:products,id',
+            'items.*.bundle_items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
+            'coupon_code' => 'nullable|string',
         ];
     }
 }

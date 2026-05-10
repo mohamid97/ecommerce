@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Admin\User;
 
+use App\Models\Api\Ecommerce\Order;
 use App\Models\User;
 use App\Services\BaseModelService;
 use Spatie\Permission\Models\Role;
@@ -31,9 +32,25 @@ class UserService extends BaseModelService
 
     }
 
+    public function orderSummary(int $userId): array
+    {
+        $user = User::findOrFail($userId);
+        $ordersQuery = Order::where('user_id', $user->id);
 
-    
-    
+        return [
+            'user' => $user,
+            'total_orders' => (clone $ordersQuery)->count(),
+            'total_spent' => (float) (clone $ordersQuery)
+                ->where('payment_status', 'paid')
+                ->sum('total'),
+            'latest_orders' => (clone $ordersQuery)
+                ->with(['user'])
+                ->withCount('items')
+                ->latest()
+                ->limit(5)
+                ->get(),
+        ];
+    }
 
     
 }

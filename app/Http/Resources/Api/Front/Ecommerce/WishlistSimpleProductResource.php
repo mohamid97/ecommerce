@@ -27,7 +27,7 @@ class WishlistSimpleProductResource extends JsonResource
             'product' => $product ? [
                 'id' => $product->id,
                 'title' => $product->title,
-                'slug' => $product->getColumnLang('slug'),
+                'slug' => $product->slug,
                 'des' => $product->des,
                 'sale_price' => (float) $product->sale_price,
                 'discount' => (float) $product->discount,

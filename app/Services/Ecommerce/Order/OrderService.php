@@ -3,25 +3,19 @@
 namespace App\Services\Ecommerce\Order;
 
 use App\Models\Api\Ecommerce\Cart;
-use App\Models\Api\Ecommerce\CartItem;
-use App\Models\Api\Ecommerce\StockMovment;
 use App\Models\Api\Ecommerce\Order;
-use App\Models\Api\Ecommerce\OrderItem;
-use App\Models\Api\Ecommerce\OrderItemBatch;
-use App\Models\Api\Ecommerce\ProductVariant;
-use App\Models\Api\Admin\Product;
-use App\Models\Api\Ecommerce\ShipmentZone;
-use App\Services\Ecommerce\Order\Strategies\VariantItemStrategy;
-use App\Services\Ecommerce\Order\Strategies\BundleItemStrategy;
-use App\Services\Ecommerce\Order\Strategies\SimpleProductItemStrategy;
 use Illuminate\Support\Facades\DB;
+use App\Services\Ecommerce\Order\CouponService;
+use App\Services\Ecommerce\Order\PointsService;
 
 class OrderService
 {
     public function __construct(
         protected OrderRepository $repo,
         protected OrderAction $action,
-        protected OrderStrategyResolver $resolver
+        protected OrderStrategyResolver $resolver,
+        protected CouponService $couponService,
+        protected PointsService $pointsService
     ) {}
     /**
      * Create order from user's cart with stock validation and allocations.
@@ -37,7 +31,6 @@ class OrderService
             // create main order record
             $order = $this->repo->createOrder($user, $data);
             
-
             $total = 0;
             $totalAfterDiscount = 0;
 
@@ -49,16 +42,19 @@ class OrderService
                 $totalAfterDiscount += $itemTotalAfterDiscount;
             }
 
-          
-           
-
-            // points handling (optional)
+            // points handling (optional) for authenticated users
             if (!empty($data['use_points']) && !empty($data['points_to_use'])) {
-                $order->points_used = (int) $data['points_to_use'];
-                // compute points_amount using conversion table if exists
-                $order->points_amount = 0; // implement conversion as needed
+                $pointsToUse = (int) $data['points_to_use'];
+                $pointsAmount = $this->pointsService->applyPointsToOrder($user, $order, $pointsToUse, $totalAfterDiscount);
+                // pointsService already sets order->points_used and order->points_amount and deducts user points
             }
            
+
+            // apply coupon (promotion) if provided
+            if (!empty($data['coupon_code'])) {
+                $discountAmount = $this->couponService->applyCouponToOrder($order, $data['coupon_code'], $totalAfterDiscount);
+                $totalAfterDiscount = max(0, $totalAfterDiscount - $discountAmount);
+            }
 
             // $order->total = $total;
             $order->total_after_discount = $totalAfterDiscount;
@@ -74,6 +70,41 @@ class OrderService
            return $order;  
         });
 
+    }
+
+    /**
+     * Create order from a guest-provided Cart object (in-memory Cart built by CartService->mapGuestCartData).
+     */
+    public function createOrderFromGuestCart(\App\Models\Api\Ecommerce\Cart $cart, array $data): Order
+    {
+        return DB::transaction(function () use ($cart, $data) {
+            // create main order record (guest => user_id null)
+            $order = $this->repo->createGuestOrder($data);
+
+            $total = 0;
+            $totalAfterDiscount = 0;
+
+            foreach ($cart->items as $cartItem) {
+                $strategy = $this->resolver->resolve($cartItem);
+                [$itemTotal, $itemTotalAfterDiscount] = $strategy->handle($cartItem, $order, $this->repo);
+                $total += $itemTotal;
+                $totalAfterDiscount += $itemTotalAfterDiscount;
+            }
+
+            // Guest orders do not support using loyalty points.
+
+            if (!empty($data['coupon_code'])) {
+                $discountAmount = $this->couponService->applyCouponToOrder($order, $data['coupon_code'], $totalAfterDiscount);
+                $totalAfterDiscount = max(0, $totalAfterDiscount - $discountAmount);
+            }
+
+            $order->total_after_discount = $totalAfterDiscount;
+            $order->total_before_discount = $total;
+            $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
+            $order->save();
+
+            return $order;
+        });
     }
 
     // Resolver removed - strategies now use repository via handle signature
