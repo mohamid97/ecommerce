@@ -44,6 +44,7 @@ class OrderListResource extends JsonResource
                     if ($item->bundel_id) {
                         $payload['type'] = 'bundle';
                         $payload['image'] = $this->getImageUrl($item->bundel?->image);
+                        $payload['title'] = $item->bundel?->translate(app()->getLocale())->title ?? null;
 
                         if ($item->orderBundelItems && $item->orderBundelItems->count() > 0) {
                             $payload['bundle_id'] = $item->bundel?->id ?? null;

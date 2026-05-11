@@ -64,7 +64,7 @@ class BundleController extends Controller
             if (!$bundle->hasOnlyAvailableItems()) {
                 return $this->error('Bundle not found or unavailable', 404);
             }
-
+           
             return $this->success(new BundelDetailsResourc($bundle) , __('main.show_successfully' , ["model"=>'bundle']));
         } catch (ModelNotFoundException $e) {
             return $this->error('Bundle not found or unavailable', 404);

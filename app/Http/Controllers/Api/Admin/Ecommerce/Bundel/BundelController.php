@@ -85,7 +85,12 @@ class BundelController extends Controller
                 return $this->error(__('main.id_is_required') , 400);
             }
               
-            $details = Bundel::with(['bundelDetails' , 'category' , 'brand'])->findOrFail($request->id);
+            $details = Bundel::with([
+                'bundelDetails.product.variants.variants.optionValue.option',
+                'category',
+                'brand',
+            ])->findOrFail($request->id);
+           
             return $this->success(new BundeDetailsResource($details) , __('main.success') );
 
         }catch(\Exception $e){

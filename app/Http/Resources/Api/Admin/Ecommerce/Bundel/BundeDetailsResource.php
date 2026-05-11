@@ -44,18 +44,20 @@ class BundeDetailsResource extends JsonResource
             'meta_des'=>$this->getColumnLang('meta_des'),
             'bundle_details'=>$this->whenLoaded('bundelDetails', function () {
                 return $this->bundelDetails->map(function ($detail) {
+                    $selectedVariantIds = $detail->selectedVariantIds();
+
                     return [
                         // 'id' => $detail->id,
                         'product' => [
                             'id'=>$detail->product->id  ,
                             'title'=>$detail->product->title,
-                            'product_varaints' => $detail->getVariants()->map(function ($variant) {
-                                    return [
-                                        'id' => $variant->id,
-                                        'title' => $variant->title,
-                                        'full_name'=>$this->buildVariantName($variant)
-                                    ];
-                            }),
+                            'sale_price'=>(float) $detail?->product?->sale_price,
+                            'price_after_discount'=>(float) $detail?->product?->getDiscountPrice(),
+                            'product_varaints' => $detail->product->variants
+                                ->map(function ($variant) use ($selectedVariantIds) {
+                                    return $this->variantData($variant, $selectedVariantIds);
+                                })
+                                ->values(),
                             'product_quantity' => $detail->quantity,
 
                         ],
@@ -94,6 +96,18 @@ class BundeDetailsResource extends JsonResource
             })
             ->filter()
             ->implode(' ');
+    }
+
+    protected function variantData($variant, array $selectedVariantIds = []): array
+    {
+        return [
+            'id' => $variant->id,
+            'title' => $variant->title,
+            'full_name' => $this->buildVariantName($variant),
+            'sale_price' => (float) $variant->sale_price,
+            'price_after_discount' => (float) $variant->getDiscountPrice(),
+            'is_selected' => in_array($variant->id, $selectedVariantIds),
+        ];
     }
 
 
