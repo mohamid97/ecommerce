@@ -26,6 +26,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::prefix('auth')->controller('MemberController')->group(function(){
             Route::get('/user', 'getUserData');
             Route::post('/update-user', 'updateUserData');
+            Route::post('/complete-profile', 'completeProfile');
         });
 
         // start carts with authanicate 

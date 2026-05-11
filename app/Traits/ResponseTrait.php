@@ -51,7 +51,7 @@ trait ResponseTrait
             'message' => $message,
             'data' => [
                 $key => $resourceCollection,
-                'paginate' => [
+                'pagination' => [
                     'total' => $paginator->total(),
                     'per_page' => $paginator->perPage(),
                     'current_page' => $paginator->currentPage(),

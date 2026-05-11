@@ -42,7 +42,7 @@ class OrderController extends Controller
             $orders = $query->latest()->paginate($data['per_page'] ?? 15);
             $collection = OrderListResource::collection($orders->getCollection());
 
-            return $this->successPaginated($orders, $collection, 'orders', __('main.orders'));
+            return $this->successPaginated($orders, $collection, 'items', __('main.orders'));
 
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);

@@ -23,6 +23,14 @@ class OrderController extends Controller
 
             $paginator = \App\Models\Api\Ecommerce\Order::query()
                 ->where('user_id', $user->id)
+                ->with([
+                    'items.product',
+                    'items.variant.variants.optionValue.option',
+                    'items.bundel.bundelDetails.product',
+                    'items.orderBundelItems.product',
+                    'items.orderBundelItems.variant.variants.optionValue.option',
+                ])
+                ->withCount('items')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
 

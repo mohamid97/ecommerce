@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Front;
 
 use App\Events\Front\SendEmailVerfication;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Front\Member\CompleteProfileRequest;
 use App\Http\Requests\Api\Front\Member\EmailRequest;
 use App\Http\Requests\Api\Front\Member\LoginMemeberRequest;
 use App\Http\Requests\Api\Front\Member\RegisterMemberRequest;
@@ -90,7 +91,7 @@ class MemberController extends Controller
         try{
             if($user = $login->login($request->only('email' , 'password'))){
             
-                return $this->success( new LoginMemeberResource($user) , __('main.memeber_data'));
+                return $this->success( new LoginMemeberResource($user->load('profile')) , __('main.memeber_data'));
             }
            return $this->error( __('main.error_happend') ,  500); 
 
@@ -104,7 +105,7 @@ class MemberController extends Controller
     public function getUserData(Request $request)
     {
         return $this->success(
-            new MemeberResource($request->user()),
+            new MemeberResource($request->user()->load('profile')),
             __('main.retrieved_successfully', ['model' => 'User'])
         );
     }
@@ -118,8 +119,29 @@ class MemberController extends Controller
             DB::commit();
 
             return $this->success(
-                new MemeberResource($user->fresh()),
+                new MemeberResource($user->fresh('profile')),
                 __('main.updated_successfully', ['model' => 'User'])
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    public function completeProfile(CompleteProfileRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $user = $request->user();
+            $user->profile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $request->validated()
+            );
+            DB::commit();
+
+            return $this->success(
+                new MemeberResource($user->fresh('profile')),
+                __('main.updated_successfully', ['model' => 'User profile'])
             );
         } catch (Exception $e) {
             DB::rollBack();

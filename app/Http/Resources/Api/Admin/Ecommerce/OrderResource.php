@@ -62,14 +62,14 @@ class OrderResource extends JsonResource
                         'price_after_discount' => (float) $item->price_after_discount,
                         'total_price' => (float) $item->total_price,
                         'total_price_after_discount' => (float) $item->total_price_after_discount,
-                        'batches' => $item->relationLoaded('batches') ? $item->batches->map(function ($b) {
-                            return [
-                                'stock_movment_id' => $b->stock_movment_id,
-                                'quantity' => $b->quantity,
-                                'sale_price' => (float) $b->sale_price,
-                                'cost_price' => (float) $b->cost_price,
-                            ];
-                        }) : [],
+                        // 'batches' => $item->relationLoaded('batches') ? $item->batches->map(function ($b) {
+                        //     return [
+                        //         'stock_movment_id' => $b->stock_movment_id,
+                        //         'quantity' => $b->quantity,
+                        //         'sale_price' => (float) $b->sale_price,
+                        //         'cost_price' => (float) $b->cost_price,
+                        //     ];
+                        // }) : [],
                     ];
 
                     if ($item->bundel_id) {
@@ -77,6 +77,8 @@ class OrderResource extends JsonResource
 
                         if ($item->relationLoaded('orderBundelItems') && $item->orderBundelItems->count() > 0) {
                             $payload['bundle_id'] = $item->bundel?->id ?? null;
+                            $payload['title'] = $item->bundel?->translate(app()->getLocale())->title ?? null;
+                            $payload['image']     = $this->getImageUrl($item->bundel?->image);
                             $payload['bundle_details'] = $item->orderBundelItems->map(function ($obi) use ($item) {
                                 $product = $obi->product;
                                 $variant = $obi->variant;
@@ -118,6 +120,7 @@ class OrderResource extends JsonResource
                     } else {
                         $payload['type'] = ($item->variant_id) ? 'variant' : 'product';
                         $payload['product_id'] = $item->product_id;
+                        $payload['image'] = $this->getImageUrl(($item->variant_id) ? $item->variant?->image : $item->product?->image);
                         $payload['product'] = $item->product ? [
                             'id' => $item->product->id,
                             'title' => $item->product->translate(app()->getLocale())->title ?? null,

@@ -20,6 +20,18 @@ class LoginMemeberResource extends JsonResource
             'email'=>$this->email,
             'username'=>$this->username,
             'phone'=>$this->phone,
+            'profile_completed'=> (bool) ($this->profile?->government && $this->profile?->address),
+            'profile'=> [
+                'government' => $this->profile?->government,
+                'address' => $this->profile?->address,
+                'city' => $this->profile?->city,
+                'area' => $this->profile?->area,
+                'building_number' => $this->profile?->building_number,
+                'floor' => $this->profile?->floor,
+                'apartment_number' => $this->profile?->apartment_number,
+                'landmark' => $this->profile?->landmark,
+                'notes' => $this->profile?->notes,
+            ],
             'token'=>$this->token
         ];
     }

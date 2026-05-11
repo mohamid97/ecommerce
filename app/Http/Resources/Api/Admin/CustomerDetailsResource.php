@@ -1,27 +1,16 @@
 <?php
 
-namespace App\Http\Resources\Api\Front\Memeber;
+namespace App\Http\Resources\Api\Admin;
 
+use App\Http\Resources\Api\Admin\Ecommerce\OrderListResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class MemeberResource extends JsonResource
+class CustomerDetailsResource extends CustomerResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return [
-            'first_name'=>$this->first_name,
-            'last_name'=>$this->last_name,
-            'username'=>$this->username,
-            'email'=>$this->email,
-            'phone'=>$this->phone,
-            'profile_completed'=> (bool) ($this->profile?->government && $this->profile?->address),
-            'profile'=> [
+        return array_merge(parent::toArray($request), [
+            'profile' => [
                 'government' => $this->profile?->government,
                 'address' => $this->profile?->address,
                 'city' => $this->profile?->city,
@@ -32,6 +21,9 @@ class MemeberResource extends JsonResource
                 'landmark' => $this->profile?->landmark,
                 'notes' => $this->profile?->notes,
             ],
-        ];
+            'paid_orders_count' => (int) ($this->paid_orders_count ?? 0),
+            'latest_orders' => OrderListResource::collection($this->whenLoaded('latestOrders')),
+            'updated_at' => $this->updated_at?->format('Y-m-d'),
+        ]);
     }
 }

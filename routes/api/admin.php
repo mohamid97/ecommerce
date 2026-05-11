@@ -105,6 +105,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
          require __DIR__.'/admin/wishlist.php';
          require __DIR__.'/admin/points.php';
          require __DIR__.'/admin/order.php';
+         require __DIR__.'/admin/customer.php';
 
 
 
