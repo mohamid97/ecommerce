@@ -39,7 +39,29 @@ class OrderController extends Controller
                 $query->where('user_id', $data['user_id']);
             }
 
-            $orders = $query->latest()->paginate($data['per_page'] ?? 15);
+            if (!empty($data['order_number'])) {
+                $query->where('order_number', $data['order_number']);
+            }
+
+            if (!empty($data['search'])) {
+                $search = $data['search'];
+                $query->where(function ($q) use ($search) {
+                        $q->where('guest_name', 'like', "%{$search}%")
+                            ->orWhere('guest_email', 'like', "%{$search}%")
+                            ->orWhereHas('user', function ($uq) use ($search) {
+                                $uq->where('first_name', 'like', "%{$search}%")
+                                    ->orWhere('last_name', 'like', "%{$search}%")
+                                    ->orWhere('email', 'like', "%{$search}%")
+                                    ->orWhere('username', 'like', "%{$search}%");
+                            });
+                });
+            }
+
+            if (!empty($data['sort']) && in_array($data['sort'], ['asc', 'desc'])) {
+                $orders = $query->orderBy('created_at', $data['sort'])->paginate($data['per_page'] ?? 15);
+            } else {
+                $orders = $query->latest()->paginate($data['per_page'] ?? 15);
+            }
             $collection = OrderListResource::collection($orders->getCollection());
 
             return $this->successPaginated($orders, $collection, 'items', __('main.orders'));

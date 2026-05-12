@@ -86,7 +86,7 @@ class ProductController extends Controller
 
     public function lastPieceProducts(Request $request)
     {
-        return $this->sectionProducts($request, LastPiece::query()->select('product_id'), 'last_piece_products');
+        return $this->sectionProducts($request, LastPiece::query()->select('product_id'), 'items');
     }
 
     public function featuredProducts(Request $request)
@@ -94,7 +94,7 @@ class ProductController extends Controller
         $products = $this->baseProductListQuery($request)
             ->where('is_featured', true);
 
-        return $this->paginatedProducts($products, $request, 'featured_products');
+        return $this->paginatedProducts($products, $request, 'items');
     }
 
 
