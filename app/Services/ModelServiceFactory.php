@@ -36,6 +36,7 @@ class ModelServiceFactory
         'brand'     => \App\Services\Admin\Brand\BrandService::class,
         'applicant'=> \App\Service\Admin\Applicant\ApplicantService::class,
         'faq'      =>  \App\Services\Admin\Faq\FaqService::class,
+        'expense' => \App\Services\Admin\Expense\ExpenseService::class,
         'certificate'=> \App\Services\Admin\Certificate\CertificateService::class,
         'page'=> \App\Services\Admin\Page\PageService::class,
         'des'=> \App\Services\Admin\Des\DesService::class,

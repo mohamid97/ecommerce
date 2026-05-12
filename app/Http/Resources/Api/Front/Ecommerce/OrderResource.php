@@ -13,6 +13,7 @@ class OrderResource extends JsonResource
             'id' => $this->id,
             'guest_name' => $this->guest_name ?? null,
             'guest_email' => $this->guest_email ?? null,
+            'phone' => $this->phone ?? $this->user?->phone ?? null,
             'status' => $this->status,
             'subtotal' => (float) $this->total_before_discount,
             'shipping_cost' => (float) $this->shipping_cost,
@@ -137,6 +138,5 @@ class OrderResource extends JsonResource
 
 
 }
-
 
 

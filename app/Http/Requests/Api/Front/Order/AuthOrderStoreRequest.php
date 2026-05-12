@@ -22,6 +22,7 @@ class AuthOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'phone' => 'nullable|string|max:20',
             'government' => 'required|string|max:255',
             'shipment_address' => 'required|string|max:500',
             'payment_method' => 'nullable|string|max:255',

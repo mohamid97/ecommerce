@@ -7,6 +7,7 @@ use App\DTO\Ecommerce\Bundel\UpdateBundelDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\StoreBundelRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Bundel\UpdateBundelRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\Bundel\UpdateBundelStatusRequest;
 use App\Http\Resources\Api\Admin\Ecommerce\Bundel\BundeDetailsResource;
 use App\Http\Resources\Api\Admin\Ecommerce\Bundel\BundelResource;
 use App\Models\Api\Ecommerce\Bundel;
@@ -61,6 +62,17 @@ class BundelController extends Controller
         }
 
     } // end update bundel 
+
+    public function updateBundelStatus(UpdateBundelStatusRequest $request)
+    {
+        try {
+            $bundel = $this->service->updateBundelStatus($request->validated());
+
+            return $this->success(new BundelResource($bundel), __('main.updated_successfully', ['model' => 'Bundel']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
 
 
 

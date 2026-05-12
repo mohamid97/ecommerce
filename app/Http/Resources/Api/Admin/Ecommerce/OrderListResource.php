@@ -15,6 +15,7 @@ class OrderListResource extends JsonResource
                 'id' => $this->user_id,
                 'name' => $this->customerName(),
                 'email' => $this->customerEmail(),
+                'phone' => $this->customerPhone(),
                 'type' => $this->user_id ? 'user' : 'guest',
             ],
             'status' => $this->status,
@@ -41,5 +42,10 @@ class OrderListResource extends JsonResource
     private function customerEmail(): ?string
     {
         return $this->user?->email ?? $this->guest_email;
+    }
+
+    private function customerPhone(): ?string
+    {
+        return $this->phone ?? $this->user?->phone;
     }
 }

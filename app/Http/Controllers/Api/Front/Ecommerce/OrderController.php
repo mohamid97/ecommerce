@@ -56,7 +56,6 @@ class OrderController extends Controller
 
     public function storeGuest(GuestOrderStoreRequest $request)
     {
-        dd("dsds");
         try{
             $data = $request->validated();
 

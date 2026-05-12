@@ -11,6 +11,7 @@ class OrderListResource extends JsonResource
         return [
             'id' => $this->id,
             'order_number' => $this->order_number ?? null,
+            'phone' => $this->phone ?? $this->user?->phone ?? null,
             'status' => $this->status,
             'payment_status' => $this->payment_status ?? 'unpaid',
             'payment_method' => $this->payment_method,

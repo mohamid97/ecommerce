@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\StoreRelatedProductsRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductSectionRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductVaraintStatusRequest;
+use App\Http\Resources\Api\Admin\ProductResource;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Admin\RelatedProduct;
 use App\Models\Api\Ecommerce\LastPiece;
@@ -78,6 +79,24 @@ class ProductController extends Controller
         return $this->deleteSectionProduct($request->id, NewProduct::class);
     }
 
+    public function newestProducts(Request $request)
+    {
+        return $this->sectionProducts($request, NewProduct::query()->select('product_id'), 'newest_products');
+    }
+
+    public function lastPieceProducts(Request $request)
+    {
+        return $this->sectionProducts($request, LastPiece::query()->select('product_id'), 'last_piece_products');
+    }
+
+    public function featuredProducts(Request $request)
+    {
+        $products = $this->baseProductListQuery($request)
+            ->where('is_featured', true);
+
+        return $this->paginatedProducts($products, $request, 'featured_products');
+    }
+
 
     public function storeRelatedProduct(StoreRelatedProductsRequest $request){
         try{
@@ -134,6 +153,59 @@ public function filterProduct(Request $request)
     {
         $modelClass::where('product_id', $productId)->delete();
         return $this->success(__('main.updated_successfully'));
+    }
+
+    private function sectionProducts(Request $request, $productsSubQuery, string $responseKey)
+    {
+        $products = $this->baseProductListQuery($request)
+            ->whereIn('id', $productsSubQuery);
+
+        return $this->paginatedProducts($products, $request, $responseKey);
+    }
+
+    private function baseProductListQuery(Request $request)
+    {
+        $products = Product::with(['category', 'brand', 'industries']);
+
+        if ($request->has('search')) {
+            $products->whereHas('translations', function ($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('category_id')) {
+            $products->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('industry_id')) {
+            $products->whereHas('industries', function ($query) use ($request) {
+                $query->where('industries.id', $request->industry_id);
+            });
+        }
+
+        if ($request->has('sort') && in_array($request->sort, ['asc', 'desc'])) {
+            $products->orderBy('created_at', $request->sort);
+        } else {
+            $products->latest();
+        }
+
+        return $products;
+    }
+
+    private function paginatedProducts($products, Request $request, string $responseKey)
+    {
+        $perPage = $request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)
+            ? (int) $request->paginate
+            : 10;
+
+        $products = $products->paginate($perPage);
+
+        return $this->successPaginated(
+            $products,
+            ProductResource::collection($products),
+            $responseKey,
+            __('main.list_successfully', ['model' => 'Products'])
+        );
     }
 
 

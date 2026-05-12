@@ -21,6 +21,7 @@ class FilterProductVaraintResource extends JsonResource
             'title'=>$this->getColumnLang('title'),
             'slug'=>$this->getColumnLang('slug'),
             'sale_price'=>$this->sale_price,
+            'price_after_discount'=>$this->getDiscountPrice(),
             'variants'=>
                 $this->whenLoaded('variants', function () {
                                 return $this->variants->map(function ($variant) {

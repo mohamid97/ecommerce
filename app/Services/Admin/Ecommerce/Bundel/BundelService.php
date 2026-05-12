@@ -28,6 +28,14 @@ class BundelService {
         return $this->update->updateBundel($data);
     }
 
+    public function updateBundelStatus(array $data): Bundel
+    {
+        $bundel = Bundel::with(['category', 'brand'])->findOrFail($data['id']);
+        $bundel->update(['status' => $data['status']]);
+
+        return $bundel;
+    }
+
     public function deleteBundel($data) {
         if (Bundel::where('id', $data['id'])->exists()) {
             Bundel::where('id', $data['id'])->delete();

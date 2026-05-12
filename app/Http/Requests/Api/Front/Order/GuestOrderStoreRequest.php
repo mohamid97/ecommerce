@@ -16,6 +16,7 @@ class GuestOrderStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
             'government' => 'required|string|max:255',
             'shipment_address' => 'required|string|max:1000',
             'payment_method' => 'required|string|max:255',

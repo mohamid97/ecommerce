@@ -24,11 +24,12 @@ class OrderResource extends JsonResource
                 'id' => $this->user_id,
                 'name' => $this->customerName(),
                 'email' => $this->customerEmail(),
-                'phone' => $this->user?->phone,
+                'phone' => $this->customerPhone(),
                 'type' => $this->user_id ? 'user' : 'guest',
             ],
             'guest_name' => $this->guest_name ?? null,
             'guest_email' => $this->guest_email ?? null,
+            'phone' => $this->phone ?? $this->user?->phone ?? null,
             'status' => $this->status,
             'payment_status' => $this->payment_status ?? 'unpaid',
             'shipment_address' => $this->shipment_address,
@@ -154,6 +155,11 @@ class OrderResource extends JsonResource
     private function customerEmail(): ?string
     {
         return $this->user?->email ?? $this->guest_email;
+    }
+
+    private function customerPhone(): ?string
+    {
+        return $this->phone ?? $this->user?->phone;
     }
 
     private function userName(): ?string

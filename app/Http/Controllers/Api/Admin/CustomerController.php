@@ -44,7 +44,7 @@ class CustomerController extends Controller
             $customers = $query->latest()->paginate($data['per_page'] ?? 15);
             $collection = CustomerResource::collection($customers->getCollection());
 
-            return $this->successPaginated($customers, $collection, 'customers', __('main.list_successfully', ['model' => 'customers']));
+            return $this->successPaginated($customers, $collection, 'items', __('main.list_successfully', ['model' => 'customers']));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
@@ -94,7 +94,7 @@ class CustomerController extends Controller
             $orders = $query->latest()->paginate($data['per_page'] ?? 15);
             $collection = OrderListResource::collection($orders->getCollection());
 
-            return $this->successPaginated($orders, $collection, 'orders', __('main.orders'));
+            return $this->successPaginated($orders, $collection, 'items', __('main.orders'));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }

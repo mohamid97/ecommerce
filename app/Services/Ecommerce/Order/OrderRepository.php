@@ -21,6 +21,7 @@ class OrderRepository
         $order = new Order();
         $order->user_id = $user->id;
         $order->status = 'pending';
+        $order->phone = $data['phone'] ?? $user->phone ?? null;
         $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
         $order->shipment_city_id = $data['shipment_city_id'] ?? null;
         $order->government = $data['government'] ?? null;
@@ -50,6 +51,7 @@ class OrderRepository
         $order->status = 'pending';
         $order->guest_name = $data['name'] ?? null;
         $order->guest_email = $data['email'] ?? null;
+        $order->phone = $data['phone'] ?? null;
         $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
         $order->shipment_city_id = $data['shipment_city_id'] ?? null;
         $order->government = $data['government'] ?? null;

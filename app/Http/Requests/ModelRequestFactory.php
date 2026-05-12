@@ -26,6 +26,8 @@ use App\Http\Requests\Api\Admin\Coupon\CouponStoreRequest;
 use App\Http\Requests\Api\Admin\Coupon\CouponUpdateRequest;
 use App\Http\Requests\Api\Admin\Event\EventStoreRequest;
 use App\Http\Requests\Api\Admin\Event\EventUpdateRequest;
+use App\Http\Requests\Api\Admin\Expense\ExpenseStoreRequest;
+use App\Http\Requests\Api\Admin\Expense\ExpenseUpdateRequest;
 use App\Http\Requests\Api\Admin\Faq\FaqStoreRequest;
 use App\Http\Requests\Api\Admin\Faq\FaqUpdateRequest;
 use App\Http\Requests\Api\Admin\Feedback\FeedbackStoreRequest;
@@ -167,6 +169,10 @@ class ModelRequestFactory
             'faq'=>[
                 'store'  => FaqStoreRequest::class,
                 'update' => FaqUpdateRequest::class 
+            ],
+            'expense'=>[
+                'store' => ExpenseStoreRequest::class,
+                'update'=> ExpenseUpdateRequest::class,
             ],
             'certificate'=>[
                 'store' => CertificateStoreRequest::class,
