@@ -32,8 +32,21 @@ class ProductResource extends JsonResource
             'breadcrumb' => $this->getImageUrl($this->breadcrumb),
             'status'=>$this->status,
             'stock'=>$this->stock,
-            'category' => $this->category?->title,
-            'brand'    => $this->brand?->title,
+            // return slug also and id
+            'category' => $this->whenLoaded('category', function () {
+                return [
+                    'id' => $this->category->id,
+                    'title' => $this->category->title,
+                    'slug' => $this->category->slug,
+                ];
+            }),
+            'brand'    => $this->whenLoaded('brand', function () {
+                return [
+                    'id' => $this->brand->id,
+                    'title' => $this->brand->title,
+                    'slug' => $this->brand->slug,
+                ];
+            }),
             'industries' => $this->whenLoaded('industries', function () {
                 return $this->industries->map(function ($industry) {
                     return [

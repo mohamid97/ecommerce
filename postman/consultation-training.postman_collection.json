@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "Consultation & Training API",
+    "_postman_id": "b2a9f2d8-0000-4c9f-9f1a-000000000001",
+    "description": "Front and Admin endpoints for consultation and training forms",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Front - Consultation Store",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"full_name\": \"John Doe\",\n  \"company_name\": \"Acme Ltd\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"0123456789\",\n  \"industry_id\": 3,\n  \"note\": \"I'd like a 30-minute intro call.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/consultation/store",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","consultation","store"]
+        }
+      }
+    },
+    {
+      "name": "Front - Training Store",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"full_name\": \"Jane Smith\",\n  \"company_name\": \"Acme Ltd\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"0111222333\",\n  \"note\": \"Interested in 2-day on-site training.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/training/store",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","training","store"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Consultation List",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"per_page\": 15,\n  \"search\": \"John\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/consultation/all",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","consultation","all"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Consultation View",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/consultation/view",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","consultation","view"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Consultation Delete",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/consultation/delete",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","consultation","delete"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Training List",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"per_page\": 15\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/training/all",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","training","all"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Training View",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/training/view",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","training","view"]
+        }
+      }
+    },
+    {
+      "name": "Admin - Training Delete",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/training/delete",
+          "host": ["{{base_url}}"],
+          "path": ["api","v1","training","delete"]
+        }
+      }
+    }
+  ]
+}

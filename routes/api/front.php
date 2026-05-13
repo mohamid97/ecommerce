@@ -77,6 +77,15 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         
     });
 
+    // consultation + training forms
+    Route::prefix('consultation')->controller('\App\Http\Controllers\Api\Front\ConsultationController')->group(function(){
+        Route::post('store', 'store');
+    });
+
+    Route::prefix('training')->controller('\App\Http\Controllers\Api\Front\TrainingController')->group(function(){
+        Route::post('store', 'store');
+    });
+
 
     Route::prefix('products')->namespace('Ecommerce')->controller('ProductController')->group(function(){
         Route::get('get' , 'get');

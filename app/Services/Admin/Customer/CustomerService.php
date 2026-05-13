@@ -4,9 +4,8 @@ namespace App\Services\Admin\Customer;
 
 use App\Models\Api\Ecommerce\Order;
 use App\Models\User;
-use App\Services\BaseModelService;
 
-class CustomerService extends BaseModelService
+class CustomerService 
 {
     protected string $modelClass = User::class;
 

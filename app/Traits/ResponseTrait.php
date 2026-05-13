@@ -50,7 +50,7 @@ trait ResponseTrait
             'success' => true,
             'message' => $message,
             'data' => [
-                $key => $resourceCollection,
+                'items' => $resourceCollection,
                 'pagination' => [
                     'total' => $paginator->total(),
                     'per_page' => $paginator->perPage(),

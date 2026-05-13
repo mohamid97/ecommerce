@@ -12,60 +12,25 @@ use App\Http\Requests\Api\Admin\Ecommerce\OrderAllRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\OrderViewRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\OrderUpdateStatusRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\OrderUserSummaryRequest;
-use App\Services\Ecommerce\Order\PointsService;
-use App\Services\Admin\User\UserService;
+use App\Http\Requests\Api\Admin\Ecommerce\OrderCreateGuestRequest;
+use App\Services\Admin\Ecommerce\Order\AdminOrderService;
 
 class OrderController extends Controller
 {
     use ResponseTrait;
 
     public function __construct(
-        protected PointsService $pointsService,
-        protected UserService $userService
+        protected AdminOrderService $adminOrderService
     ) {}
 
     public function all(OrderAllRequest $request)
     {
         try {
-            $query = Order::with(['user'])->withCount('items');
-
             $data = $request->validated();
-
-            if (!empty($data['status'])) {
-                $query->where('status', $data['status']);
-            }
-
-            if (!empty($data['user_id'])) {
-                $query->where('user_id', $data['user_id']);
-            }
-
-            if (!empty($data['order_number'])) {
-                $query->where('order_number', $data['order_number']);
-            }
-
-            if (!empty($data['search'])) {
-                $search = $data['search'];
-                $query->where(function ($q) use ($search) {
-                        $q->where('guest_name', 'like', "%{$search}%")
-                            ->orWhere('guest_email', 'like', "%{$search}%")
-                            ->orWhereHas('user', function ($uq) use ($search) {
-                                $uq->where('first_name', 'like', "%{$search}%")
-                                    ->orWhere('last_name', 'like', "%{$search}%")
-                                    ->orWhere('email', 'like', "%{$search}%")
-                                    ->orWhere('username', 'like', "%{$search}%");
-                            });
-                });
-            }
-
-            if (!empty($data['sort']) && in_array($data['sort'], ['asc', 'desc'])) {
-                $orders = $query->orderBy('created_at', $data['sort'])->paginate($data['per_page'] ?? 15);
-            } else {
-                $orders = $query->latest()->paginate($data['per_page'] ?? 15);
-            }
+            $orders = $this->adminOrderService->listOrders($data);
             $collection = OrderListResource::collection($orders->getCollection());
 
             return $this->successPaginated($orders, $collection, 'items', __('main.orders'));
-
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
@@ -75,23 +40,9 @@ class OrderController extends Controller
     {
         try {
             $data = $request->validated();
-
-            $query = Order::with([
-                'user',
-                'items.batches.stockMovment',
-                'items.product',
-                'items.variant.variants.optionValue.option',
-                'items.orderBundelItems.product',
-                'items.orderBundelItems.variant.variants.optionValue.option',
-                'items.bundel.bundelDetails.product',
-            ]);
-
-            $order = !empty($data['order_number'])
-                ? $query->where('order_number', $data['order_number'])->firstOrFail()
-                : $query->findOrFail($data['id']);
+            $order = $this->adminOrderService->viewOrder($data);
 
             return $this->success(new OrderResource($order), __('main.order_details'));
-
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
@@ -101,7 +52,7 @@ class OrderController extends Controller
     {
         try {
             $data = $request->validated();
-            $summary = $this->userService->orderSummary($data['user_id']);
+            $summary = $this->adminOrderService->userOrderSummary($data['user_id']);
 
             return $this->success(new UserOrderSummaryResource($summary), __('main.retrieved_successfully', ['model' => 'user order summary']));
         } catch (\Exception $e) {
@@ -113,21 +64,22 @@ class OrderController extends Controller
     {
         try {
             $data = $request->validated();
+            $order = $this->adminOrderService->updateStatus($data);
 
-            $order = !empty($data['order_number'])
-                ? Order::where('order_number', $data['order_number'])->firstOrFail()
-                : Order::findOrFail($data['id']);
+            return $this->success(new OrderResource($order), __('main.updated_successfully', ['model' => 'Order']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
 
-            $order->status = $data['status'];
-            $order->payment_status = $data['payment_status'];
+    public function createGuest(OrderCreateGuestRequest $request)
+    {
+        try {
+            $data = $request->validated();
 
-            if ($order->status === 'delivered' && !$order->delivered_at) {
-                $order->delivered_at = now();
-            }
-            $order->save();
-            $this->pointsService->awardPointsForCompletedPaidOrder($order);
+            $order = $this->adminOrderService->createGuestOrder($data);
 
-            return $this->success(new OrderResource($order->fresh('user')), __('main.updated_successfully', ['model' => 'Order']));
+            return $this->success(new OrderResource($order), __('main.created_successfully', ['model' => 'Order']));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }

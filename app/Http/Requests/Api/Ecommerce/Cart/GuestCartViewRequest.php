@@ -70,7 +70,7 @@ class GuestCartViewRequest extends FormRequest
             'products.*.variant_id' => 'nullable|integer|exists:product_variants,id',
             'products.*.quantity' => 'required|integer|min:1|max:50',
             'bundles' => 'nullable|array',
-            'bundles.*.bundle_id' => 'required|integer|exists:bundels,id',
+            'bundles.*.bundel_id' => 'required|integer|exists:bundels,id',
             'bundles.*.quantity' => 'required|integer|min:1|max:50',
             'bundles.*.bundle_items' => 'required|array|min:1',
             'bundles.*.bundle_items.*.product_id' => 'required|integer|exists:products,id',

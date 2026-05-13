@@ -43,6 +43,8 @@ class ModelServiceFactory
         'option'=> \App\Services\Admin\Ecommerce\Option\OptionService::class,
         'zone'=>\App\Services\Admin\Ecommerce\Shipment\ZoneService::class,
         'city'=>\App\Services\Admin\Ecommerce\Shipment\CityService::class,
+        'consultation'=>\App\Services\Admin\Consultation\ConsultationService::class,
+        'training'=>\App\Services\Admin\Training\TrainingService::class,
       
     ];
 
