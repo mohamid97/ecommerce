@@ -68,10 +68,10 @@ class ProductController extends Controller
     public function productDetails(Request $request){
         $product = Product::with(['category', 'brand', 'industries'])->where('status', '!=', 'draft')->where('id', $request->id)->first();
         if(!$product){
-            return $this->error(__('main.not_found' , ['product']));
+            return $this->error(__('main.not_found' , ['model' => 'Product']) , 404);
         }
         if (!$product->has_options) {
-            return $this->success(new ProductNoOptionResource($product), __('main.show_successfully', ['product']));
+            return $this->success(new ProductNoOptionResource($product), __('main.show_successfully', ['model' => 'Product']));
         }
 
         $product->load([
@@ -81,7 +81,7 @@ class ProductController extends Controller
             'variants.varaintImages.image',
         ]);
 
-        return $this->success(new ProductDetailsResource($product), __('main.show_successfully', ['product']));
+        return $this->success(new ProductDetailsResource($product), __('main.show_successfully', ['model' => 'Product']));
 
 
     }
@@ -163,9 +163,9 @@ class ProductController extends Controller
         if($request->has('variant_id')){
             $variant = ProductVariant::with(['varaintImages' , 'variants'])->where('status', '!=', 'draft')->where('id', $request->variant_id)->first();
             if(!$variant){
-                return $this->error(__('main.not_found' , ['variant']));
+                return $this->error(__('main.not_found' , ['model' => 'Variant']), 404);
             }
-            return $this->success(new VaraintDetailsResource($variant) , __('main.show_successfully' , ['variant']));
+            return $this->success(new VaraintDetailsResource($variant) , __('main.show_successfully' , ['model' => 'Variant']));
         }
 
     }

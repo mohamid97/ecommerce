@@ -78,7 +78,7 @@ class ProductDetailsResource extends JsonResource
                         
 
                         'option' => $productOption->option ? [
-                           'id' => $productOption->id,
+                           'id' => $productOption->option->id,
                             'title' => $productOption->option->title ?? null,
                         ] : null,
 

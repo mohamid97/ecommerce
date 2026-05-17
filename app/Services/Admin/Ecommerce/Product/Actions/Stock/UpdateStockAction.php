@@ -51,7 +51,7 @@ class UpdateStockAction
 
 
     private function updateVariantStock($oldQty , $newQty , $productID , $variantId){
-      $variant = ProductVariant::where('product_id' , $productID)->where('variant_id' , $variantId)->first();
+      $variant = ProductVariant::where('product_id' , $productID)->where('id' , $variantId)->first();
       $variant->update([
         'stock' => ( $variant->stock - $oldQty ) + $newQty,
       ]);

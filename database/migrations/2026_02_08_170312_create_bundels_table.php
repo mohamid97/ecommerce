@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null');
             $table->string('bundle_image')->nullable();
-            $table->enum('status' , ['active','inactive'])->default('active');
+            $table->enum('status' , ['active', 'draft', 'unavailable'])->default('active');
             $table->timestamps();
         });
     }

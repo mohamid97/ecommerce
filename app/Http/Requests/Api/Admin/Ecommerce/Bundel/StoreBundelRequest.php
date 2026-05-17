@@ -31,7 +31,7 @@ class StoreBundelRequest extends FormRequest
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'bundle_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'nullable|in:active,inactive',
+            'status' => 'nullable|in:active,draft,unavailable',
             'products' => 'required|array',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|numeric',

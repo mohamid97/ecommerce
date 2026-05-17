@@ -20,7 +20,7 @@ class UpdateBundelStatusRequest extends FormRequest
     {
         return [
             'id' => 'required|exists:bundels,id',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:active,draft,unavailable',
         ];
     }
 

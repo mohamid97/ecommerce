@@ -48,8 +48,14 @@ class FrontendService{
             $this->createResponsePaginate($query);
 
         } else {
+
+        // need to check of sent if or slug
             if($request->has('id')){
                 $query = $query->where('id' , $request->id)->get();
+            }else if($request->has('slug')){
+                $query = $query->whereHas('translations' , function($q) use ($request){
+                    $q->where('slug' , $request->slug);
+                })->get();
             }else{
               $query = $query->get();
             }
