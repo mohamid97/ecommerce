@@ -72,5 +72,6 @@ class Kernel extends HttpKernel
         'checkEcommercePermision' => \App\Http\Middleware\Api\Admin\CheckPermissionEcommerce::class,
         'ckeckLang'=>\App\Http\Middleware\Api\CheckLang::class,
         'checkAdmin'=>\App\Http\Middleware\Api\Admin\checkAdmin::class,
+        'allowFrontendModels' => \App\Http\Middleware\Api\Front\AllowFrontendModels::class,
     ];
 }

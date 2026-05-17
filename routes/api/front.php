@@ -22,7 +22,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('/guest/view', 'viewGuestCart');
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'abilities:customer:*'])->group(function () {
         Route::prefix('auth')->controller('MemberController')->group(function(){
             Route::get('/user', 'getUserData');
             Route::post('/update-user', 'updateUserData');
@@ -66,7 +66,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     // dynamic endpoint to get profile data
     Route::prefix('data')->controller('FrontendController')->group(function(){
-        Route::post('get' , 'get');  
+        Route::post('get' , 'get')->middleware('allowFrontendModels');
         Route::post('dynamic/filter' , 'dynamicFilter');
         Route::post('gallery' , 'getGallery'); 
         Route::post('search' , 'search');     

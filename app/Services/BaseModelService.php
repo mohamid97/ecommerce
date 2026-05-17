@@ -42,6 +42,9 @@ abstract class BaseModelService
         if (!empty($request['type']) && method_exists($this, 'type')) {
             $query = $this->type($query, $request['type']);
         }
+        // if(!empty($request['sortBy']) && method_exists($this, 'sortBy')){
+        //     $query = $this->sortBy($query, $request['sortBy']);
+        // }
 
         return isset($request['paginate']) ? $query->paginate($request['paginate']) : $query->get();
 

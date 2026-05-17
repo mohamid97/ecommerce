@@ -13,7 +13,11 @@ class LoginService{
          return false;
        } 
 
-       $user->token = $user->createToken('API Token')->plainTextToken;
+       $user->token = $user->createToken(
+           'API Token',
+           ['customer:*'],
+           now()->addMinutes((int) config('sanctum_expiration.customer_minutes', 43200))
+       )->plainTextToken;
        return $user;
 
         

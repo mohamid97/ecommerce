@@ -19,7 +19,11 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (auth()->attempt($credentials)) {
             $user = auth()->user();
-            $token = $user->createToken('AdminToken')->plainTextToken;
+            $token = $user->createToken(
+                'AdminToken',
+                ['admin:*'],
+                now()->addMinutes((int) config('sanctum_expiration.admin_minutes', 480))
+            )->plainTextToken;
             return $this->success([
                 'token' => $token,
                 'user'=>new UserResource($user),

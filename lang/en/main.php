@@ -4,6 +4,7 @@ return [
  
     'stored_successfully'=> 'The :model has been stored successfully.',
     'update_successfully'=> 'The :model has been updated successfully.',
+    'model_not_allowed'=>'The :model is not allowed for this endpoint.',
     'unauthenticated'=>'You are not unauthenticated. Please log in to access this resource',
     'many_request'=>'Too many requests, please slow down!',
     'no_id_exist'=>'No Id Sent',
