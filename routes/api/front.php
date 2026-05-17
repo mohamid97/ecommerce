@@ -95,6 +95,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::get('industry-products' , 'productsByIndustry');
         Route::post('details' , 'productDetails');
         Route::post('varaint-details' , 'varaintDetails');
+        Route::post('related' , 'relatedProducts');
     });
 
     Route::prefix('industries')->namespace('Ecommerce')->controller('ProductController')->group(function(){
@@ -109,6 +110,18 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::get('get' , 'get');
         Route::post('details' , 'bundleDetails');
     });
+
+
+    Route::prefix('coupons')->namespace('Ecommerce')->controller('CouponController')->group(function(){
+        Route::post('validate' , 'validateCoupon');
+    });
+
+
+    Route::prefix('points')->namespace('Ecommerce')->controller('PointController')->group(function(){
+        Route::post('calculate' , 'calculate');
+    });
+
+
 
 
 

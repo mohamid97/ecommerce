@@ -26,6 +26,7 @@ class IndustryResource extends JsonResource
             'meta_title' => $this->getColumnLang('meta_title'),
             'meta_des' => $this->getColumnLang('meta_des'),
             'industry_image' => $this->getImageUrl($this->industry_image),
+            'breadcrumb' => $this->getImageUrl($this->breadcrumb),
             'title_image' => $this->getColumnLang('title_image'),
             'alt_image' => $this->getColumnLang('alt_image'),
             'order' => $this->order,

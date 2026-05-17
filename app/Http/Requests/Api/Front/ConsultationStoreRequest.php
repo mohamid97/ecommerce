@@ -2,10 +2,14 @@
 
 namespace App\Http\Requests\Api\Front;
 
+use App\Traits\ResponseTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ConsultationStoreRequest extends FormRequest
 {
+    use ResponseTrait;
     public function authorize(): bool
     {
         return true;
@@ -21,5 +25,14 @@ class ConsultationStoreRequest extends FormRequest
             'industry_id' => 'nullable|integer|exists:industries,id',
             'note' => 'nullable|string|max:2000',
         ];
+    }
+
+
+
+        protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            $this->error($validator->errors()->first(), 422)
+        );
     }
 }

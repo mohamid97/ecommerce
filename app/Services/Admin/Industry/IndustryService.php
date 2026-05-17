@@ -16,8 +16,8 @@ class IndustryService extends BaseModelService
 
     public function store()
     {
-        $this->uploadSingleImage(['industry_image'], 'uploads/industries');
-        $industry = parent::store($this->getBasicColumn(['industry_image', 'order']));
+        $this->uploadSingleImage(['industry_image' , 'breadcrumb'], 'uploads/industries');
+        $industry = parent::store($this->getBasicColumn(['industry_image', 'breadcrumb', 'order']));
         $this->data['slug'] = $this->createSlug($this->data);
         $this->processTranslations($industry, $this->data, ['title', 'slug', 'small_des', 'des', 'alt_image', 'title_image', 'meta_title', 'meta_des']);
 
@@ -26,8 +26,8 @@ class IndustryService extends BaseModelService
 
     public function update($id)
     {
-        $this->uploadSingleImage(['industry_image'], 'uploads/industries');
-        $industry = parent::update($id, $this->getBasicColumn(['industry_image', 'order']));
+        $this->uploadSingleImage(['industry_image','breadcrumb'], 'uploads/industries');
+        $industry = parent::update($id, $this->getBasicColumn(['industry_image', 'breadcrumb', 'order']));
         $this->processTranslations($industry, $this->data, ['title', 'slug', 'small_des', 'des', 'alt_image', 'title_image', 'meta_title', 'meta_des']);
 
         return $industry;

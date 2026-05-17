@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('industries', function (Blueprint $table) {
             $table->id();
             $table->string('industry_image')->nullable();
+            $table->string('breadcrumb')->nullable();
             $table->integer('order')->nullable();
             $table->timestamps();
         });

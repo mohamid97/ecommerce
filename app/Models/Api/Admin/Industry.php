@@ -11,7 +11,7 @@ class Industry extends Model implements TranslatableContract
 {
     use HasFactory, Translatable;
 
-    protected $fillable = ['industry_image', 'order'];
+    protected $fillable = ['industry_image' , 'breadcrumb', 'order'];
     public $translatedAttributes = ['title', 'slug', 'small_des', 'des', 'alt_image', 'title_image', 'meta_title', 'meta_des'];
     public $translationForeignKey = 'industry_id';
     public $translationModel = 'App\Models\Api\Admin\IndustryTranslation';

@@ -21,6 +21,7 @@ class IndustryUpdateRequest extends FormRequest
         return [
             'id' => 'required|exists:industries,id',
             'industry_image' => 'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
+            'breadcrumb' => 'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'title' => 'required|array|min:1',
             'title.*' => 'required|string|max:255',
             'slug' => 'required|array|min:1',

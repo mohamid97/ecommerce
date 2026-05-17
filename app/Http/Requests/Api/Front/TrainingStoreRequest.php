@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Api\Front;
 
+use App\Traits\ResponseTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class TrainingStoreRequest extends FormRequest
 {
@@ -20,5 +23,13 @@ class TrainingStoreRequest extends FormRequest
             'phone' => 'nullable|string|max:30',
             'note' => 'nullable|string|max:2000',
         ];
+    }
+
+
+        protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            $this->error($validator->errors()->first(), 422)
+        );
     }
 }

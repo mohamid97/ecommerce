@@ -194,4 +194,46 @@ class ProductController extends Controller
         );
     }
 
+
+
+
+    // get realted products based on product id
+    public function relatedProducts(Request $request){
+        if(!$request->has('id')){
+            return $this->error(__('main.no_id'), 404);
+        }
+        $product = Product::find($request->id);
+        if(!$product){
+            return $this->error(__('main.not_found', ['model' => 'Product']), 404);
+        }
+        $relatedProducts = Product::with(['category', 'brand', 'industries'])
+            ->where('status', '!=', 'draft')
+            ->where('id', '!=', $product->id)
+            ->where(function ($query) use ($product) {
+                $query->where('category_id', $product->category_id)
+                    ->orWhere('brand_id', $product->brand_id)
+                    ->orWhereHas('industries', function ($query) use ($product) {
+                        $query->whereIn('industries.id', $product->industries->pluck('id'));
+                    });
+        });
+
+        if($request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)){
+            $relatedProducts = $relatedProducts->paginate($request->paginate);
+        }else{
+            $relatedProducts = $relatedProducts->paginate(10);
+        }
+
+        return $this->successPaginated(
+            $relatedProducts,
+            ProductResource::collection($relatedProducts),
+            'related_products',
+            __('main.list_successfully', ['model' => 'Related Products'])
+        );
+
+        
+    }
+
+
+
+
 }

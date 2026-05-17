@@ -49,7 +49,7 @@ class ProductDetailsResource extends JsonResource
                     ];
                 });
             }),
-            'varaint_images'=> $defaultVaraintModel->varaintImages->map(function ($image) {
+            'varaint_images'=> $defaultVaraintModel?->varaintImages?->map(function ($image) {
                 return [
                     'id' => $image->id,
                     'image' => $this->getImageUrl($image->image?->image)
