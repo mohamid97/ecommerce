@@ -60,6 +60,10 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('/guest/store', 'storeGuest');
     });
 
+    Route::prefix('govs')->namespace('Ecommerce')->controller('GovController')->group(function(){
+        Route::get('get', 'get');
+    });
+
 
     // contact and messages
     Route::post('send-message', [MessageController::class, 'sendMessage']);

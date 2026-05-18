@@ -33,7 +33,11 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'payment_status' => $this->payment_status ?? 'unpaid',
             'shipment_address' => $this->shipment_address,
-            'government' => $this->government,
+            'government_id' => $this->government_id,
+            'government' => $this->government ? [
+                'id' => $this->government->id,
+                'name' => ['ar' => $this->government->name_ar, 'en' => $this->government->name_en],
+            ] : null,
             'shipment_zone_id' => $this->shipment_zone_id,
             'shipment_city_id' => $this->shipment_city_id,
             'payment_method' => $this->payment_method,

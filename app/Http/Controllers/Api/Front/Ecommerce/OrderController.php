@@ -24,6 +24,7 @@ class OrderController extends Controller
             $paginator = \App\Models\Api\Ecommerce\Order::query()
                 ->where('user_id', $user->id)
                 ->with([
+                    'government',
                     'items.product',
                     'items.variant.variants.optionValue.option',
                     'items.bundel.bundelDetails.product',
@@ -105,7 +106,7 @@ class OrderController extends Controller
                 return $this->error(__('main.not_found', ['model' => 'Order']), 404);
             }
 
-            $order->load(['items.product', 'items.variant', 'items.bundel.bundelDetails.product']);
+            $order->load(['government', 'items.product', 'items.variant', 'items.bundel.bundelDetails.product']);
 
             return $this->success(new OrderResource($order), __('main.retrieved_successfully', ['model' => 'Order']));
         } catch (\Exception $e) {

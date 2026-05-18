@@ -29,6 +29,7 @@ class AdminOrderService
     {
         $query = OrderModel::with([
             'user',
+            'government',
             'items.batches.stockMovment',
             'items.product',
             'items.variant.variants.optionValue.option',

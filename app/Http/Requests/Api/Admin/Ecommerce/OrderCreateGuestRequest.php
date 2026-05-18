@@ -17,7 +17,7 @@ class OrderCreateGuestRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
-            'government' => 'required|string|max:255',
+            'government_id' => 'required|integer|exists:govs,id',
             'shipment_address' => 'required|string|max:1000',
             'payment_method' => 'required|string|max:255',
             'items' => 'required|array|min:1',

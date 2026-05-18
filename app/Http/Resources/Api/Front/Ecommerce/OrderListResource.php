@@ -15,6 +15,11 @@ class OrderListResource extends JsonResource
             'status' => $this->status,
             'payment_status' => $this->payment_status ?? 'unpaid',
             'payment_method' => $this->payment_method,
+            'government_id' => $this->government_id,
+            'government' => $this->government ? [
+                'id' => $this->government->id,
+                'name' =>['ar' => $this->government->name_ar, 'en' => $this->government->name_en],
+            ] : null,
             'items_count' => $this->items_count ?? null,
             'subtotal' => (float) $this->total_before_discount,
             'shipping_cost' => (float) $this->shipping_cost,

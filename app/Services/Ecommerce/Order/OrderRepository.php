@@ -24,10 +24,10 @@ class OrderRepository
         $order->phone = $data['phone'] ?? $user->phone ?? null;
         $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
         $order->shipment_city_id = $data['shipment_city_id'] ?? null;
-        $order->government = $data['government'] ?? null;
+        $order->government_id = $data['government_id'] ?? null;
         $order->shipment_address = $data['shipment_address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
-        // shipping cost is static (front will send government + full address)
+        // shipping cost is static (front sends government_id + full address)
         $order->shipping_cost = 70;
         $order->total= 0;
         $order->tax = 0;
@@ -54,7 +54,7 @@ class OrderRepository
         $order->phone = $data['phone'] ?? null;
         $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
         $order->shipment_city_id = $data['shipment_city_id'] ?? null;
-        $order->government = $data['government'] ?? null;
+        $order->government_id = $data['government_id'] ?? null;
         $order->shipment_address = $data['shipment_address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
         // shipping cost is static
