@@ -13,7 +13,11 @@ use Astrotomic\Translatable\Translatable;
 class Bundel extends Model implements TranslatableContract
 {
     use HasFactory , Translatable;
-    protected $fillable = ['price' , 'category_id' , 'brand_id' , 'bundle_image' , 'status'];
+    protected $fillable = ['price' , 'discount', 'discount_type', 'category_id' , 'brand_id' , 'bundle_image' , 'status'];
+    protected $casts = [
+        'price' => 'float',
+        'discount' => 'float',
+    ];
     public $translatedAttributes = ['title' , 'slug' , 'des' , 'meta_title' , 'meta_des'];
     public $translationForeignKey = 'bundel_id';
     public $translationModel = 'App\Models\Api\Ecommerce\BundelTranslation';
@@ -108,9 +112,36 @@ class Bundel extends Model implements TranslatableContract
             $totalPrice += $price * $detail->quantity;
         }
 
-        return ['total_price' => $totalPrice, 'price_after_discount' => $totalDiscountPrice];
+        $priceAfterDiscount = $this->hasBundleDiscount()
+            ? $this->applyBundleDiscount($totalPrice)
+            : $totalDiscountPrice;
+
+        return ['total_price' => $totalPrice, 'price_after_discount' => $priceAfterDiscount];
     }
 
+    public function hasBundleDiscount(): bool
+    {
+        return $this->discount !== null && !empty($this->discount_type);
+    }
+
+    public function applyBundleDiscount(float $totalPrice): float
+    {
+        if (!$this->hasBundleDiscount()) {
+            return $totalPrice;
+        }
+
+        $discount = (float) $this->discount;
+
+        if ($discount <= 0) {
+            return $totalPrice;
+        }
+
+        if ($this->discount_type === 'percentage') {
+            return max($totalPrice - ($totalPrice * ($discount / 100)), 0);
+        }
+
+        return max($totalPrice - $discount, 0);
+    }
 
 
 

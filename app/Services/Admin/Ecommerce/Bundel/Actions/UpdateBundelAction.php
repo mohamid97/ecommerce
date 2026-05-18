@@ -18,6 +18,8 @@ class UpdateBundelAction{
 
         $bundel->update([
             'price' => null,
+            'discount' => $data->discount,
+            'discount_type' => $data->discount_type,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
             'bundle_image' => $this->uploadImage($data->bundle_image, 'bundel', 'public'),

@@ -28,6 +28,8 @@ class UpdateBundelRequest extends FormRequest
         return [
             'id'=>'required|exists:bundels,id',
             'price' => 'nullable|numeric',
+            'discount' => 'nullable|numeric|min:0|required_with:discount_type',
+            'discount_type' => 'nullable|in:fixed,percentage|required_with:discount',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'bundle_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

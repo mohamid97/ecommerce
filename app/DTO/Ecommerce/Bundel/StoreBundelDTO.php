@@ -5,6 +5,8 @@ class StoreBundelDTO{
 
         public function __construct(
             public ?float $price,
+            public ?float $discount,
+            public ?string $discount_type,
             public ?int $category_id,
             public ?int $brand_id,
             public ?string $bundle_image = null,
@@ -24,6 +26,8 @@ class StoreBundelDTO{
 
         return new self(
             $data["price"]??null,
+            $data["discount"]??null,
+            $data["discount_type"]??null,
             $data["category_id"]??null,
             $data["brand_id"]??null,
             $data["bundle_image"]??null,

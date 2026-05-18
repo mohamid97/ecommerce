@@ -190,6 +190,10 @@ class BundleItemStrategy implements CartItemStrategyInterface
 
         }
 
+        if ($bundle->hasBundleDiscount()) {
+            $price_after_discount = $bundle->applyBundleDiscount($sale_price);
+        }
+
         return [$sale_price, $price_after_discount];
 
 

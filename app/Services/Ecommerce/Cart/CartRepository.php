@@ -192,6 +192,10 @@ class CartRepository
             $totalDiscountPrice += $discountPrice * $bundleDetail->quantity;
         }
 
+        if ($bundle && $bundle->hasBundleDiscount()) {
+            $totalDiscountPrice = $bundle->applyBundleDiscount($totalPrice);
+        }
+
         return [
             'total_price' => $totalPrice,
             'total_discount_price' => $totalDiscountPrice,
