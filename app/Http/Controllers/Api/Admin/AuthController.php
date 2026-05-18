@@ -19,10 +19,13 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (auth()->attempt($credentials)) {
             $user = auth()->user();
+
+            // Invalidate all previous tokens on each login.
+            $user->tokens()->delete();
+
             $token = $user->createToken(
                 'AdminToken',
-                ['admin:*'],
-                now()->addMinutes((int) config('sanctum_expiration.admin_minutes', 480))
+                expiresAt: now()->addMinutes((int) config('sanctum_expiration.admin_minutes', 480))
             )->plainTextToken;
             return $this->success([
                 'token' => $token,

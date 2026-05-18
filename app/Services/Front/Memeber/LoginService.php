@@ -13,10 +13,12 @@ class LoginService{
          return false;
        } 
 
+       // Invalidate all previous tokens on each login.
+       $user->tokens()->delete();
+
        $user->token = $user->createToken(
            'API Token',
-           ['customer:*'],
-           now()->addMinutes((int) config('sanctum_expiration.customer_minutes', 43200))
+           expiresAt: now()->addMinutes((int) config('sanctum_expiration.customer_minutes', 43200))
        )->plainTextToken;
        return $user;
 

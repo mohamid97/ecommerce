@@ -76,7 +76,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     Route::post('login', 'AuthController@login');
     
-    Route::middleware(['auth:sanctum', 'abilities:admin:*'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('get-user', 'AuthController@getData');
         Route::post('logout', 'AuthController@logout');
         Route::post('store', 'CrudController@store')->middleware('checkPermision:create');

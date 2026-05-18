@@ -22,7 +22,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('/guest/view', 'viewGuestCart');
     });
 
-    Route::middleware(['auth:sanctum', 'abilities:customer:*'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('auth')->controller('MemberController')->group(function(){
             Route::get('/user', 'getUserData');
             Route::post('/update-user', 'updateUserData');
