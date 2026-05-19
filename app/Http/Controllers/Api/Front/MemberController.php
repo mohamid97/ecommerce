@@ -116,8 +116,11 @@ class MemberController extends Controller
             DB::beginTransaction();
             $user = $request->user();
             $user->update($request->validated());
+            $user->profile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $request->only('government_id', 'address')
+            );
             DB::commit();
-
             return $this->success(
                 new MemeberResource($user->fresh('profile')),
                 __('main.updated_successfully', ['model' => 'User'])
@@ -128,24 +131,24 @@ class MemberController extends Controller
         }
     }
 
-    public function completeProfile(CompleteProfileRequest $request)
-    {
-        try {
-            DB::beginTransaction();
-            $user = $request->user();
-            $user->profile()->updateOrCreate(
-                ['user_id' => $user->id],
-                $request->validated()
-            );
-            DB::commit();
+    // public function completeProfile(CompleteProfileRequest $request)
+    // {
+    //     try {
+    //         DB::beginTransaction();
+    //         $user = $request->user();
+    //         $user->profile()->updateOrCreate(
+    //             ['user_id' => $user->id],
+    //             $request->validated()
+    //         );
+    //         DB::commit();
 
-            return $this->success(
-                new MemeberResource($user->fresh('profile')),
-                __('main.updated_successfully', ['model' => 'User profile'])
-            );
-        } catch (Exception $e) {
-            DB::rollBack();
-            return $this->error($e->getMessage(), 500);
-        }
-    }
+    //         return $this->success(
+    //             new MemeberResource($user->fresh('profile')),
+    //             __('main.updated_successfully', ['model' => 'User profile'])
+    //         );
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return $this->error($e->getMessage(), 500);
+    //     }
+    // }
 }

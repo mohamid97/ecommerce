@@ -30,6 +30,8 @@ class UpdateMemberRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($this->user()?->id),
             ],
             'phone' => 'nullable|string|max:12',
+            'government_id'=>'nullable|integer|exists:govs,id',
+            'address'=>'nullable|string|max:5000',
         ];
     }
 
@@ -42,4 +44,5 @@ class UpdateMemberRequest extends FormRequest
             )
         );
     }
+    
 }

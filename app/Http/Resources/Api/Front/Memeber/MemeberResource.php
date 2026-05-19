@@ -22,7 +22,7 @@ class MemeberResource extends JsonResource
             'phone'=>$this->phone,
             'profile_completed'=> (bool) ($this->profile?->government && $this->profile?->address),
             'profile'=> [
-                'government' => $this->profile?->government,
+                'government' => $this->profile?->government->name_ar,
                 'address' => $this->profile?->address,
                 'city' => $this->profile?->city,
                 'area' => $this->profile?->area,

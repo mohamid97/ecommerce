@@ -13,6 +13,7 @@ use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\FilterProductVaraintR
 use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\ProductVaraintsResource;
 use App\Http\Resources\Api\Admin\Ecommerce\Product\Varaint\VarinatDetailsResource;
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Services\Admin\Ecommerce\Product\Actions\Variant\DeleteVaraintAction;
 // use App\Services\Admin\Ecommerce\Product\Actions\Variant\DeleteVaraintAction;
@@ -197,10 +198,25 @@ private function generateCombinations(array $optionsArray)
 
 
  public function filterProductaraints(Request $request){
-    $products = Product::with('variants')->whereHas('translation' , function($query) use ($request) {
+    $filter = [];
+
+    // search for product
+    $filter[] = Product::with('variants')->whereHas('translation' , function($query) use ($request) {
         $query->where('title', 'like', '%' . $request->search . '%');
     })->get();
-    return $this->success( FilterProductVaraintResource::collection($products) , __('main.updated_successfully' , ['model' => 'Variant']));
+
+    // search for bundle
+    if($request->has('type') && $request->type == 'all'){
+    $filter[] = Bundel::with([
+        'bundelDetails.product'])->whereHas('translation', function ($query) use ($request) {
+        $query->where('title', 'like', '%' . $request->search . '%');
+    })->get();
+    }
+     // need to merge the two collection and remove duplicates
+     $filter = collect($filter)->flatten()->values();
+     
+  
+    return $this->success( FilterProductVaraintResource::collection($filter) , __('main.filtered_successfully' , ['model' => 'Variant']));
 
  }
 
