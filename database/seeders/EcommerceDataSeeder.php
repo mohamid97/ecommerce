@@ -20,6 +20,11 @@ use App\Models\Api\Ecommerce\ShipmentZone;
 use App\Models\Api\Ecommerce\ShipmentCity;
 use App\Models\Api\Ecommerce\LastPiece;
 use App\Models\Api\Ecommerce\NewProduct;
+use App\Models\Api\Ecommerce\Order;
+use App\Models\Api\Ecommerce\OrderItem;
+use App\Models\Api\Ecommerce\OrderItemBatch;
+use App\Models\Api\Ecommerce\OrderItemBundelItem;
+use App\Models\Api\Ecommerce\Gov;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -212,7 +217,22 @@ class EcommerceDataSeeder extends Seeder
             NewProduct::firstOrCreate(['product_id' => $simpleKeyboard->id]);
             NewProduct::firstOrCreate(['product_id' => $poloProduct->id]);
 
-            $this->seedShipmentZoneAndCity();
+            $shipment = $this->seedShipmentZoneAndCity();
+
+            $this->seedDummyOrders([
+                'simple_mouse' => $simpleMouse,
+                'simple_keyboard' => $simpleKeyboard,
+                'simple_headset' => $simpleHeadset,
+                'simple_hoodie' => $simpleHoodie,
+                'tshirt_red_small' => $tshirtRedSmall,
+                'tshirt_blue_medium' => $tshirtBlueMedium,
+                'tshirt_black_large' => $tshirtBlackLarge,
+                'polo_blue_medium' => $poloBlueMedium,
+                'polo_black_large' => $poloBlackLarge,
+                'bundle' => $bundle,
+                'zone' => $shipment['zone'],
+                'city' => $shipment['city'],
+            ]);
         });
     }
 
@@ -554,7 +574,388 @@ class EcommerceDataSeeder extends Seeder
         );
     }
 
-    private function seedShipmentZoneAndCity(): void
+    private function seedDummyOrders(array $catalog): void
+    {
+        $user = User::firstOrCreate(
+            ['email' => 'shopper.one@example.com'],
+            [
+                'username' => 'shopperone',
+                'first_name' => 'Shopper',
+                'last_name' => 'One',
+                'phone' => '01000000001',
+                'password' => 'password',
+                'type' => 'user',
+            ]
+        );
+
+        $secondUser = User::firstOrCreate(
+            ['email' => 'shopper.two@example.com'],
+            [
+                'username' => 'shopppertwo',
+                'first_name' => 'Shopper',
+                'last_name' => 'Two',
+                'phone' => '01000000002',
+                'password' => 'password',
+                'type' => 'user',
+            ]
+        );
+
+        $zoneId = $catalog['zone']->id;
+        $cityId = $catalog['city']->id;
+        $governmentId = Gov::query()->value('id');
+
+        $definitions = [
+            [
+                'order_number' => 'ORD-SEED-000001',
+                'user_id' => $user->id,
+                'status' => 'delivered',
+                'payment_status' => 'paid',
+                'payment_method' => 'cash',
+                'phone' => '01000000001',
+                'guest_name' => null,
+                'guest_email' => null,
+                'shipment_address' => 'Seed Address 1',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDays(10),
+                'items' => [
+                    ['type' => 'simple', 'product_id' => $catalog['simple_mouse']->id, 'quantity' => 2],
+                    ['type' => 'variant', 'variant_id' => $catalog['tshirt_blue_medium']->id, 'quantity' => 1],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000002',
+                'user_id' => null,
+                'status' => 'confirmed',
+                'payment_status' => 'paid',
+                'payment_method' => 'card',
+                'phone' => '01000000003',
+                'guest_name' => 'Guest Alpha',
+                'guest_email' => 'guest.alpha@example.com',
+                'shipment_address' => 'Seed Address 2',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDays(8),
+                'items' => [
+                    ['type' => 'simple', 'product_id' => $catalog['simple_keyboard']->id, 'quantity' => 1],
+                    ['type' => 'simple', 'product_id' => $catalog['simple_headset']->id, 'quantity' => 2],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000003',
+                'user_id' => $secondUser->id,
+                'status' => 'pending',
+                'payment_status' => 'unpaid',
+                'payment_method' => 'cash',
+                'phone' => '01000000002',
+                'guest_name' => null,
+                'guest_email' => null,
+                'shipment_address' => 'Seed Address 3',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDays(6),
+                'items' => [
+                    ['type' => 'variant', 'variant_id' => $catalog['polo_black_large']->id, 'quantity' => 1],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000004',
+                'user_id' => null,
+                'status' => 'cancelled',
+                'payment_status' => 'unpaid',
+                'payment_method' => 'cash',
+                'phone' => '01000000004',
+                'guest_name' => 'Guest Beta',
+                'guest_email' => 'guest.beta@example.com',
+                'shipment_address' => 'Seed Address 4',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDays(5),
+                'items' => [
+                    ['type' => 'simple', 'product_id' => $catalog['simple_hoodie']->id, 'quantity' => 1],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000005',
+                'user_id' => $user->id,
+                'status' => 'shipped',
+                'payment_status' => 'paid',
+                'payment_method' => 'card',
+                'phone' => '01000000001',
+                'guest_name' => null,
+                'guest_email' => null,
+                'shipment_address' => 'Seed Address 5',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDays(3),
+                'items' => [
+                    [
+                        'type' => 'bundle',
+                        'bundel_id' => $catalog['bundle']->id,
+                        'quantity' => 2,
+                        'selected_variants' => [
+                            $catalog['tshirt_red_small']->product_id => $catalog['tshirt_red_small']->id,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000006',
+                'user_id' => $secondUser->id,
+                'status' => 'refunded',
+                'payment_status' => 'refunded',
+                'payment_method' => 'card',
+                'phone' => '01000000002',
+                'guest_name' => null,
+                'guest_email' => null,
+                'shipment_address' => 'Seed Address 6',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDays(2),
+                'items' => [
+                    ['type' => 'simple', 'product_id' => $catalog['simple_keyboard']->id, 'quantity' => 1],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000007',
+                'user_id' => null,
+                'status' => 'processing',
+                'payment_status' => 'paid',
+                'payment_method' => 'cash',
+                'phone' => '01000000007',
+                'guest_name' => 'Guest Gamma',
+                'guest_email' => 'guest.gamma@example.com',
+                'shipment_address' => 'Seed Address 7',
+                'shipping_cost' => 70,
+                'created_at' => now()->subDay(),
+                'items' => [
+                    ['type' => 'variant', 'variant_id' => $catalog['tshirt_black_large']->id, 'quantity' => 3],
+                ],
+            ],
+            [
+                'order_number' => 'ORD-SEED-000008',
+                'user_id' => $user->id,
+                'status' => 'delivered',
+                'payment_status' => 'paid',
+                'payment_method' => 'card',
+                'phone' => '01000000001',
+                'guest_name' => null,
+                'guest_email' => null,
+                'shipment_address' => 'Seed Address 8',
+                'shipping_cost' => 70,
+                'created_at' => now(),
+                'items' => [
+                    ['type' => 'simple', 'product_id' => $catalog['simple_mouse']->id, 'quantity' => 4],
+                    ['type' => 'variant', 'variant_id' => $catalog['polo_blue_medium']->id, 'quantity' => 2],
+                ],
+            ],
+        ];
+
+        foreach ($definitions as $definition) {
+            $order = Order::updateOrCreate(
+                ['order_number' => $definition['order_number']],
+                [
+                    'user_id' => $definition['user_id'],
+                    'guest_name' => $definition['guest_name'],
+                    'guest_email' => $definition['guest_email'],
+                    'phone' => $definition['phone'],
+                    'status' => $definition['status'],
+                    'payment_status' => $definition['payment_status'],
+                    'shipment_zone_id' => $zoneId,
+                    'shipment_city_id' => $cityId,
+                    'government_id' => $governmentId,
+                    'shipment_address' => $definition['shipment_address'],
+                    'payment_method' => $definition['payment_method'],
+                    'shipping_cost' => $definition['shipping_cost'],
+                    'tax' => 0,
+                    'discount' => 0,
+                    'discount_type' => null,
+                    'coupon_code' => null,
+                    'points_used' => null,
+                    'points_amount' => null,
+                    'points_earned' => 0,
+                    'created_at' => $definition['created_at'],
+                    'updated_at' => now(),
+                ]
+            );
+
+            $order->items()->delete();
+
+            foreach ($definition['items'] as $itemDefinition) {
+                $this->seedOrderItem($order, $itemDefinition);
+            }
+
+            $this->recalculateOrderTotals($order);
+        }
+    }
+
+    private function seedOrderItem(Order $order, array $itemDefinition): void
+    {
+        $type = $itemDefinition['type'];
+        $quantity = (int) ($itemDefinition['quantity'] ?? 1);
+
+        if ($type === 'simple') {
+            $product = Product::findOrFail($itemDefinition['product_id']);
+            $salePrice = (float) $product->sale_price;
+            $priceAfterDiscount = (float) ($product->getDiscountPrice() ?? $salePrice);
+
+            $orderItem = OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'variant_id' => null,
+                'bundel_id' => null,
+                'quantity' => $quantity,
+                'sale_price' => $salePrice,
+                'price_after_discount' => $priceAfterDiscount,
+                'total_price' => $salePrice * $quantity,
+                'total_price_after_discount' => $priceAfterDiscount * $quantity,
+            ]);
+
+            $this->createOrderBatch($orderItem->id, $product->id, null, $quantity, $salePrice);
+            return;
+        }
+
+        if ($type === 'variant') {
+            $variant = ProductVariant::with('product')->findOrFail($itemDefinition['variant_id']);
+            $salePrice = (float) $variant->sale_price;
+            $priceAfterDiscount = (float) ($variant->getDiscountPrice() ?? $salePrice);
+
+            $orderItem = OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $variant->product_id,
+                'variant_id' => $variant->id,
+                'bundel_id' => null,
+                'quantity' => $quantity,
+                'sale_price' => $salePrice,
+                'price_after_discount' => $priceAfterDiscount,
+                'total_price' => $salePrice * $quantity,
+                'total_price_after_discount' => $priceAfterDiscount * $quantity,
+            ]);
+
+            $this->createOrderBatch($orderItem->id, $variant->product_id, $variant->id, $quantity, $salePrice);
+            return;
+        }
+
+        if ($type === 'bundle') {
+            $bundle = Bundel::with('bundelDetails.product')->findOrFail($itemDefinition['bundel_id']);
+            $selectedVariants = $itemDefinition['selected_variants'] ?? [];
+
+            $bundleSalePrice = 0.0;
+            $bundleAfterDiscount = 0.0;
+            $bundleSnapshotDetails = [];
+
+            foreach ($bundle->bundelDetails as $detail) {
+                $selectedVariantId = $selectedVariants[$detail->product_id] ?? null;
+                $selectedVariant = null;
+
+                if (!empty($selectedVariantId)) {
+                    $selectedVariant = ProductVariant::find($selectedVariantId);
+                }
+
+                $sourceProduct = $detail->product;
+                $sourceSale = (float) ($selectedVariant?->sale_price ?? $sourceProduct?->sale_price ?? 0);
+                $sourceAfterDiscount = (float) ($selectedVariant?->getDiscountPrice() ?? $sourceProduct?->getDiscountPrice() ?? $sourceSale);
+                $detailQuantity = (int) ($detail->quantity ?? 1);
+
+                $bundleSalePrice += $sourceSale * $detailQuantity;
+                $bundleAfterDiscount += $sourceAfterDiscount * $detailQuantity;
+
+                $bundleSnapshotDetails[] = [
+                    'product_id' => $detail->product_id,
+                    'product' => $sourceProduct ? [
+                        'id' => $sourceProduct->id,
+                        'title' => $sourceProduct->translate('en')?->title ?? null,
+                    ] : null,
+                    'variant_ids' => $detail->variant_ids,
+                    'selected_variant_id' => $selectedVariant?->id,
+                    'quantity' => $detailQuantity,
+                ];
+            }
+
+            if ($bundle->hasBundleDiscount()) {
+                $bundleAfterDiscount = (float) $bundle->applyBundleDiscount($bundleSalePrice);
+            }
+
+            $orderItem = OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => null,
+                'variant_id' => null,
+                'bundel_id' => $bundle->id,
+                'quantity' => $quantity,
+                'sale_price' => $bundleSalePrice,
+                'price_after_discount' => $bundleAfterDiscount,
+                'total_price' => $bundleSalePrice * $quantity,
+                'total_price_after_discount' => $bundleAfterDiscount * $quantity,
+                'bundel_snapshot' => [
+                    'id' => $bundle->id,
+                    'title' => $bundle->translate('en')?->title ?? null,
+                    'price' => (float) $bundle->price,
+                    'details' => $bundleSnapshotDetails,
+                ],
+            ]);
+
+            foreach ($bundle->bundelDetails as $detail) {
+                $selectedVariantId = $selectedVariants[$detail->product_id] ?? null;
+                $selectedVariant = $selectedVariantId ? ProductVariant::find($selectedVariantId) : null;
+
+                OrderItemBundelItem::create([
+                    'order_item_id' => $orderItem->id,
+                    'product_id' => $detail->product_id,
+                    'variant_id' => $selectedVariant?->id,
+                    'quantity' => (int) ($detail->quantity ?? 1),
+                ]);
+
+                $totalBatchQty = $quantity * (int) ($detail->quantity ?? 1);
+                $batchProductId = $selectedVariant?->product_id ?? $detail->product_id;
+                $batchVariantId = $selectedVariant?->id;
+                $fallbackSale = (float) ($selectedVariant?->sale_price ?? $detail->product?->sale_price ?? 0);
+
+                $this->createOrderBatch(
+                    $orderItem->id,
+                    $batchProductId,
+                    $batchVariantId,
+                    $totalBatchQty,
+                    $fallbackSale
+                );
+            }
+        }
+    }
+
+    private function createOrderBatch(
+        int $orderItemId,
+        int $productId,
+        ?int $variantId,
+        int $quantity,
+        float $fallbackSalePrice
+    ): void {
+        $stockQuery = StockMovment::query()
+            ->where('product_id', $productId);
+
+        if ($variantId) {
+            $stockQuery->where('variant_id', $variantId);
+        } else {
+            $stockQuery->whereNull('variant_id');
+        }
+
+        $stock = $stockQuery->orderBy('id')->first();
+
+        OrderItemBatch::create([
+            'order_item_id' => $orderItemId,
+            'stock_movment_id' => $stock?->id,
+            'quantity' => $quantity,
+            'sale_price' => (float) ($stock?->sale_price ?? $fallbackSalePrice),
+            'cost_price' => (float) ($stock?->cost_price ?? round($fallbackSalePrice * 0.6, 2)),
+        ]);
+    }
+
+    private function recalculateOrderTotals(Order $order): void
+    {
+        $order->load('items');
+        $totalBeforeDiscount = (float) $order->items->sum('total_price');
+        $totalAfterDiscount = (float) $order->items->sum('total_price_after_discount');
+
+        $order->total_before_discount = round($totalBeforeDiscount, 2);
+        $order->total_after_discount = round($totalAfterDiscount, 2);
+        $order->total = round($totalAfterDiscount + (float) $order->shipping_cost - (float) ($order->points_amount ?? 0), 2);
+        $order->points_earned = $order->payment_status === 'paid' ? (int) floor($totalAfterDiscount / 50) : 0;
+        $order->save();
+    }
+
+    private function seedShipmentZoneAndCity(): array
     {
         $zone = ShipmentZone::firstOrCreate(
             ['price' => 25],
@@ -575,5 +976,10 @@ class EcommerceDataSeeder extends Seeder
         $city->translateOrNew('ar')->title = 'مدينة نصر';
         $city->translateOrNew('ar')->des = 'مدينة شحن سريع';
         $city->save();
+
+        return [
+            'zone' => $zone,
+            'city' => $city,
+        ];
     }
 }

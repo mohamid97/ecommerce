@@ -33,6 +33,7 @@ class ProductDetailsResource extends JsonResource
             'sku' => $this->sku,
             'barcode' => $this->barcode,
             'stock' => $this->stock,
+            'sales_number' => $this->resolvedSalesNumber(),
             'category' => $this->whenLoaded('category' , function(){
                     return [
                         'id'=>$this->category ? $this->category->id : null,
@@ -124,5 +125,22 @@ class ProductDetailsResource extends JsonResource
         
         ];
 
+    }
+
+    private function resolvedSalesNumber(): int
+    {
+        if (!$this->has_options) {
+            return (int) ($this->sales_number ?? 0);
+        }
+
+        if (isset($this->variants_sales_number_sum)) {
+            return (int) $this->variants_sales_number_sum;
+        }
+
+        if ($this->relationLoaded('variants')) {
+            return (int) $this->variants->sum('sales_number');
+        }
+
+        return (int) $this->variants()->sum('sales_number');
     }
 }

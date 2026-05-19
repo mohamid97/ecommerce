@@ -94,10 +94,10 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         // get brands with category id
         Route::post('category/brands' ,"CategoryController@getBrand");
 
-        // home page 
-        Route::get('/home' ,'HomeController@index');
+
 
         // start product file route
+         require __DIR__.'/admin/statistics/home.php';
          require __DIR__.'/admin/product.php';
          require __DIR__.'/admin/bundel.php';
          require __DIR__.'/admin/promotion.php';

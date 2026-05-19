@@ -165,7 +165,8 @@ public function filterProduct(Request $request)
 
     private function baseProductListQuery(Request $request)
     {
-        $products = Product::with(['category', 'brand', 'industries']);
+        $products = Product::with(['category', 'brand', 'industries'])
+            ->withSum('variants as variants_sales_number_sum', 'sales_number');
 
         if ($request->has('search')) {
             $products->whereHas('translations', function ($query) use ($request) {

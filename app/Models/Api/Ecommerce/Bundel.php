@@ -13,10 +13,11 @@ use Astrotomic\Translatable\Translatable;
 class Bundel extends Model implements TranslatableContract
 {
     use HasFactory , Translatable;
-    protected $fillable = ['price' , 'discount', 'discount_type', 'category_id' , 'brand_id' , 'bundle_image' , 'status'];
+    protected $fillable = ['price' , 'discount', 'discount_type', 'category_id' , 'brand_id' , 'bundle_image' , 'status', 'sales_number'];
     protected $casts = [
         'price' => 'float',
         'discount' => 'float',
+        'sales_number' => 'integer',
     ];
     public $translatedAttributes = ['title' , 'slug' , 'des' , 'meta_title' , 'meta_des'];
     public $translationForeignKey = 'bundel_id';
