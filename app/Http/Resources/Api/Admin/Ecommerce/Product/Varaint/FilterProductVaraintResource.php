@@ -54,6 +54,7 @@ class FilterProductVaraintResource extends JsonResource
                                         ->filter()
                                         ->implode(' '),
                                         'sale_price'=>$variant->sale_price,
+                                        'price_after_discount'=>$variant->getDiscountPrice(),
                                     ];
                                 }),
                             ];
@@ -103,6 +104,8 @@ class FilterProductVaraintResource extends JsonResource
             ->filter()
             ->implode(' '),
             'sale_price'=>$variant->sale_price,
+            'price_after_discount'=>$variant->getDiscountPrice(),
+
         ];
     }
 

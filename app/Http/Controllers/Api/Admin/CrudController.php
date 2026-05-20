@@ -70,6 +70,7 @@ class CrudController extends Controller
     
             return $this->success( is_array($this->data)|| $this->data instanceof \Illuminate\Support\Collection  ? $resourceClass::collection($this->data) : new $resourceClass($this->data), __($msg, ['model' => $modelName]));
         }
+        
         return $this->error( __('main.no_model_data', ['model' => $modelName]) , 404);
 
         
