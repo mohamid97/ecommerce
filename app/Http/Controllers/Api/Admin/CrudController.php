@@ -45,10 +45,15 @@ class CrudController extends Controller
       
         $studlyName = Str::studly($modelName);
       
+      
         
         $resourceClass =  "App\\Http\\Resources\\Api\\Admin\\{$studlyName}Resource";
+        //   dd(class_exists($resourceClass) );
 
-        if (class_exists($resourceClass) && (!empty($this->data))) {
+        if (class_exists($resourceClass)) {
+            if(!$this->data){
+                return $this->success( [], __($msg, ['model' => $modelName]));
+            }
             if($this->data instanceof \Illuminate\Pagination\AbstractPaginator){
                 return $this->success(
                     [
@@ -70,7 +75,6 @@ class CrudController extends Controller
     
             return $this->success( is_array($this->data)|| $this->data instanceof \Illuminate\Support\Collection  ? $resourceClass::collection($this->data) : new $resourceClass($this->data), __($msg, ['model' => $modelName]));
         }
-        
         return $this->error( __('main.no_model_data', ['model' => $modelName]) , 404);
 
         
