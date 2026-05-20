@@ -16,6 +16,8 @@ class BestSellingStatisticsRequest extends FormRequest
         return [
             'month' => 'nullable|date_format:Y-m',
             'limit' => 'nullable|integer|min:1|max:50',
+            'per_page' => 'nullable|integer|min:1|max:100',
+            'page' => 'nullable|integer|min:1',
         ];
     }
 }

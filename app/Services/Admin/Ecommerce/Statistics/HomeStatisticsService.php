@@ -13,6 +13,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomeStatisticsService
 {
@@ -125,117 +126,123 @@ class HomeStatisticsService
         });
     }
 
-    public function bestSelling(int $limit = 5, ?string $month = null): array
-    {
-        $key = 'admin_stats:best_selling:' . ($month ?: 'all') . ':limit:' . $limit . ':locale:' . app()->getLocale();
 
-        return Cache::remember($key, now()->addMinutes(self::CACHE_TTL_MINUTES), function () use ($limit, $month) {
-            $baseQuery = OrderItem::query()
-                ->join('orders', 'orders.id', '=', 'order_items.order_id')
-                ->where('orders.payment_status', 'paid')
-                ->whereNotIn('orders.status', ['cancelled', 'refunded']);
+public function bestSelling(int $perPage = 5, ?string $month = null , int $page = 1): LengthAwarePaginator
+{
+    // no Cache here because LengthAwarePaginator isn't serializable cleanly
+    $baseQuery = OrderItem::query()
+        ->join('orders', 'orders.id', '=', 'order_items.order_id')
+        ->where('orders.payment_status', 'paid')
+        ->whereNotIn('orders.status', ['cancelled', 'refunded']);
 
-            if (!empty($month)) {
-                $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-                $end = $start->copy()->endOfMonth();
-                $baseQuery->whereBetween('orders.created_at', [$start, $end]);
-            }
-
-            $productRows = (clone $baseQuery)
-                ->whereNotNull('order_items.product_id')
-                ->whereNull('order_items.variant_id')
-                ->whereNull('order_items.bundel_id')
-                ->select(
-                    'order_items.product_id',
-                    DB::raw('SUM(order_items.quantity) as total_quantity'),
-                    DB::raw('SUM(order_items.total_price_after_discount) as total_sales')
-                )
-                ->groupBy('order_items.product_id')
-                ->orderByDesc('total_quantity')
-                ->limit($limit)
-                ->get();
-
-            $variantRows = (clone $baseQuery)
-                ->whereNotNull('order_items.variant_id')
-                ->select(
-                    'order_items.variant_id',
-                    'order_items.product_id',
-                    DB::raw('SUM(order_items.quantity) as total_quantity'),
-                    DB::raw('SUM(order_items.total_price_after_discount) as total_sales')
-                )
-                ->groupBy('order_items.variant_id', 'order_items.product_id')
-                ->orderByDesc('total_quantity')
-                ->limit($limit)
-                ->get();
-
-            $bundelRows = (clone $baseQuery)
-                ->whereNotNull('order_items.bundel_id')
-                ->select(
-                    'order_items.bundel_id',
-                    DB::raw('SUM(order_items.quantity) as total_quantity'),
-                    DB::raw('SUM(order_items.total_price_after_discount) as total_sales')
-                )
-                ->groupBy('order_items.bundel_id')
-                ->orderByDesc('total_quantity')
-                ->limit($limit)
-                ->get();
-
-            $products = Product::query()
-                ->whereIn('id', $productRows->pluck('product_id')->filter()->unique()->values())
-                ->get()
-                ->keyBy('id');
-
-            $variants = ProductVariant::query()
-                ->with('product')
-                ->whereIn('id', $variantRows->pluck('variant_id')->filter()->unique()->values())
-                ->get()
-                ->keyBy('id');
-
-            $bundels = Bundel::query()
-                ->whereIn('id', $bundelRows->pluck('bundel_id')->filter()->unique()->values())
-                ->get()
-                ->keyBy('id');
-
-            return [
-                'products' => $productRows->map(function ($row) use ($products) {
-                    $product = $products->get($row->product_id);
-
-                    return [
-                        'product_id' => (int) $row->product_id,
-                        'title' => $this->translatedTitle($product, 'Product #' . $row->product_id),
-                        'image' => $product?->product_image,
-                        'sold_quantity' => (int) $row->total_quantity,
-                        'revenue' => round((float) $row->total_sales, 2),
-                    ];
-                })->values()->all(),
-                'variants' => $variantRows->map(function ($row) use ($variants) {
-                    $variant = $variants->get($row->variant_id);
-                    $product = $variant?->product;
-
-                    return [
-                        'variant_id' => (int) $row->variant_id,
-                        'product_id' => $row->product_id ? (int) $row->product_id : null,
-                        'title' => $this->translatedTitle($variant, 'Variant #' . $row->variant_id),
-                        'product_title' => $this->translatedTitle($product, null),
-                        'sold_quantity' => (int) $row->total_quantity,
-                        'revenue' => round((float) $row->total_sales, 2),
-                    ];
-                })->values()->all(),
-                'bundels' => $bundelRows->map(function ($row) use ($bundels) {
-                    $bundel = $bundels->get($row->bundel_id);
-
-                    return [
-                        'bundel_id' => (int) $row->bundel_id,
-                        'title' => $this->translatedTitle($bundel, 'Bundel #' . $row->bundel_id),
-                        'image' => $bundel?->bundle_image,
-                        'sold_quantity' => (int) $row->total_quantity,
-                        'revenue' => round((float) $row->total_sales, 2),
-                    ];
-                })->values()->all(),
-            ];
-        });
+    if (!empty($month)) {
+        $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+        $baseQuery->whereBetween('orders.created_at', [$start, $end]);
     }
 
+    $productRows = (clone $baseQuery)
+        ->whereNotNull('order_items.product_id')
+        ->whereNull('order_items.variant_id')
+        ->whereNull('order_items.bundel_id')
+        ->select(
+            'order_items.product_id',
+            DB::raw('SUM(order_items.quantity) as total_quantity'),
+            DB::raw('SUM(order_items.total_price_after_discount) as total_sales')
+        )
+        ->groupBy('order_items.product_id')
+        ->orderByDesc('total_quantity')
+        ->get();
+
+    $variantRows = (clone $baseQuery)
+        ->whereNotNull('order_items.variant_id')
+        ->select(
+            'order_items.variant_id',
+            'order_items.product_id',
+            DB::raw('SUM(order_items.quantity) as total_quantity'),
+            DB::raw('SUM(order_items.total_price_after_discount) as total_sales')
+        )
+        ->groupBy('order_items.variant_id', 'order_items.product_id')
+        ->orderByDesc('total_quantity')
+        ->get();
+
+    $bundelRows = (clone $baseQuery)
+        ->whereNotNull('order_items.bundel_id')
+        ->select(
+            'order_items.bundel_id',
+            DB::raw('SUM(order_items.quantity) as total_quantity'),
+            DB::raw('SUM(order_items.total_price_after_discount) as total_sales')
+        )
+        ->groupBy('order_items.bundel_id')
+        ->orderByDesc('total_quantity')
+        ->get();
+
+    $products = Product::query()
+        ->whereIn('id', $productRows->pluck('product_id')->filter()->unique()->values())
+        ->get()->keyBy('id');
+
+    $variants = ProductVariant::query()
+        ->with('product')
+        ->whereIn('id', $variantRows->pluck('variant_id')->filter()->unique()->values())
+        ->get()->keyBy('id');
+
+    $bundels = Bundel::query()
+        ->whereIn('id', $bundelRows->pluck('bundel_id')->filter()->unique()->values())
+        ->get()->keyBy('id');
+
+    $mappedProducts = $productRows->map(function ($row) use ($products) {
+        $product = $products->get($row->product_id);
+        return [
+            'id'           => (int) $row->product_id,
+            'type'         => 'product',
+            'title'        => $this->translatedTitle($product, 'Product #' . $row->product_id),
+            'image'        => $product?->product_image,
+            'sales_number' => (int) $row->total_quantity,
+            'revenue'      => round((float) $row->total_sales, 2),
+        ];
+    });
+
+    $mappedVariants = $variantRows->map(function ($row) use ($variants) {
+        $variant = $variants->get($row->variant_id);
+        $product = $variant?->product;
+        return [
+            'id'            => (int) $row->variant_id,
+            'type'          => 'variant',
+            'title'         => $this->translatedTitle($variant, 'Variant #' . $row->variant_id),
+            'product_title' => $this->translatedTitle($product, null),
+            'image'         => $product?->product_image,
+            'sales_number'  => (int) $row->total_quantity,
+            'revenue'       => round((float) $row->total_sales, 2),
+        ];
+    });
+
+    $mappedBundels = $bundelRows->map(function ($row) use ($bundels) {
+        $bundel = $bundels->get($row->bundel_id);
+        return [
+            'id'           => (int) $row->bundel_id,
+            'type'         => 'bundle',
+            'title'        => $this->translatedTitle($bundel, 'Bundel #' . $row->bundel_id),
+            'image'        => $bundel?->bundle_image,
+            'sales_number' => (int) $row->total_quantity,
+            'revenue'      => round((float) $row->total_sales, 2),
+        ];
+    });
+
+    $merged = $mappedProducts
+        ->concat($mappedVariants)
+        ->concat($mappedBundels)
+        ->sortByDesc('sales_number')
+        ->values();
+
+    // ── wrap into LengthAwarePaginator so successPaginated works ─────────────
+    return new LengthAwarePaginator(
+        items: $merged->forPage($page, $perPage)->values(),
+        total: $merged->count(),
+        perPage: $perPage,
+        currentPage: $page,
+        options: ['path' => request()->url(), 'query' => request()->query()]
+    );
+}
     private function overviewDaily(): array
     {
         $now = now();

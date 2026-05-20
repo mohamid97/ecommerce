@@ -67,13 +67,16 @@ class HomeController extends Controller
             $data = $request->validated();
             $month = $data['month'] ?? null;
             $limit = (int) ($data['limit'] ?? 5);
+            $page = (int) ($data['page'] ?? 1);
 
-            $result = $this->homeStatisticsService->bestSelling($limit, $month);
-
-            return $this->success(
-                $result,
-                $month ? ('Best selling statistics for ' . $month) : 'Best selling statistics'
+            $result = $this->homeStatisticsService->bestSelling($limit, $month , $page);
+            return $this->successPaginated(
+                paginator:          $result,
+                resourceCollection: $result->items(),
+                message:            'Best selling items'
             );
+
+
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
