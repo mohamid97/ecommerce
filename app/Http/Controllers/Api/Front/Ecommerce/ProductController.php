@@ -42,7 +42,7 @@ class ProductController extends Controller
         }
 
         if($request->has('sort') && in_array($request->sort , ['asc' , 'desc'])){
-            if($request->has('sort_by') && in_array($request->sort_by, ['created_at', 'sale_price' , 'id'])){
+            if($request->has('sort_by') && in_array($request->sort_by, ['created_at', 'sale_price' , 'id' , 'discount' , 'order'])){
                 $products->orderBy($request->sort_by, $request->sort);
             }else{
             $products->orderBy('created_at', $request->sort);
