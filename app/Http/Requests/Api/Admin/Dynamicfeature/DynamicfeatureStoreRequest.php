@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Requests\Api\Admin\Faq;
+namespace App\Http\Requests\Api\Admin\Dynamicfeature;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class FaqStoreRequest extends FormRequest
+class DynamicfeatureStoreRequest extends FormRequest
 {
     use ResponseTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,28 +27,24 @@ class FaqStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'question'=>'required|array',
-            'question.*'=>'required|string|max:255',
-            'answer'=>'required|array',
-            'answer.*'=>'required|string|max:5000',
-            'icon'=>'nullable|image|mimes:png,jpg,webp|max:3000',
-            'topic'=>'nullable|string|max:255',
-            'type'=>'nullable|string|in:consultation,training,cms',
+            'type' => 'required|string|in:train,consult',
+            'icon' => 'nullable|image|mimes:png,jpg,webp,jpeg|max:5000',
+            'title' => 'required|array',
+            'title.*' => 'required|string|max:255',
+            'small_des' => 'nullable|array',
+            'small_des.*' => 'nullable|string|max:1000',
+            'des' => 'nullable|array',
+            'des.*' => 'nullable|string|max:10000',
         ];
     }
-
 
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
             $this->error(
-              
                 $validator->errors()->first(), 
-                422, 
-                
+                422
             )
         );
     }
-
-
 }

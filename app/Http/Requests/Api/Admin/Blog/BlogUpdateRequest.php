@@ -43,6 +43,11 @@ class BlogUpdateRequest extends FormRequest
             'small_des.*' => 'nullable|string|max:255',
             'des' => 'nullable|array',
             'des.*' => 'nullable|string|max:5000',
+            'faqs.*' => [
+                'integer',
+                Rule::exists('faqs', 'id')->where('type', 'cms'),
+            ],
+
         ];
         
 

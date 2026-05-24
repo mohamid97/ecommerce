@@ -6,6 +6,9 @@ use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
+
+
 
 class BlogStoreRequest extends FormRequest
 {
@@ -41,6 +44,12 @@ class BlogStoreRequest extends FormRequest
             'small_des.*' => 'nullable|string|max:255',
             'des' => 'nullable|array',
             'des.*' => 'nullable|string|max:5000',
+            'faqs'   => 'nullable|array',
+            'faqs.*' => [
+                'integer',
+                Rule::exists('faqs', 'id')->where('type', 'cms'),
+            ],
+
         ];
         
     }

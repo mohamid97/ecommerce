@@ -48,6 +48,7 @@ class CrudController extends Controller
       
         
         $resourceClass =  "App\\Http\\Resources\\Api\\Admin\\{$studlyName}Resource";
+        //dd($resourceClass);
         //   dd(class_exists($resourceClass) );
 
         if (class_exists($resourceClass)) {

@@ -26,7 +26,10 @@ class UserOrderSummaryResource extends JsonResource
                 'phone' => $user->phone,
                 'type' => $user->type,
                 'loyalty_points' => (int) ($user->points ?? 0),
-                'created_at' => $user->created_at?->format('Y-m-d H:i:s'),
+                'created_at' => $user->created_at?->format('Y-m-d'),
+                'shipment_address'=>$user->profile?->address,
+                'government_name'=>
+                ['ar'=>$user->profile?->government?->name_ar,'en'=>$user->profile?->government?->name_en],
             ],
             'total_orders' => (int) $this->resource['total_orders'],
             'total_spent' => (float) $this->resource['total_spent'],

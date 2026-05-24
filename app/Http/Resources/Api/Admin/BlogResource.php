@@ -33,6 +33,16 @@ class BlogResource extends JsonResource
                         'slug'  =>$this->category ? $this->getColumnLang('slug','category') : null,
                     ];
             }),
+            'faqs' => $this->whenLoaded('faqs', function () {
+                return $this->faqs->map(function ($faq) {
+                  
+                    return [
+                        'id' => $faq->id,
+                        'question' => $faq->question,
+                        'answer' => $faq->answer,
+                    ];
+                });
+            }),
             'meta_title' => $this->getColumnLang('meta_title'),
             'meta_des' => $this->getColumnLang('meta_des'),
             'alt_image' => $this->getColumnLang('alt_image'),

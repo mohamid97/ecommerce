@@ -10,6 +10,14 @@ class UserService extends BaseModelService
 {
     protected string $modelClass = User::class;
 
+
+    public function all($request)
+    {
+
+        $users = User::query()->where('type' , 'admin')->latest()->paginate(15);
+        return $users;
+
+    }
     public function store()
     {
         $this->hassBassword();
@@ -34,7 +42,7 @@ class UserService extends BaseModelService
 
     public function orderSummary(int $userId): array
     {
-        $user = User::findOrFail($userId);
+        $user = User::with('profile.government')->findOrFail($userId);
         $ordersQuery = Order::where('user_id', $user->id);
 
         return [

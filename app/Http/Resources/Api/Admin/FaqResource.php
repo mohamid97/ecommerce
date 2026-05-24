@@ -20,6 +20,8 @@ class FaqResource extends JsonResource
         return [
             'id'=>$this->id,
             'icon'=>$this->getImageUrl($this->icon),
+            'type'=>$this->type,
+            'blog'=>$this->whenLoaded('blog'),
             'topic'=>$this->topic,
             'question'=>$this->getColumnLang('question'),
             'answer'=>$this->getColumnLang('answer')

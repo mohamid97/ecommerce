@@ -10,7 +10,7 @@ use Astrotomic\Translatable\Translatable;
 class Faq extends Model implements TranslatableContract
 {
     use HasFactory , Translatable;
-    protected $fillable = ['icon' , 'topic'];
+    protected $fillable = ['icon' , 'topic', 'type'];
     public $translatedAttributes = ['question','answer'];
     public $translationForeignKey = 'faq_id';
     public $translationModel = 'App\Models\Api\Admin\FaqTranslation';
@@ -20,5 +20,14 @@ class Faq extends Model implements TranslatableContract
       return $date->format('Y-m-d'); 
     }
 
-    
+    public function blogs()
+    {
+        return $this->belongsToMany(Blog::class, 'blog_faq', 'faq_id', 'blog_id')
+                    ->withTimestamps();
+    }
+
+
+
+
+
 }

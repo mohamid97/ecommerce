@@ -13,11 +13,16 @@ class FaqService extends BaseModelService{
     public function store()
     {
         $this->uploadSingleImage(['icon'] , 'uploads/faq');
-        $faq = parent::store($this->getBasicColumn(['icon' , 'topic']));
+        $faq = parent::store($this->getBasicColumn(['icon' , 'topic', 'type', 'blog_id']));
         $this->processTranslations($faq, $this->data, ['question' , 'answer']);  
         return $faq;     
     }
 
-
-
+    public function update(int $id)
+    {
+        $this->uploadSingleImage(['icon'] , 'uploads/faq');
+        $faq = parent::update($id, $this->getBasicColumn(['icon' , 'topic', 'type', 'blog_id']));
+        $this->processTranslations($faq, $this->data, ['question' , 'answer']);  
+        return $faq;     
+    }
 }

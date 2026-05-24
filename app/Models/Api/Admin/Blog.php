@@ -26,6 +26,9 @@ class Blog extends Model implements TranslatableContract
     public function category(){
         return $this->belongsTo(Category::class , 'category_id');
     }
-    
+    public function faqs()
+    {
+        return $this->belongsToMany(Faq::class, 'blog_faq', 'blog_id', 'faq_id');
+    }
     
 }

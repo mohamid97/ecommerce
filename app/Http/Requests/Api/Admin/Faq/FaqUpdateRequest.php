@@ -30,7 +30,8 @@ class FaqUpdateRequest extends FormRequest
             'answer'=>'required|array',
             'answer.*'=>'required|string|max:5000',
             'icon'=>'nullable|image|mimes:png,jpg,webp|max:3000',
-            'topic'=>'nullable|string|max:255'
+            'topic'=>'nullable|string|max:255',
+            'type'=>'nullable|string|in:consultation,training,cms',
         ];
     }
 

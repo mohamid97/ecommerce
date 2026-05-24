@@ -30,5 +30,6 @@ return [
         'mediavideo',
         'coupon',
         'event',
+        'dynamicfeature',
     ],
 ];

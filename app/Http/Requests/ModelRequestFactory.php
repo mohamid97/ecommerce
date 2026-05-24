@@ -197,6 +197,10 @@ class ModelRequestFactory
             'city'=>[
                 'store'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\CityStoreRequest::class,
                 'update'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\CityUpdateRequest::class,
+            ],
+            'dynamicfeature'=>[
+                'store'=>\App\Http\Requests\Api\Admin\Dynamicfeature\DynamicfeatureStoreRequest::class,
+                'update'=>\App\Http\Requests\Api\Admin\Dynamicfeature\DynamicfeatureUpdateRequest::class,
             ]
 
 

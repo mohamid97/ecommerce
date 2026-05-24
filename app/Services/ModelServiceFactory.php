@@ -45,6 +45,7 @@ class ModelServiceFactory
         'city'=>\App\Services\Admin\Ecommerce\Shipment\CityService::class,
         'consultation'=>\App\Services\Admin\Consultation\ConsultationService::class,
         'training'=>\App\Services\Admin\Training\TrainingService::class,
+        'dynamicfeature'=>\App\Services\Admin\Dynamicfeature\DynamicfeatureService::class,
       
     ];
 
