@@ -51,7 +51,7 @@ class ProductStoreRequest extends FormRequest
             'order'=>'nullable|integer|unique:products,order',
             'has_options'  => 'required|boolean',
             'on_demand'    => 'nullable|boolean',
-            'sale_price'=>'nullable|numeric|min:0',
+            'sale_price'=>'required|numeric|min:0|max:10000000',
             'discount'=>'nullable|numeric|min:0',
             'discount_type'=>'nullable|in:fixed,percentage',
             'sku'=>'nullable|string|max:255',

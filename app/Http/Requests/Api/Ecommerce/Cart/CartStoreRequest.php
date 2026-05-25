@@ -35,6 +35,49 @@ class CartStoreRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $bundleId = $this->input('bundel_id');
+            $bundleItems = $this->input('bundle_items', []);
+
+            if ($bundleId && !empty($bundleItems) && is_array($bundleItems)) {
+                $bundleDetails = \DB::table('bundel_details')
+                    ->where('bundel_id', $bundleId)
+                    ->get();
+
+                foreach ($bundleItems as $index => $item) {
+                    $productId = $item['product_id'] ?? null;
+                    $variantId = $item['variant_id'] ?? null;
+
+                    if (!$productId) {
+                        continue;
+                    }
+
+                    $matchingDetail = $bundleDetails->firstWhere('product_id', $productId);
+
+                    if (!$matchingDetail) {
+                        $validator->errors()->add(
+                            "bundle_items.{$index}.product_id",
+                            "The product with ID {$productId} does not belong to bundle ID {$bundleId}."
+                        );
+                        continue;
+                    }
+
+                    if ($variantId !== null) {
+                        $allowedVariantIds = json_decode($matchingDetail->variant_ids, true) ?: [];
+                        if (!in_array((int)$variantId, array_map('intval', $allowedVariantIds))) {
+                            $validator->errors()->add(
+                                "bundle_items.{$index}.variant_id",
+                                "The variant with ID {$variantId} does not belong to the selected product inside bundle ID {$bundleId}."
+                            );
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 
     protected function failedValidation(Validator $validator): void
     {

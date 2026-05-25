@@ -6,7 +6,7 @@ use App\Services\BaseModelService;
 use App\Traits\HandlesImage;
 use App\Traits\StoreMultiLang;
 use Illuminate\Database\Eloquent\Builder;
-
+use Nette\Utils\Type;
 
 class OptionService extends BaseModelService
 {
@@ -132,6 +132,18 @@ class OptionService extends BaseModelService
     {
         return $query->orderBy($orderBy, $direction);
     }
+
+    public function applySearch(Builder $query, string $search)
+    {
+        return $query->whereHas('translations', function (Builder $q) use ($search) {
+            $q->where('title', 'like', "%$search%");
+        });
+    }
+    public function type(Builder $query, string $type){
+        return $query->where('value_type', $type);
+    }
+
+    
 
 
 }

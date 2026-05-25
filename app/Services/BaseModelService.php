@@ -21,6 +21,7 @@ abstract class BaseModelService
         $this->data = $data;
         return $this;
     }
+
     public function all($request){
 
         if(is_array($this->relations) && !empty($this->relations)){
@@ -32,6 +33,7 @@ abstract class BaseModelService
 
        
         if (!empty($request['search']) && method_exists($this, 'applySearch')) {
+         
             $query = $this->applySearch($query, $request['search']);
         }
 

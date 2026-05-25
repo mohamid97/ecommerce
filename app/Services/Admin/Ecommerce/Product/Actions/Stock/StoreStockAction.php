@@ -10,14 +10,12 @@ class StoreStockAction
     public function addStock($dto)
     {
 
-        // get product
         $product = Product::findOrFail($dto->product_id);
         // check if front sent variant id and this variant belong to this product
         if(isset($dto->variant_id) && !$this->checkHasVariantId($dto->variant_id , $dto->product_id)){
             throw new \Exception('Variant not found');
         }
 
-  
         return $this->storeStock($dto , $product->has_options);
         
     } 
@@ -39,12 +37,12 @@ class StoreStockAction
                 'status'     => $dto->status ?? 'active',
             ]);
 
-          
 
-
-
+        if($stock->status == 'active'){
             $this->UpdateMainStock($dto);
-            return $stock;
+        }
+
+        return $stock;
      }
 
 
@@ -62,10 +60,7 @@ class StoreStockAction
                 'stock' => $dto->quantity + $this->getProductStock($dto->product_id),
                 // 'sale_price' => $dto->sale_price,
             ]);
-
         }
-
-
 
      }
 

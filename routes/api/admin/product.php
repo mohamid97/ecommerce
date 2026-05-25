@@ -19,6 +19,10 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('/related-products' , 'ProductController@relatedProducts')->name('checkPermision:view');
     Route::post('/filter-product' , 'ProductController@filterProduct')->name('checkPermision:view');
     
+
+
+
+
     // stocks
     Route::post('update-batch-status' , 'StockController@updateStatus')->middleware('checkPermision:update');
     Route::post('delete-batch' , 'StockController@deleteBatch')->middleware('checkPermision:delete');
@@ -26,6 +30,11 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('get-batches' , 'StockController@getBatches')->middleware('checkPermision:view');
     Route::post('add-stock' , 'StockController@addStock')->middleware('checkPermision:create');
     Route::post('update-stock' , 'StockController@updateStock')->middleware('checkPermision:update');
+
+
+
+
+
 
 
     // variants
@@ -36,6 +45,9 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('view-variant' , 'VariantController@viewVariant')->middleware('checkPermision:view');
     Route::post('delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
     Route::post('make-default' , 'VariantController@makeDefault')->middleware('checkPermision:update');
+
+
+
 
 
 
@@ -52,6 +64,9 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('delete-general-image' , 'GalleryController@deleteGeneralImage')->middleware('checkPermision:delete');
     Route::post('delete-special-image' , 'GalleryController@deleteSpecialImage')->middleware('checkPermision:delete');
 
+
+
+    
 
 
 

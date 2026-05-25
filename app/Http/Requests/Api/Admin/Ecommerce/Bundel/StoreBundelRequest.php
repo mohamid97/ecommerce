@@ -7,6 +7,7 @@ use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StoreBundelRequest extends FormRequest
 {
@@ -35,15 +36,21 @@ class StoreBundelRequest extends FormRequest
             'bundle_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|in:active,draft,unavailable',
             'products' => 'required|array',
-            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.product_id' => [
+                'required',
+                Rule::exists('products', 'id')->where('status', 'active'),
+            ],
             'products.*.quantity' => 'required|numeric',
             'products.*.variant_ids' => 'nullable|array',
-            'products.*.variant_ids.*' => 'nullable|exists:product_variants,id',
+            'products.*.variant_ids.*' => [
+                'nullable',
+                Rule::exists('product_variants', 'id')->where('status', 'active'),
+            ],
         ];
     }
 
 
-       protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
             $this->error(

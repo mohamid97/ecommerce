@@ -10,9 +10,10 @@ class UpdateProductService
 {
     private $productId;
 
-    public function updateProductOption($data, $id): void
+
+    public function updateProductOption($data, $product , DeleteEmptyProductOptionService $deleteEmptyProductOption): void
     {
-        $this->productId = $id;
+        $this->productId = $product->id;
         
         // Get incoming option IDs
         $incomingOptionIds = collect($data)->pluck('option_id')->toArray();
@@ -40,6 +41,20 @@ class UpdateProductService
             // Sync the option values
             $this->syncProductOptionValues($productOption, $option);
         }
+
+
+        $deleteEmptyProductOption->deleteEmptyOptions($this->productId);
+         // check if product has option make product active
+        if($product->options()->count() > 0){
+            $product->update(['status' => 'active']);
+        }
+
+
+
+
+
+
+
     }
 
     

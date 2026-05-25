@@ -26,19 +26,6 @@ class UpdateStockAction
         
     } 
 
-    // update status 
-
-    public function updateStatus($data){
-      $stock = StockMovment::where('id', $data->batch_id)->update(
-      [
-        'status' => $data->status,
-      ]);
-
-
-
-        
-    }// end update status
-
 
     private function updateMainStock($oldQty , $newQty , $productID , $variantId){
       if($variantId){
@@ -67,6 +54,75 @@ class UpdateStockAction
 
       
     }
+
+
+
+
+
+
+
+        // update status 
+
+    public function updateStatus($data){
+      $stock = StockMovment::where('id', $data->batch_id)->update(
+      [
+        'status' => $data->status,
+      ]);
+
+      $stock = StockMovment::where('id', $data->batch_id)->first();
+
+      if($data->status == 'active'){
+         $this->addMainStock($stock);
+      }else{
+        $this->cutMainStock($stock);
+      }
+
+
+      return $stock;
+
+       
+
+
+        
+    }// end update status
+
+
+
+
+    // add stock to main stock if status is active
+    private function addMainStock($stock)
+    {
+        if ($stock->variant_id) {
+            ProductVariant::where('id', $stock->variant_id)
+                ->increment('stock', $stock->quantity);
+        } else {
+            Product::where('id', $stock->product_id)
+                ->increment('stock', $stock->quantity);
+        }
+    }
+
+
+
+    //cut stock from main stock if status is inactive
+    private function cutMainStock($stock)
+    {
+        if ($stock->variant_id) {
+            ProductVariant::where('id', $stock->variant_id)
+                ->decrement('stock', $stock->quantity);
+        } else {
+            Product::where('id', $stock->product_id)
+                ->decrement('stock', $stock->quantity);
+        }
+    }
+
+
+
+
+    
+
+
+
+
 
 
 

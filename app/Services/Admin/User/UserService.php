@@ -5,6 +5,7 @@ use App\Models\Api\Ecommerce\Order;
 use App\Models\User;
 use App\Services\BaseModelService;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserService extends BaseModelService
 {
@@ -13,11 +14,22 @@ class UserService extends BaseModelService
 
     public function all($request)
     {
+        $query = $this->modelClass::query();
+        if (!empty($request['search']) && method_exists($this, 'applySearch')) {
+         
+            $query = $this->applySearch($query, $request['search']);
+        }
 
-        $users = User::query()->where('type' , 'admin')->latest()->paginate(15);
+        if (!empty($request['orderBy']) && method_exists($this, 'orderBy')) {
+            $query = $this->orderBy($query, $request['orderBy'] , $request['orderDirection'] ?? 'DESC');
+        }
+        $query = $this->type($query, 'admin');
+        $users = $query->paginate(15);
         return $users;
-
+        
     }
+
+
     public function store()
     {
         $this->hassBassword();
@@ -40,6 +52,34 @@ class UserService extends BaseModelService
 
     }
 
+
+    public function applySearch(Builder $query, string $search)
+    {
+        return $query->whereAny([
+            'username',
+            'email',
+            'phone',
+            'first_name',
+            'last_name',
+        ], 'like', "%$search%");
+    }
+
+    public function orderBy(Builder $query, string $orderBy, string $direction = 'asc')
+    {
+        return $query->orderBy($orderBy, $direction);
+    }
+
+    public function type(Builder $query, string $type)
+    {
+        return $query->where('type', $type);
+    }
+
+
+
+
+
+
+    // order sumary for user
     public function orderSummary(int $userId): array
     {
         $user = User::with('profile.government')->findOrFail($userId);
@@ -59,6 +99,8 @@ class UserService extends BaseModelService
                 ->get(),
         ];
     }
+
+
 
     
 }

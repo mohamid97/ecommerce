@@ -13,8 +13,7 @@ class StoreVaraintAction
 
     public function storeVariant($dto){
         $this->validateDiscount($dto->discountType, $dto->discount , $dto->salePrice);
-        $this->checkIfVariantExists($dto->productId, $dto->optionValueIds);
-          
+        $this->checkIfVariantExists($dto->productId, $dto->optionValueIds);         
         $productVaraint = ProductVariant::create([
             'product_id' => $dto->productId,
             'sale_price' => $dto->salePrice,

@@ -16,6 +16,9 @@ use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Services\Admin\Ecommerce\Product\Actions\Variant\DeleteVaraintAction;
+use App\Services\Admin\Ecommerce\Product\Actions\Variant\FilterProductaraintsAction;
+use App\Services\Admin\Ecommerce\Product\Actions\Variant\MakeDefaultVaraintAction;
+use App\Services\Admin\Ecommerce\Product\Actions\Variant\GenerateCombinationsVaraintAction;
 // use App\Services\Admin\Ecommerce\Product\Actions\Variant\DeleteVaraintAction;
 use Illuminate\Support\Facades\DB;
 use App\Traits\ResponseTrait;
@@ -27,8 +30,6 @@ use Symfony\Component\HttpFoundation\Request;
 class VariantController extends Controller
 {
     use ResponseTrait;
-
-
     // view varaint details data
     public function viewVariant(Request $request){
         if(!$request->id){
@@ -49,194 +50,87 @@ class VariantController extends Controller
 
     }
     // get all combination of varinats 
-   public function variantsCombinations(VariantCombinationRequest $request){
-    $product = Product::findOrFail($request->product_id);
-    
-    if($product->has_options == 0){
-        throw new \Exception('Product has no variants');
-    }
-    
-    $product->load(['options.option', 'options.values.optionValue']);
-    
-    if ($product->options->isEmpty()) {
-        throw new \Exception('Product has no variants');
-    }
+   public function variantsCombinations(VariantCombinationRequest $request, GenerateCombinationsVaraintAction $generateCombinationsVaraintAction){
+       try {
+           $result = $generateCombinationsVaraintAction->generate($request->product_id);
+           return $this->success($result, __('main.list_successfully', ['model' => 'Combinations']));
+       } catch (\Exception $e) {
+           return $this->error($e->getMessage(), 500);
+       }
+   }
 
-    $optionsArray = [];
-    
-    foreach ($product->options as $productOption) {
-        $optionName = $productOption->option->title; // e.g., "اللون"
+
+
+
+    // store new variant 
+    public function storeVariant(StoreVariantRequest $request , StoreVaraintAction $storeVariantAction){
         
-        $values = $productOption->values->map(function ($productOptionValue) {
-            return [
-                'id' => $productOptionValue->optionValue->id,
-                'value' => $productOptionValue->optionValue->title
-            ];
-        })->toArray();
+        try{
+                DB::beginTransaction();  
+                $DTO = StoreVaraintDTO::fromRequest($request->validated());
+                $details = $storeVariantAction->storeVariant($DTO);
+                DB::commit();
+                return $this->success(new VarinatDetailsResource($details) , __('main.stored_successfully' , ['model' => 'Variant']));
 
-        if (!empty($values)) {
-            $optionsArray[$optionName] = $values;
-        }
-    }
+        }catch(\Exception $e){
+                DB::rollBack();
+                return $this->error($e->getMessage(), 500);     
 
-    // Generate combinations AFTER collecting all options
-    $combinations = $this->generateCombinations($optionsArray);
-    return $this->success([     
-        'product_id' => $product->id,
-        'total_combinations' => count($combinations),
-        'combinations' => $combinations
-    ] ,  __('main.list_successfully' , ['model'=>'Combinations']));
-    
-
-}
-
-private function generateCombinations(array $optionsArray)
-{
-    if (empty($optionsArray)) {
-        return [];
-    }
-
-    $result = [[]];
-    
-    foreach ($optionsArray as $optionName => $values) {
-        $temp = [];
-        foreach ($result as $combination) {
-            foreach ($values as $value) {
-                $newCombination = $combination;
-                $newCombination[$optionName] = $value;
-                $temp[] = $newCombination;
-            }
-        }
-        $result = $temp;
-    }
-
-    // Format combinations for better readability
-    return array_map(function ($combination) {
-        $formatted = [
-            'option_value_ids' => [],
-            'display_name' => [],
-            'attributes' => []
-        ];
-
-        foreach ($combination as $optionName => $value) {
-            $formatted['option_value_ids'][] = $value['id'];
-            $formatted['display_name'][] = "{$optionName}: {$value['value']}";
-            $formatted['attributes'][$optionName] = $value['value'];
         }
 
-        $formatted['display_name'] = implode(' | ', $formatted['display_name']);
+    } // end store variant
+
+    public function updateVariant(UpdateVaraintRequest $request , UpdateVaraintAction $updateVaraintAction){
+        try{
+
+                DB::beginTransaction();  
+                    $DTO = UpdateVaraintDTO::fromRequest($request->validated());
+                    $details = $updateVaraintAction->updateVariant($DTO);
+                DB::commit();
+                return $this->success(new VarinatDetailsResource($details) , __('main.updated_successfully' , ['model' => 'Variant']));
+
+        }catch(\Exception $e){
+                DB::rollBack();
+                return $this->error($e->getMessage(), 500); 
+
+        }
+
+    } // end update variant
+
+    public function deleteVariant(Request $request , DeleteVaraintAction $deleteVaraintAction){
         
-        return $formatted;
-    }, $result);
-}
+        try{
+            $id = $request->id;
+            $details = $deleteVaraintAction->deleteVariant($id);
+            return $this->success(new VarinatDetailsResource($details) , __('main.deleted_successfully' , ['model' => 'Variant']));
+
+        }catch(\Exception $e){
+            return $this->error($e->getMessage(), 500); 
+
+        }
+    } // end delete variant
 
 
 
-
- // store new variant 
- public function storeVariant(StoreVariantRequest $request){
-     
-   try{
-        DB::beginTransaction();  
-        $DTO = StoreVaraintDTO::fromRequest($request->validated());
-        $service = app(StoreVaraintAction::class);
-        $details = $service->storeVariant($DTO);
-        DB::commit();
-        return $this->success(new VarinatDetailsResource($details) , __('main.stored_successfully' , ['model' => 'Variant']));
-
-   }catch(\Exception $e){
-        DB::rollBack();
-        return $this->error($e->getMessage(), 500); 
-
-   }
-
-
-
-
-
-
- } // end store variant
-
-
-
-
- public function updateVariant(UpdateVaraintRequest $request){
-    try{
-
-        DB::beginTransaction();  
-            $DTO = UpdateVaraintDTO::fromRequest($request->validated());
-            $service = app(UpdateVaraintAction::class);
-            $details = $service->updateVariant($DTO);
-        DB::commit();
-        return $this->success(new VarinatDetailsResource($details) , __('main.updated_successfully' , ['model' => 'Variant']));
-
-   }catch(\Exception $e){
-        DB::rollBack();
-        return $this->error($e->getMessage(), 500); 
-
-   }
-
- } // end update variant
-
- public function deleteVariant(Request $request){
-     $id = $request->id;
-    try{
-            $service = app(DeleteVaraintAction::class);
-            $service->deleteVariant($id);
-            return $this->success(null , __('main.deleted_successfully' , ['model' => 'Variant']));
-
-   }catch(\Exception $e){
-        return $this->error($e->getMessage(), 500); 
-
-   }
- } // end delete variant
-
-
-
-
-
-
-
- public function filterProductaraints(Request $request){
-    $filter = [];
-
-    // search for product
-    $filter[] = Product::with('variants')->whereHas('translation' , function($query) use ($request) {
-        $query->where('title', 'like', '%' . $request->search . '%');
-    })->get();
-
-    // search for bundle
-    if($request->has('type') && $request->type == 'all'){
-    $filter[] = Bundel::with([
-        'bundelDetails.product'])->whereHas('translation', function ($query) use ($request) {
-        $query->where('title', 'like', '%' . $request->search . '%');
-    })->get();
+    public function filterProductaraints(Request $request, FilterProductaraintsAction $filterProductaraintsAction){
+        try {
+            $filter = $filterProductaraintsAction->filter($request);
+            return $this->success(FilterProductVaraintResource::collection($filter), __('main.filtered_successfully', ['model' => 'Variant']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
     }
-     // need to merge the two collection and remove duplicates
-     $filter = collect($filter)->flatten()->values();
-     
-  
-    return $this->success( FilterProductVaraintResource::collection($filter) , __('main.filtered_successfully' , ['model' => 'Variant']));
-
- }
 
 
-    public function makeDefault(Request $request)
+    public function makeDefault(Request $request, MakeDefaultVaraintAction $makeDefaultVaraintAction)
     {
         if ($request->variant_id) {
-            $variant = ProductVariant::find($request->variant_id);
-
-            if (!$variant) {
-                return $this->error(__('main.model_not_found_id', ['model'=>'Variant' , 'id'=>$request->variant_id ]));
+            try {
+                $makeDefaultVaraintAction->makeDefault($request->variant_id);
+                return $this->success(__('main.updated_successfully'));
+            } catch (\Exception $e) {
+                return $this->error($e->getMessage(), 500);
             }
-
-            ProductVariant::where('product_id', $variant->product_id)
-                ->where('is_default', true)
-                ->update(['is_default' => false]);
-
-            $variant->update(['is_default' => true]);
-
-            return $this->success(__('main.updated_successfully'));
         }
 
         return $this->error(__('main.no_id'));

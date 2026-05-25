@@ -8,6 +8,7 @@ class DeleteVaraintAction
     public function deleteVariant($variant_id){
         $productVaraint = ProductVariant::findOrFail($variant_id);
         $productVaraint->delete();
+        return $productVaraint;
     }
     
 }

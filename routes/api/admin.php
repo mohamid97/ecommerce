@@ -77,35 +77,35 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
     Route::post('login', 'AuthController@login');
     
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::get('get-user', 'AuthController@getData');
-        Route::post('logout', 'AuthController@logout');
-        Route::post('store', 'CrudController@store')->middleware('checkPermision:create');
-        Route::post('update', 'CrudController@update')->middleware('checkPermision:update');
-        Route::post('delete' , 'CrudController@delete')->middleware('checkPermision:delete');
-        Route::post('all' , 'CrudController@all')->middleware('checkPermision:view');
-        Route::post('view' , 'CrudController@view')->middleware('checkPermision:view');
+
+
         Route::post('gallery/store','CrudController@storeGallery')->middleware('checkPermision:create');
         Route::post('gallery/all','CrudController@viewGallery')->middleware('checkPermision:view');
-
         // specification
         Route::post('specification/store' , 'CrudController@storeSpecification')->middleware('checkPermision:create');
         Route::post('specification/all','CrudController@viewSpecification')->middleware('checkPermision:view');
 
+
+
         // get brands with category id
         Route::post('category/brands' ,"CategoryController@getBrand");
+
+        
 
 
 
         // start product file route
-         require __DIR__.'/admin/statistics/home.php';
-         require __DIR__.'/admin/product.php';
-         require __DIR__.'/admin/bundel.php';
-         require __DIR__.'/admin/promotion.php';
-         require __DIR__.'/admin/cart.php';
-         require __DIR__.'/admin/wishlist.php';
-         require __DIR__.'/admin/points.php';
-         require __DIR__.'/admin/order.php';
-         require __DIR__.'/admin/customer.php';
+        require __DIR__.'/admin/user.php';
+        require __DIR__.'/admin/crud.php';
+        require __DIR__.'/admin/statistics/home.php';
+        require __DIR__.'/admin/product.php';
+        require __DIR__.'/admin/bundel.php';
+        require __DIR__.'/admin/promotion.php';
+        require __DIR__.'/admin/cart.php';
+        require __DIR__.'/admin/wishlist.php';
+        require __DIR__.'/admin/points.php';
+        require __DIR__.'/admin/order.php';
+        require __DIR__.'/admin/customer.php';
 
 
 

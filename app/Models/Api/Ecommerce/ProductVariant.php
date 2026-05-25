@@ -14,6 +14,39 @@ class ProductVariant extends Model implements TranslatableContract
     public $translatedAttributes = ['title' , 'slug' , 'des' , 'meta_title' , 'meta_des'];
     public $translationForeignKey = 'product_variant_id';
     public $translationModel = 'App\Models\Api\Ecommerce\ProductVariantTranslation';
+
+    protected static function booted()
+    {
+        static::deleting(function ($variant) {
+            $affectedDetails = \DB::table('bundel_details')
+                ->whereJsonContains('variant_ids', $variant->id)
+                ->get();
+
+            if ($affectedDetails->isNotEmpty()) {
+                $bundleIds = $affectedDetails->pluck('bundel_id')->unique()->toArray();
+
+                // 1. Make all affected bundles draft
+                \App\Models\Api\Ecommerce\Bundel::whereIn('id', $bundleIds)
+                    ->update(['status' => 'draft']);
+
+                // 2. Remove the deleted variant ID from the JSON arrays in bundel_details
+                foreach ($affectedDetails as $detail) {
+                    $variantIds = json_decode($detail->variant_ids, true) ?: [];
+                    
+                    $filteredIds = array_values(array_filter($variantIds, function ($id) use ($variant) {
+                        return (int)$id !== (int)$variant->id;
+                    }));
+
+                    \DB::table('bundel_details')
+                        ->where('id', $detail->id)
+                        ->update([
+                            'variant_ids' => !empty($filteredIds) ? json_encode($filteredIds) : null
+                        ]);
+                }
+            }
+        });
+    }
+
     protected $fillable = ['product_id','is_default', 'sku' , 'barcode'  , 'status' , 'stock' , 'sales_number' , 'sale_price' , 'discount_value' , 'discount_type' , 'length' , 'width' , 'height' , 'weight' , 'delivery_time' , 'max_time' , 'images'];
     protected $casts = [
         'sale_price' => 'float',

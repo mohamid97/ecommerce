@@ -19,6 +19,21 @@ class Product extends Model implements TranslatableContract
     public $translationForeignKey = 'product_id';
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';
 
+    protected static function booted()
+    {
+        static::deleting(function ($product) {
+            $affectedBundleIds = \DB::table('bundel_details')
+                ->where('product_id', $product->id)
+                ->pluck('bundel_id')
+                ->toArray();
+
+            if (!empty($affectedBundleIds)) {
+                \App\Models\Api\Ecommerce\Bundel::whereIn('id', $affectedBundleIds)
+                    ->update(['status' => 'draft']);
+            }
+        });
+    }
+
 
     protected $casts = [
         

@@ -13,11 +13,13 @@ StoreBundelAction{
     use HandlesImage;
 
     public function __construct(
-        public ValidateBundel $validateBundel
+        public ValidateBundel $validateBundel,
+        private CheckBundleProductsStatusAction $checkBundleProductsStatus
     ) {}
     public function storeBundel($data){
         
         $translation = app(TranslationService::class);
+
         $bundel = Bundel::create([
             'price' => null,
             'discount' => $data->discount,
@@ -25,15 +27,20 @@ StoreBundelAction{
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
             'bundle_image' => $this->uploadImage($data->bundle_image ,'bundel' , 'public'),
-            'status' => $data->status,
+            //'status' => $data->status,
         ]);
+
+        
 
         $translation->storeTranslations($bundel, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
  
         $this->validateBundel->validateBundelDetails($bundel->id, $data);
         
         $this->StoreBundelDetails($bundel->id , $data);
-        
+        if($data->status == 'active'){
+            $this->checkBundleProductsStatus->execute($bundel);
+        }
+        $bundel->update(['status' => $data->status]);
         return $bundel;
 
 

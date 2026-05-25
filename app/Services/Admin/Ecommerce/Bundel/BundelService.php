@@ -7,12 +7,13 @@ use App\Services\Admin\Ecommerce\Bundel\Actions\StoreBundelAction;
 use App\Services\Admin\Ecommerce\Bundel\Actions\UpdateBundelAction;
 use Exception;
 
-// BundelService.php
 class BundelService {
 
     public function __construct(
         private StoreBundelAction $store,
         private UpdateBundelAction $update,
+        private CheckBundleProductsStatusAction $checkBundleProductsStatus,
+        private RemoveBundleFromCartAction $removeBundleFromCart,
     ) {}
 
     public function getBundels($request){
@@ -31,8 +32,15 @@ class BundelService {
     public function updateBundelStatus(array $data): Bundel
     {
         $bundel = Bundel::with(['category', 'brand'])->findOrFail($data['id']);
+        // need if make bundle active need to make sure that all products  or varint in the bundle are active?
+        if($data['status'] == 'active'){
+            $this->checkBundleProductsStatus->execute($bundel);
+        }else{
+            // remove bundle from cart  if exists because bundle will be inactive
+            $this->removeBundleFromCart->execute($bundel);
+        }
+        
         $bundel->update(['status' => $data['status']]);
-
         return $bundel;
     }
 
@@ -43,4 +51,8 @@ class BundelService {
         }
         throw new Exception(__('main.not_found', ['model' => 'Bundel']));
     }
+
+
+
+
 }

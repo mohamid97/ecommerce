@@ -29,14 +29,14 @@ class StoreProductService
     // }
 
 
-    public function addProductOption($data , $id):void{
+    public function addProductOption($data , $product , DeleteEmptyProductOptionService $deleteEmptyProductOption):void{
 
         foreach ($data as $option) {
 
 
             $productOption = ProductOption::firstOrCreate(
                 [
-                    'product_id' => $id,
+                    'product_id' => $product->id,
                     'option_id' => $option['option_id'],
                 ]
             );
@@ -46,7 +46,7 @@ class StoreProductService
                     ->where('option_id', $option['option_id'])
                     ->exists();
 
-                if (! $isValid) {
+                if (!$isValid) {
                     continue;
                 }
 
@@ -59,6 +59,14 @@ class StoreProductService
 
             
         }
+        
+        $deleteEmptyProductOption->deleteEmptyOptions($product->id);
+
+        // check if product has option make product active
+        if($product->options()->count() > 0){
+            $product->update(['status' => 'active']);
+        }
+        
 
 
 

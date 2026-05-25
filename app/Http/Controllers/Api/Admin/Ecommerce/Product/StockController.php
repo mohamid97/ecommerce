@@ -23,21 +23,24 @@ class StockController extends Controller
 {
     use ResponseTrait;
 
+    public function __construct(
+        private DetailsStockAction $detailsStockAction , 
+        private StoreStockAction $storeStockAction,
+        private UpdateStockAction $updateStockAction,
+        private DeleteStockAction $deleteStockAction,
+        ){}
     // get batch detils 
     public function batchDetails(Request $request){
         if(!$request->batch_id){
             return $this->error(__('main.no_id'), 422);
         }
-          $service = app(DetailsStockAction::class);
-          $batch = $service->batchDetails($request->batch_id);
+          $batch = $DetailsStockAction->batchDetails($request->batch_id);
           return $this->success(new StockDetailsResource($batch) , __('main.retrieved_successfully' , ['model' => 'Stock']));
     }
     // get batches or all stocks 
-    public function getBatches(StockDetailsRequest $request){
+    public function getBatches(StockDetailsRequest $request ){
         try{
-
-            $service = app(DetailsStockAction::class);
-            $batches = $service->show($request);       
+            $batches = $DetailsStockAction->show($request);       
             return $this->success(StocksResource::collection($batches) , __('main.retrieved_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){
             return $this->error($e->getMessage(), 500);
@@ -47,8 +50,7 @@ class StockController extends Controller
         try{
             DB::beginTransaction();
             $dto = AddStockDTO::fromRequest($request->validated());
-            $service = app(StoreStockAction::class);
-            $data = $service->addStock($dto);
+            $data = $storeStockAction->addStock($dto);
             DB::commit();
             return $this->success(new StockDetailsResource($data) , __('main.stored_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){
@@ -65,8 +67,7 @@ class StockController extends Controller
         try{
             DB::beginTransaction();
             $dto = UpdateStockDTO::fromRequest($request->validated());
-            $service = app(UpdateStockAction::class);
-            $service->updateStock($dto);
+            $updateStockAction->updateStock($dto);
             DB::commit();
             return $this->success('Stock updated successfully');
         }catch(\Exception $e){
@@ -87,8 +88,7 @@ class StockController extends Controller
         }
         try{
             DB::beginTransaction();
-            $service = app(DeleteStockAction::class);
-            $service->deleteBatch($request->batch_id);
+            $deleteStockAction->deleteBatch($request->batch_id);
             DB::commit();
             return $this->success(__('main.deleted_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){
@@ -102,8 +102,7 @@ class StockController extends Controller
     public function updateStatus(UpdateStatusRequest $request){
         try{
             DB::beginTransaction();
-            $service = app(UpdateStockAction::class);
-            $service->updateStatus($request->validated());
+            $updateStockAction->updateStatus($request->validated());
             DB::commit();
             return $this->success(__('main.updated_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){

@@ -83,6 +83,53 @@ class GuestCartViewRequest extends FormRequest
         $validator->after(function ($validator) {
             if (empty($this->input('products', [])) && empty($this->input('bundles', []))) {
                 $validator->errors()->add('cart', 'At least one product or bundle is required.');
+                return;
+            }
+
+            $bundles = $this->input('bundles', []);
+            if (is_array($bundles)) {
+                foreach ($bundles as $bIndex => $bundle) {
+                    $bundleId = $bundle['bundel_id'] ?? null;
+                    if (!$bundleId) {
+                        continue;
+                    }
+
+                    $bundleDetails = \DB::table('bundel_details')
+                        ->where('bundel_id', $bundleId)
+                        ->get();
+
+                    $bundleItems = $bundle['bundle_items'] ?? [];
+                    if (is_array($bundleItems)) {
+                        foreach ($bundleItems as $iIndex => $item) {
+                            $productId = $item['product_id'] ?? null;
+                            $variantId = $item['variant_id'] ?? null;
+
+                            if (!$productId) {
+                                continue;
+                            }
+
+                            $matchingDetail = $bundleDetails->firstWhere('product_id', $productId);
+
+                            if (!$matchingDetail) {
+                                $validator->errors()->add(
+                                    "bundles.{$bIndex}.bundle_items.{$iIndex}.product_id",
+                                    "The product with ID {$productId} does not belong to bundle ID {$bundleId}."
+                                );
+                                continue;
+                            }
+
+                            if ($variantId !== null) {
+                                $allowedVariantIds = json_decode($matchingDetail->variant_ids, true) ?: [];
+                                if (!in_array((int)$variantId, array_map('intval', $allowedVariantIds))) {
+                                    $validator->errors()->add(
+                                        "bundles.{$bIndex}.bundle_items.{$iIndex}.variant_id",
+                                        "The variant with ID {$variantId} does not belong to the selected product inside bundle ID {$bundleId}."
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
     }

@@ -23,7 +23,7 @@ class UpdateStatusRequest extends FormRequest
     {
         return [
           'batch_id' => 'required|exists:stock_movments,id',
-          'status' => 'required|in:active,inactive',
+          'status' => 'required|in:active,inactive,draft',
         ];
     }
 }
