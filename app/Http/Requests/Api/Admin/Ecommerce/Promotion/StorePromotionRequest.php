@@ -44,7 +44,7 @@ class StorePromotionRequest extends FormRequest
             'coupon_limit' => 'nullable|integer|min:1|max:1000',
             'type' => 'required|in:percent,fixed,bundle,bulk,buy-x-get-y',
             'target' => 'required|in:global,category,product,brand,order',
-            'location' => 'required|in:hero,offers_section,pop_up,header_alert',
+            'location' => 'nullable|in:hero,offers_section,pop_up,header_alert',
             'image' => 'nullable|image|mimes:jpeg,png,webp,gif,svg|max:2048',
             'discount' => 'required|numeric|min:0',
             'max_amount_discount' => 'nullable|numeric|min:0',
