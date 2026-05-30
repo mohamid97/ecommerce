@@ -5,6 +5,8 @@ namespace App\Services\Admin\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Services\Admin\Ecommerce\Bundel\Actions\StoreBundelAction;
 use App\Services\Admin\Ecommerce\Bundel\Actions\UpdateBundelAction;
+use App\Services\Admin\Ecommerce\Bundel\Actions\CheckBundleProductsStatusAction;
+use App\Services\Admin\Ecommerce\Bundel\Actions\RemoveBundleFromCartAction;
 use Exception;
 
 class BundelService {

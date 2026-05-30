@@ -32,6 +32,8 @@ class Product extends Model implements TranslatableContract
                     ->update(['status' => 'draft']);
             }
         });
+
+        
     }
 
 

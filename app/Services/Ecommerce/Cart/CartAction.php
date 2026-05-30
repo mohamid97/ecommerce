@@ -2,6 +2,7 @@
 
 namespace App\Services\Ecommerce\Cart;
 
+use App\DTO\Ecommerce\Cart\AddToCartDTO;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\CartItem;
@@ -228,5 +229,73 @@ class CartAction
     }
 
 
-    
+
+    // ── Variant resolution ───────────────────────────────────────────────────
+
+    /**
+     * If the product has options and the DTO has no variant_id, automatically
+     * select the default variant (is_default = 1), falling back to the first
+     * active variant. Throws if the product has options but zero active variants.
+     *
+     * Mutates $dto->variant_id in-place.
+     */
+    public function resolveDefaultVariant(AddToCartDTO $dto): void
+    {
+        $product = Product::find($dto->product_id);
+
+        if (!$product || !$product->has_options) {
+            // Simple product — nothing to resolve
+            return;
+        }
+
+        $variant = ProductVariant::where('product_id', $dto->product_id)
+            ->where('status', 'active')
+            ->orderByDesc('is_default') // is_default=1 floats to the top
+            ->first();
+
+        if (!$variant) {
+            throw new \Exception(__('main.product_has_no_variants'));
+        }
+
+        $dto->variant_id = $variant->id;
+    }
+
+    /**
+     * For every bundle item that carries a product with options but no variant_id,
+     * auto-resolve the variant using the same default → first-active logic.
+     *
+     * Mutates the variant_id entries inside $dto->bundle_items in-place.
+     */
+    public function resolveBundleItemVariants(AddToCartDTO $dto): void
+    {
+        $resolvedItems = [];
+
+        foreach ($dto->bundle_items as $item) {
+            $productId = $item['product_id'] ?? null;
+            $variantId = $item['variant_id'] ?? null;
+
+            if ($productId && !$variantId) {
+                $product = Product::find($productId);
+
+                if ($product && $product->has_options) {
+                    $variant = ProductVariant::where('product_id', $productId)
+                        ->where('status', 'active')
+                        ->orderByDesc('is_default')
+                        ->first();
+
+                    if (!$variant) {
+                        throw new \Exception(
+                            __('main.product_has_no_variants') . " (Product ID: {$productId})"
+                        );
+                    }
+
+                    $item['variant_id'] = $variant->id;
+                }
+            }
+
+            $resolvedItems[] = $item;
+        }
+
+        $dto->bundle_items = $resolvedItems;
+    }
 }

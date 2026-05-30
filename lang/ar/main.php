@@ -10,6 +10,7 @@ return [
     'missing_products_in_bundle_items' => 'Some required bundle products are missing.',
     'invalid_products_in_bundle_items' => 'Bundle items contain products that do not belong to this bundle.',
     'variant_is_required_for_this_product' => 'Variant is required for this product.',
+    'product_has_no_variants' => 'المنتج يحتوي على خيارات ولكن لا توجد خيارات متاحة.',
     'model_not_allowed'
 
     
