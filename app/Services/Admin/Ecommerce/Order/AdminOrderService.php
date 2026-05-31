@@ -6,6 +6,7 @@ use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\Order as OrderModel;
 use App\Models\Api\Ecommerce\ProductVariant;
+use App\Models\Api\Ecommerce\StockMovment;
 use App\Services\Ecommerce\Order\OrderService as EcommerceOrderService;
 use App\Services\Ecommerce\Order\PointsService;
 use App\Services\Admin\User\UserService;
@@ -76,6 +77,11 @@ class AdminOrderService
             // Increase sales counters once, the first time an order reaches delivered.
             if (!$wasEverDelivered && $order->status === 'delivered') {
                 $this->increaseSalesNumbersForDeliveredOrder($order);
+            }
+
+            // Restore stock when an order is refunded.
+            if ($order->status === 'refunded') {
+                $this->restoreStockForRefundedOrder($order);
             }
 
             // award points if necessary
@@ -202,5 +208,43 @@ class AdminOrderService
         }
     }
 
-    
+
+    /**
+     * Reverse every stock batch that was consumed when the order was created.
+     *
+     * For each order_item_batch row we:
+     *   1. Add the taken quantity back to the original stock_movment row.
+     *   2. Add the same quantity back to the denormalized product/variant stock counter.
+     */
+    private function restoreStockForRefundedOrder(OrderModel $order): void
+    {
+        // Load items → batches → the original stock movement in one query.
+        $order->load([
+            'items.batches.stockMovment.variant',
+            'items.batches.stockMovment.product',
+        ]);
+
+        foreach ($order->items as $item) {
+            foreach ($item->batches as $batch) {
+                $movement = $batch->stockMovment;
+
+                if (!$movement) {
+                    continue; // safety – orphaned record, skip
+                }
+
+                // 1. Restore the stock_movment quantity.
+                $movement->quantity += $batch->quantity;
+                $movement->save();
+
+                // 2. Keep the denormalized stock counter in sync.
+                if ($movement->variant_id && $movement->variant) {
+                    $movement->variant->stock += $batch->quantity;
+                    $movement->variant->save();
+                } elseif ($movement->product_id && $movement->product) {
+                    $movement->product->stock += $batch->quantity;
+                    $movement->product->save();
+                }
+            }
+        }
+    }
 }
