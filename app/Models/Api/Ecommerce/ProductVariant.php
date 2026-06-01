@@ -64,6 +64,23 @@ class ProductVariant extends Model implements TranslatableContract
      {
        return $date->format('Y-m-d'); 
      }
+
+    public function getVariantFullNameAttribute(): ?string
+    {
+        return $this->variants
+            ->map(function ($variantOptionValue) {
+                $optionTitle = optional($variantOptionValue->optionValue?->option)->title;
+                $valueTitle = $variantOptionValue->optionValue?->title;
+
+                if (!$optionTitle || !$valueTitle) {
+                    return null;
+                }
+
+                return $optionTitle . ' ' . $valueTitle;
+            })
+            ->filter()
+            ->implode(' ');
+    }
         
     
     public function product()

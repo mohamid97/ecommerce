@@ -30,6 +30,19 @@ class VariantItemStrategy implements CartItemStrategyInterface
             'price_after_discount' => $priceAfterDiscount,
             'total_price' => $salePrice * $qty,
             'total_price_after_discount' => $priceAfterDiscount * $qty,
+            'product_name' => $product?->translate(app()->getLocale())->title ?? $product?->title ?? null,
+            'product_sku' => $product?->sku ?? null,
+            'product_price' => $product?->sale_price ?? 0,
+            'variant_combination_name' => $variant?->variant_full_name ?? $variant?->translate(app()->getLocale())->title ?? null,
+            'variant_sku' => $variant?->sku ?? null,
+            'variant_price' => $variant?->sale_price ?? null,
+            'variant_attributes' => null,
+            'product_snapshot' => [
+                'id' => $product?->id,
+                'title' => $product?->translate(app()->getLocale())->title ?? $product?->title ?? null,
+                'sku' => $product?->sku ?? null,
+                'sale_price' => (float) ($product?->sale_price ?? 0),
+            ],
         ]);
 
         // allocate stock for variant (FIFO)

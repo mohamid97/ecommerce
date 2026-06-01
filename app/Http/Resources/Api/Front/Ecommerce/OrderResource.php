@@ -48,65 +48,94 @@ class OrderResource extends JsonResource
                 ];
 
                 if ($item->bundel_id) {
-                    // fallback to live relation if snapshot missing
                     $payload['type'] = 'bundle';
-                    $payload['image'] = $this->getImageUrl($item->bundel?->image);
-                    // flatten bundle data onto the item for easier frontend consumption
-                    if ($item->orderBundelItems && $item->orderBundelItems->count() > 0) {
-                        $payload['bundle_id'] = $item->bundel?->id ?? null;
-                        // $payload['bundle_price'] = (float) ($item->bundel?->price ?? $item->sale_price);
-                        $payload['bundle_details'] = $item->orderBundelItems->map(function ($obi) use ($item) {
-                            $product = $obi->product;
-                            $variant = $obi->variant;
-                            $perBundleQty = $obi->quantity ?? 1;
 
-                            return [
-                                'product_id' => $obi->product_id,
-                                'product' => $product ? [
-                                    'id' => $product->id,
-                                    'title' => $product->title ?? null,
-                                ] : null,
-                                'selected_variant_id' => $obi->variant_id,
-                                'selected_variant' => $variant ? [
-                                    'id' => $variant->id,
-                                    'variant_name' => $this->buildVariantName($product, $variant),
-                                ] : null,
-                                'per_bundle_quantity' => $perBundleQty,
-                                'total_quantity' => $perBundleQty * $item->quantity,
-                            ];
-                        });
+                    // prefer live bundle relation when available
+                    if ($item->bundel) {
+                        $payload['image'] = $this->getImageUrl($item->bundel->image);
+
+                        if ($item->orderBundelItems && $item->orderBundelItems->count() > 0) {
+                            $payload['bundle_id'] = $item->bundel->id ?? null;
+                            $payload['bundle_details'] = $item->orderBundelItems->map(function ($obi) use ($item) {
+                                $product = $obi->product;
+                                $variant = $obi->variant;
+                                $perBundleQty = $obi->quantity ?? 1;
+
+                                return [
+                                    'product_id' => $obi->product_id,
+                                    'product' => $product ? [
+                                        'id' => $product->id,
+                                        'title' => $product->title ?? null,
+                                    ] : null,
+                                    'selected_variant_id' => $obi->variant_id,
+                                    'selected_variant' => $variant ? [
+                                        'id' => $variant->id,
+                                        'variant_name' => $this->buildVariantName($product, $variant),
+                                    ] : null,
+                                    'per_bundle_quantity' => $perBundleQty,
+                                    'total_quantity' => $perBundleQty * $item->quantity,
+                                ];
+                            });
+                        } else {
+                            $payload['bundle_id'] = $item->bundel->id ?? null;
+                            $payload['bundle_price'] = (float) ($item->bundel->price ?? $item->sale_price);
+                            $payload['bundle_details'] = $item->bundel->bundelDetails->map(function ($d) {
+                                return [
+                                    'product_id' => $d->product_id,
+                                    'product' => $d->product ? [
+                                        'id' => $d->product->id,
+                                        'title' => $d->product->title ?? null,
+                                    ] : null,
+                                    'per_bundle_quantity' => $d->quantity,
+                                    'total_quantity' => $d->quantity, // frontend can multiply by order item qty
+                                ];
+                            }) ?? null;
+                        }
+
+                    } elseif (!empty($item->bundel_snapshot)) {
+                        // live bundle missing -> use snapshot
+                        $payload['bundle_id'] = $item->bundel_id;
+                        $payload['bundle_price'] = (float) ($item->bundel_snapshot['price'] ?? $item->sale_price);
+                        $payload['bundle_details'] = $item->bundel_snapshot['details'] ?? null;
+
                     } else {
-                        $payload['bundle_id'] = $item->bundel?->id ?? null;
-                        $payload['bundle_price'] = (float) ($item->bundel?->price ?? $item->sale_price);
-                        $payload['bundle_details'] = $item->bundel?->bundelDetails->map(function ($d) {
-                            return [
-                                'product_id' => $d->product_id,
-                                'product' => $d->product ? [
-                                    'id' => $d->product->id,
-                                    'title' => $d->product->title ?? null,
-                                ] : null,
-                                'per_bundle_quantity' => $d->quantity,
-                                'total_quantity' => $d->quantity, // frontend can multiply by order item qty
-                            ];
-                        }) ?? null;
+                        $payload['bundle_id'] = null;
+                        $payload['bundle_details'] = null;
                     }
                 } else {
                     $payload['type'] = ($item->variant_id) ? 'variant' : 'product';
                     $payload['image'] = $this->getImageUrl($item->variant?->image ?? $item->product?->image);
                     $payload['product_id'] = $item->product_id;
-                    $payload['product'] = $item->product ? [
-                        'id' => $item->product->id,
-                        'title' => $item->product->translate(app()->getLocale())->title ?? null,
-                        'sale_price' => (float) ($item->product->sale_price ?? 0),
-                        // 'stock' => $item->product->stock ?? null,
-                    ] : null;
+                    // prefer live relation, otherwise use snapshot fields
+                    if ($item->product) {
+                        $payload['product'] = [
+                            'id' => $item->product->id,
+                            'title' => $item->product->translate(app()->getLocale())->title ?? null,
+                            'sale_price' => (float) ($item->product->sale_price ?? 0),
+                        ];
+                    } elseif (!empty($item->product_name) || !empty($item->product_snapshot)) {
+                        $payload['product'] = [
+                            'id' => $item->product_id,
+                            'title' => $item->product_name ?? ($item->product_snapshot['title'] ?? null),
+                            'sale_price' => (float) ($item->product_price ?? ($item->product_snapshot['sale_price'] ?? 0)),
+                        ];
+                    } else {
+                        $payload['product'] = null;
+                    }
 
                     if ($item->variant_id) {
                         $payload['variant_id'] = $item->variant_id;
-                        $payload['variant'] = $item->variant ? [
-                            'id' => $item->variant->id,
-                            'variant_name' => $this->buildVariantName($item->product, $item->variant),
-                        ] : null;
+                        if ($item->variant) {
+                            $payload['variant'] = [
+                                'id' => $item->variant->id,
+                                'variant_name' => $this->buildVariantName($item->product, $item->variant),
+                            ];
+                        } else {
+                            $payload['variant'] = [
+                                'id' => $item->variant_id,
+                                'variant_name' => $item->variant_combination_name ?? null,
+                            ];
+                        }
                     }
                 }
 

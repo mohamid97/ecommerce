@@ -36,6 +36,18 @@ class BundleItemStrategy implements CartItemStrategyInterface
             'total_price' => $sale_price * $qty,
             'total_price_after_discount' => $price_after_discount * $qty,
             'bundel_snapshot' => null,
+            'product_name' => $bundle?->translate(app()->getLocale())->title ?? null,
+            'product_sku' => null,
+            'product_price' => $sale_price,
+            'variant_combination_name' => null,
+            'variant_sku' => null,
+            'variant_price' => null,
+            'variant_attributes' => null,
+            'product_snapshot' => [
+                'bundel_id' => $bundle?->id,
+                'title' => $bundle?->translate(app()->getLocale())->title ?? null,
+                'price' => (float) $bundle?->price,
+            ],
         ]);
 
         if ($bundle) {
