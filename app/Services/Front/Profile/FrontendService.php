@@ -37,6 +37,18 @@ class FrontendService{
           $query = $modelClass::query();
 
         }
+
+        if($request->has('where') && is_array($request->where) && !empty($request->where)){
+            foreach($request->where as $where){
+                if($where['value'] == 'null' ||  $where['value'] == null){
+                    $where['value'] = null;
+                }
+                $query->where($where['column'], $where['operator'], $where['value']);
+            }
+        }
+
+
+
         if ($request->has('order') && in_array($request->order, ['asc', 'desc' , 'ASC', 'DESC'])) {
                     $orderBy = $request->order_by ?? 'id';
                     $query->orderBy($orderBy, $request->order);
