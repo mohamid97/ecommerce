@@ -2,10 +2,14 @@
 
 namespace App\Http\Requests\Api\Admin\Ecommerce\Product\Stock;
 
+use App\Traits\ResponseTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Http\Exceptions\HttpResponseException;
 class UpdateStatusRequest extends FormRequest
 {
+
+    use ResponseTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,4 +30,19 @@ class UpdateStatusRequest extends FormRequest
           'status' => 'required|in:active,inactive,draft',
         ];
     }
+
+
+        protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            $this->error(
+                $validator->errors()->first(), 
+                422, 
+                
+            )
+        );
+    }
+
+
+
 }

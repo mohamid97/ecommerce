@@ -57,28 +57,25 @@ class UpdateStockAction
 
 
 
-
-
-
-
         // update status 
 
     public function updateStatus($data){
-      $stock = StockMovment::where('id', $data->batch_id)->update(
-      [
-        'status' => $data->status,
-      ]);
 
-      $stock = StockMovment::where('id', $data->batch_id)->first();
+        StockMovment::where('id', $data['batch_id'])->update(
+        [
+          'status' => $data['status'],
+        ]);
 
-      if($data->status == 'active'){
-         $this->addMainStock($stock);
-      }else{
-        $this->cutMainStock($stock);
-      }
+        $stock = StockMovment::where('id', $data['batch_id'])->first();
+
+        if($data['status'] == 'active'){
+          $this->addMainStock($stock);
+        }else{
+          $this->cutMainStock($stock);
+        }
 
 
-      return $stock;
+        return $stock;
 
        
 

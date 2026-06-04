@@ -196,16 +196,22 @@ class ProductService
             throw new Exception(__('main.not_found', ['model' => 'Product']));
         }
 
+        // $relatedProducts = Product::with(['category', 'brand', 'industries'])
+        //     ->where('status', '!=', 'draft')
+        //     ->where('id', '!=', $product->id)
+        //     ->where(function ($query) use ($product) {
+        //         $query->where('category_id', $product->category_id)
+        //             ->orWhere('brand_id', $product->brand_id)
+        //             ->orWhereHas('industries', function ($query) use ($product) {
+        //                 $query->whereIn('industries.id', $product->industries->pluck('id'));
+        //             });
+        //     });
+
+        $relatedIds = RelatedProduct::where('product_id', $product->id)->pluck('related_product_id')->toArray();
+
         $relatedProducts = Product::with(['category', 'brand', 'industries'])
-            ->where('status', '!=', 'draft')
-            ->where('id', '!=', $product->id)
-            ->where(function ($query) use ($product) {
-                $query->where('category_id', $product->category_id)
-                    ->orWhere('brand_id', $product->brand_id)
-                    ->orWhereHas('industries', function ($query) use ($product) {
-                        $query->whereIn('industries.id', $product->industries->pluck('id'));
-                    });
-            });
+            ->where('status', 'active')
+            ->whereIn('id', $relatedIds);
 
         $paginate = (!empty($data['paginate']) && ($data['paginate'] >= 1 && $data['paginate'] <= 100)) ? $data['paginate'] : 10;
 

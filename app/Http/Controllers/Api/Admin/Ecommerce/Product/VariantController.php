@@ -45,7 +45,10 @@ class VariantController extends Controller
         $product = Product::findOrFail($request->product_id);
         $variants = ProductVariant::with(['variants.optionValue.option'])->where('product_id' , $request->product_id)->get();
 
-        return $this->success( ['product'=>['id'=>$product->id,'title'=>$product->title,'on_demand'=>$product->on_demand , 'sale_price'=>(float)$product->sale_price] , 'variants'=>ProductVaraintsResource::collection($variants)] , __('main.retreived_successfully' , ['model' => 'Variant'])  );
+        return $this->success( [
+            'product'=>['id'=>$product->id,'title'=>$product->title,'on_demand'=>$product->on_demand , 
+            'sale_price'=>(float)$product->sale_price,'price_after_discount'=>(float)$product->getDiscountPrice(),
+            ] , 'variants'=>ProductVaraintsResource::collection($variants)] , __('main.retreived_successfully' , ['model' => 'Variant'])  );
         
 
     }

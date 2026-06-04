@@ -34,13 +34,13 @@ class StockController extends Controller
         if(!$request->batch_id){
             return $this->error(__('main.no_id'), 422);
         }
-          $batch = $DetailsStockAction->batchDetails($request->batch_id);
+          $batch = $this->detailsStockAction->batchDetails($request->batch_id);
           return $this->success(new StockDetailsResource($batch) , __('main.retrieved_successfully' , ['model' => 'Stock']));
     }
     // get batches or all stocks 
     public function getBatches(StockDetailsRequest $request ){
         try{
-            $batches = $DetailsStockAction->show($request);       
+            $batches = $this->detailsStockAction->show($request);       
             return $this->success(StocksResource::collection($batches) , __('main.retrieved_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){
             return $this->error($e->getMessage(), 500);
@@ -50,7 +50,7 @@ class StockController extends Controller
         try{
             DB::beginTransaction();
             $dto = AddStockDTO::fromRequest($request->validated());
-            $data = $storeStockAction->addStock($dto);
+            $data = $this->storeStockAction->addStock($dto);
             DB::commit();
             return $this->success(new StockDetailsResource($data) , __('main.stored_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){
@@ -67,7 +67,7 @@ class StockController extends Controller
         try{
             DB::beginTransaction();
             $dto = UpdateStockDTO::fromRequest($request->validated());
-            $updateStockAction->updateStock($dto);
+            $this->updateStockAction->updateStock($dto);
             DB::commit();
             return $this->success('Stock updated successfully');
         }catch(\Exception $e){
@@ -88,7 +88,7 @@ class StockController extends Controller
         }
         try{
             DB::beginTransaction();
-            $deleteStockAction->deleteBatch($request->batch_id);
+            $this->deleteStockAction->deleteBatch($request->batch_id);
             DB::commit();
             return $this->success(__('main.deleted_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){
@@ -102,7 +102,7 @@ class StockController extends Controller
     public function updateStatus(UpdateStatusRequest $request){
         try{
             DB::beginTransaction();
-            $updateStockAction->updateStatus($request->validated());
+            $this->updateStockAction->updateStatus($request->validated());
             DB::commit();
             return $this->success(__('main.updated_successfully' , ['model' => 'Stock']));
         }catch(\Exception $e){

@@ -27,10 +27,10 @@ class UpdateStockRequest extends FormRequest
     {
         return [
             'id' => 'required|exists:stock_movments,id',
-            'product_id' => 'required|exists:products,id',
-            'variant_id' => 'nullable|exists:product_options,id',
+            // 'product_id' => 'required|exists:products,id',
+            // 'variant_id' => 'nullable|exists:product_options,id',
             'quantity' => 'required|integer|min:1',
-            'type' => 'nullable|in:increase,decrease',
+            // 'type' => 'nullable|in:increase,decrease',
             'note' => 'nullable|string',
             'cost_price' => 'nullable|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',

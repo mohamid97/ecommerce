@@ -7,6 +7,7 @@ use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\VariantOptionValue;
 use App\Models\Api\Ecommerce\OptionValue;
 use App\Models\Api\Ecommerce\ProductOption;
+use App\Models\Api\Admin\Product;
 
 class StoreVaraintAction
 {
@@ -16,7 +17,7 @@ class StoreVaraintAction
         $this->checkIfVariantExists($dto->productId, $dto->optionValueIds);         
         $productVaraint = ProductVariant::create([
             'product_id' => $dto->productId,
-            'sale_price' => $dto->salePrice,
+            'sale_price' => isset($dto->salePrice) ? $dto->salePrice : Product::find($dto->productId)->sale_price ?? 0,
             'discount' => $dto->discount,
             'discount_type' => $dto->discountType,
             'sku' => $dto->sku,

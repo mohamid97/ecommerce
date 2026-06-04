@@ -17,8 +17,8 @@ class StocksResource extends JsonResource
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
-            'cost_price' => $this->cost_price,
-            'sale_price' => $this->sale_price,
+            'cost_price' => (float)$this->cost_price,
+            'sale_price' => (float)$this->sale_price,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];
