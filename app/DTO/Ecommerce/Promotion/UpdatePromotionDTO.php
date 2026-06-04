@@ -43,7 +43,7 @@ class UpdatePromotionDTO
             $data['location']?? null,
             $data['target']??'hero',
             $data['image'] ?? null,
-            $data['categories'],
+            $data['categories']??[],
             $data['product_id']?? null,
             $data['brands'] ?? [],
             $data['discount'] ?? null,

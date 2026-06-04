@@ -52,6 +52,7 @@ class PromotionController extends Controller
     {
         try {
             DB::beginTransaction();
+            
             $data = UpdatePromotionDTO::fromRequest($request->all());
             $promotion = $this->promotionService->updatePromotion($data);
             DB::commit();

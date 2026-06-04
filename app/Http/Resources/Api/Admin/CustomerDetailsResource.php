@@ -11,7 +11,7 @@ class CustomerDetailsResource extends CustomerResource
     {
         return array_merge(parent::toArray($request), [
             'profile' => [
-                'government' => $this->profile?->government,
+                'government' => ['ar'=>$this->profile?->government?->name_ar,'en'=>$this->profile?->government?->name_en],
                 'address' => $this->profile?->address,
                 'city' => $this->profile?->city,
                 'area' => $this->profile?->area,

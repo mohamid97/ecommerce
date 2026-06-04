@@ -25,10 +25,10 @@ class UserOrderSummaryResource extends JsonResource
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'type' => $user->type,
-                'loyalty_points' => (int) ($user->points ?? 0),
+                'points' => (int) ($user->points ?? 0),
                 'created_at' => $user->created_at?->format('Y-m-d'),
-                'shipment_address'=>$user->profile?->address,
-                'government_name'=>
+                'address'=>$user->profile?->address,
+                'government'=>
                 ['ar'=>$user->profile?->government?->name_ar,'en'=>$user->profile?->government?->name_en],
             ],
             'total_orders' => (int) $this->resource['total_orders'],
