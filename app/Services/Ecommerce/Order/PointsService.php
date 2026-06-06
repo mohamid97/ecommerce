@@ -49,6 +49,38 @@ class PointsService
     }
 
     /**
+     * Calculate monetary amount for given points without mutating user or order.
+     * Validates rules and returns the monetary amount that would be applied.
+     */
+    public function calculatePointsAmount(User $user, int $pointsToUse, float $baseAmount): float
+    {
+        if ($pointsToUse <= 0) {
+            return 0.0;
+        }
+
+        $setting = PointsSetting::first();
+        if (!$setting) {
+            throw new \Exception(__('main.points_not_configured'));
+        }
+
+        if ($baseAmount < ($setting->min_order_amount ?? 0)) {
+            throw new \Exception(__('main.points_min_order'));
+        }
+
+        if (($user->points ?? 0) < $pointsToUse) {
+            throw new \Exception(__('main.insufficient_points'));
+        }
+
+        $amount = $pointsToUse * ($setting->pound_per_point ?? 0);
+        $amount = max(0, (float) $amount);
+
+        // Do not allow points to exceed order amount
+        $amount = min($amount, $baseAmount);
+
+        return $amount;
+    }
+
+    /**
      * Award configured loyalty points once an authenticated order is delivered and paid.
      */
     public function awardPointsForCompletedPaidOrder(Order $order): int

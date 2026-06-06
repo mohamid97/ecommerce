@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "Order Preview (Auth + Guest)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Preview endpoints for authenticated and guest order totals. Use {{base_url}} and {{auth_token}} environment variables."
+  },
+  "item": [
+    {
+      "name": "Auth: Preview Order Totals",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"coupon_code\": \"ABC123\",\n  \"use_points\": true,\n  \"points_to_use\": 10\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders/preview",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "preview"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Guest: Preview Order Totals",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"variant_id\": null,\n      \"quantity\": 2\n    }\n  ],\n  \"coupon_code\": \"ABC123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders/guest/preview",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "orders",
+            "guest",
+            "preview"
+          ]
+        }
+      }
+    }
+  ]
+}

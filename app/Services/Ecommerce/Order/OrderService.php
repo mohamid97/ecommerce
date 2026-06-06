@@ -108,4 +108,62 @@ class OrderService
     }
 
     // Resolver removed - strategies now use repository via handle signature
+
+
+    /**
+     * Calculate totals for a given Cart object without creating an order or mutating state.
+     * Returns an array with breakdown: total_before_discount, total_after_discount, discount_amount,
+     * points_amount, shipping_cost, total
+     */
+    public function calculateTotalsFromCart(Cart $cart, array $data = [], $user = null): array
+    {
+        $total = 0.0;
+        $totalAfterDiscount = 0.0;
+
+        foreach ($cart->items as $cartItem) {
+            $total += (float) ($cartItem->total_before_discount ?? 0);
+            $totalAfterDiscount += (float) ($cartItem->total_after_discount ?? 0);
+        }
+
+        $discountAmount = 0.0;
+        if (!empty($data['coupon_code'])) {
+            $discountAmount = $this->couponService->calculateCouponDiscount($data['coupon_code'], $totalAfterDiscount);
+            $totalAfterDiscount = max(0, $totalAfterDiscount - $discountAmount);
+        }
+
+        $pointsAmount = 0.0;
+        if (!empty($data['use_points']) && !empty($data['points_to_use']) && $user) {
+            $pointsToUse = (int) $data['points_to_use'];
+            $pointsAmount = $this->pointsService->calculatePointsAmount($user, $pointsToUse, $totalAfterDiscount);
+        }
+
+        // shipping cost same as repository default
+        $shippingCost = 70;
+
+        $finalTotal = $totalAfterDiscount + $shippingCost - $pointsAmount;
+
+        return [
+            'total_before_discount' => (float) $total,
+            'total_after_discount' => (float) $totalAfterDiscount,
+            'discount_amount' => (float) $discountAmount,
+            'points_amount' => (float) $pointsAmount,
+            'shipping_cost' => (float) $shippingCost,
+            'total' => (float) max(0, $finalTotal),
+        ];
+    }
+
+    /**
+     * Convenience method: build preview for authenticated user's open cart.
+     */
+    public function previewForUser($user, array $data = []): array
+    {
+        $cart = $this->action->getUserOpenCart($user->id);
+        return $this->calculateTotalsFromCart($cart, $data, $user);
+    }
+
+
+
+
+
+
 }

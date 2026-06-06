@@ -25,7 +25,7 @@ class RoleSeeder extends Seeder
             [
                 'first_name' => 'Super',
                 'last_name' => 'Admin',
-                'username' => 'superadmin',
+                'username' => 'superadmin', 
                 'password' => Hash::make('123456'),
                 'type' => 'admin',
             ]

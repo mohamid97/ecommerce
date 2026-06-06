@@ -55,6 +55,23 @@ class OrderController extends Controller
         
     }
 
+    /**
+     * Preview totals for authenticated user's current cart with optional coupon/points.
+     */
+    public function preview(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $data = $request->only(['coupon_code', 'use_points', 'points_to_use']);
+
+            $result = $this->service->previewForUser($user, $data);
+
+            return $this->success($result, __('main.retrieved_successfully'));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 400);
+        }
+    }
+
     public function storeGuest(GuestOrderStoreRequest $request)
     {
         try{
@@ -89,6 +106,50 @@ class OrderController extends Controller
 
             return $this->success(new OrderResource($order), __('main.created_successfully', ['model' => 'Order']));
         }catch(\Exception $e){
+            return $this->error($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Preview totals for a guest-provided cart payload (items + optional coupon).
+     */
+    public function previewGuest(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'items' => 'required|array',
+                'coupon_code' => 'nullable|string',
+            ]);
+
+            // normalize incoming items into products/bundles arrays for CartService
+            $products = [];
+            $bundles = [];
+
+            foreach ($data['items'] as $item) {
+                if (!empty($item['bundel_id'])) {
+                    $bundles[] = [
+                        'bundle_id' => $item['bundel_id'],
+                        'quantity' => $item['quantity'],
+                        'bundle_items' => $item['bundle_items'] ?? [],
+                    ];
+                } else {
+                    $products[] = [
+                        'product_id' => $item['product_id'],
+                        'variant_id' => $item['variant_id'] ?? null,
+                        'quantity' => $item['quantity'],
+                    ];
+                }
+            }
+
+            $cart = app(\App\Services\Ecommerce\Cart\CartService::class)->mapGuestCartData([
+                'products' => $products,
+                'bundles' => $bundles,
+            ]);
+
+            $result = $this->service->calculateTotalsFromCart($cart, $data, null);
+
+            return $this->success($result, __('main.retrieved_successfully'));
+        } catch (\Exception $e) {
             return $this->error($e->getMessage(), 400);
         }
     }

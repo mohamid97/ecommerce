@@ -11,7 +11,7 @@ class Mediavideo extends Model implements TranslatableContract
 {
     use HasFactory , Translatable;
 
-    protected $fillable = ['link'];
+    protected $fillable = ['link', 'type'];
     public $translatedAttributes = ['title','des'];
     public $translationForeignKey = 'mediavideo_id';
     public $translationModel = 'App\Models\Api\Admin\MediavideoTranslation';

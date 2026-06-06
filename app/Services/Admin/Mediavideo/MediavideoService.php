@@ -13,13 +13,13 @@ class MediavideoService extends BaseModelService{
     
     public function store()
     {
-        $media = parent::store($this->getBasicColumn(['link']));
+        $media = parent::store($this->getBasicColumn(['link','type']));
         $this->processTranslations($media, $this->data, ['title', 'des']);  
         return $media;    
     }
 
     public function update($id){
-        $media = parent::update($id , $this->getBasicColumn( ['link']));
+        $media = parent::update($id , $this->getBasicColumn( ['link','type']));
         $this->processTranslations($media, $this->data, ['title', 'des']);
         return $media;        
     }

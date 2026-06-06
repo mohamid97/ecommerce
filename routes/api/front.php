@@ -49,6 +49,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         // orders
         Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
             Route::get('/', 'index');
+            Route::post('/preview', 'preview');
             Route::post('/store', 'store');
             Route::get('/{order_number}', 'show');
         });
@@ -57,6 +58,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     // guest order (no auth)
     Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
+        Route::post('/guest/preview', 'previewGuest');
         Route::post('/guest/store', 'storeGuest');
     });
 
