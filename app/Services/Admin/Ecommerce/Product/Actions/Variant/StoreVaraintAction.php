@@ -18,7 +18,7 @@ class StoreVaraintAction
         $productVaraint = ProductVariant::create([
             'product_id' => $dto->productId,
             'sale_price' => isset($dto->salePrice) ? $dto->salePrice : Product::find($dto->productId)->sale_price ?? 0,
-            'discount' => $dto->discount,
+            'discount_value' => $dto->discount,
             'discount_type' => $dto->discountType,
             'sku' => $dto->sku,
             'barcode' => $dto->barcode,

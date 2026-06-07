@@ -144,6 +144,19 @@ class Bundel extends Model implements TranslatableContract
         return max($totalPrice - $discount, 0);
     }
 
+    protected static function booted()
+    {
+        static::updated(function ($bundel) {
+            if ($bundel->wasChanged('status') && $bundel->status !== 'active') {
+                try {
+                    \App\Models\Api\Ecommerce\CartItem::where('bundel_id', $bundel->id)->delete();
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+            }
+        });
+    }
+
 
 
 

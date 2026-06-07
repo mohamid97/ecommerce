@@ -60,13 +60,13 @@ class OrderController extends Controller
      */
     public function preview(Request $request)
     {
+        
         try {
             $user = $request->user();
             $data = $request->only(['coupon_code', 'use_points', 'points_to_use']);
 
             $result = $this->service->previewForUser($user, $data);
-
-            return $this->success($result, __('main.retrieved_successfully'));
+            return $this->success($result, __('main.retrieved_successfully' , ['model' => 'Order Preview']));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 400);
         }

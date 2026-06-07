@@ -45,6 +45,48 @@ class ProductVariant extends Model implements TranslatableContract
                 }
             }
         });
+        static::updated(function ($variant) {
+            if ($variant->wasChanged(['sale_price', 'discount_value', 'discount_type'])) {
+                $cartItems = \App\Models\Api\Ecommerce\CartItem::where('variant_id', $variant->id)
+                    ->get();
+
+                foreach ($cartItems as $item) {
+                    $qty = (int) $item->quantity;
+                    $before = (float) ($variant->sale_price ?? 0) * $qty;
+                    $after = (float) ($variant->getDiscountPrice() ?? 0) * $qty;
+                    try {
+                        $item->update([
+                            'total_before_discount' => $before,
+                            'total_after_discount' => $after,
+                        ]);
+                    } catch (\Throwable $e) {
+                        // continue on failure
+                    }
+                }
+            }
+        });
+        // Remove cart items referencing this variant when it becomes not active
+        static::updated(function ($variant) {
+            if ($variant->wasChanged('status') && $variant->status !== 'active') {
+                try {
+                    // mark affected bundles as draft
+                    $affectedDetails = \DB::table('bundel_details')
+                        ->whereJsonContains('variant_ids', $variant->id)
+                        ->get();
+
+                    if ($affectedDetails->isNotEmpty()) {
+                        $bundleIds = $affectedDetails->pluck('bundel_id')->unique()->toArray();
+                        \App\Models\Api\Ecommerce\Bundel::whereIn('id', $bundleIds)
+                            ->update(['status' => 'draft']);
+                    }
+
+                    // remove cart items referencing this variant
+                    \App\Models\Api\Ecommerce\CartItem::where('variant_id', $variant->id)->delete();
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+            }
+        });
     }
 
     protected $fillable = ['product_id','is_default', 'sku' , 'barcode'  , 'status' , 'stock' , 'sales_number' , 'sale_price' , 'discount_value' , 'discount_type' , 'length' , 'width' , 'height' , 'weight' , 'delivery_time' , 'max_time' , 'images'];

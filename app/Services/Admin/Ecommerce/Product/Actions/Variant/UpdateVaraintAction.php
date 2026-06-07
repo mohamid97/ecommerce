@@ -2,15 +2,17 @@
 namespace App\Services\Admin\Ecommerce\Product\Actions\Variant;
 
 use App\Models\Api\Admin\Lang;
+use App\Models\Api\Ecommerce\ProductVaraintImages;
 use App\Models\Api\Ecommerce\ProductVariant;
 
 class UpdateVaraintAction
 {
     public function updateVariant($dto){
-        ProductVariant::where('id', $dto->variant_id)->update([
-            'cost_price' => $dto->cost_price,
+        $productVaraint = ProductVariant::findOrFail($dto->id);
+
+        $data = array_filter([
             'sale_price' => $dto->sale_price,
-            'discount' => $dto->discount,
+            'discount_value' => $dto->discount,
             'discount_type' => $dto->discount_type,
             'sku' => $dto->sku,
             'barcode' => $dto->barcode,
@@ -18,19 +20,22 @@ class UpdateVaraintAction
             'weight' => $dto->weight,
             'width' => $dto->width,
             'height' => $dto->height,
-            // 'stock' => $dto->stock,
-            'price' => $dto->price,
             'delivery_time' => $dto->delivery_time,
             'max_time' => $dto->max_time,
-        ]);
-        $productVaraint = ProductVariant::find($dto->variant_id);
+        ], fn ($value) => $value !== null);
+
+        if (!empty($data)) {
+            $productVaraint->update($data);
+        }
+
         $this->updateVariantTranslations($dto, $productVaraint);
 
         // update variant images
-        if($dto->imagesIds){
-            $productVaraint->variantImages()->delete();
-            foreach($dto->imagesIds as $imageId){
-                $productVaraint->variantImages()->create([
+        if($dto->images){
+            ProductVaraintImages::where('variant_id', $productVaraint->id)->delete();
+            foreach($dto->images as $imageId){
+                ProductVaraintImages::create([
+                    'variant_id' => $productVaraint->id,
                     'image_id' => $imageId,
                 ]); 
             }

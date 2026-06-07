@@ -33,6 +33,56 @@ class Product extends Model implements TranslatableContract
             }
         });
 
+        // Immediate update for products without variants/options
+        static::updated(function ($product) {
+            if (!empty($product->has_options)) {
+                return;
+            }
+
+            if ($product->wasChanged(['sale_price', 'discount', 'discount_type'])) {
+                $cartItems = \App\Models\Api\Ecommerce\CartItem::where('product_id', $product->id)
+                    ->whereNull('variant_id')
+                    ->get();
+
+                foreach ($cartItems as $item) {
+                    $qty = (int) $item->quantity;
+                    $before = (float) ($product->sale_price ?? 0) * $qty;
+                    $after = (float) ($product->getDiscountPrice() ?? 0) * $qty;
+                    try {
+                        $item->update([
+                            'total_before_discount' => $before,
+                            'total_after_discount' => $after,
+                        ]);
+                    } catch (\Throwable $e) {
+                        // continue on failure
+                    }
+                }
+            }
+        });
+
+        // Remove product-related cart items when product becomes not active
+        static::updated(function ($product) {
+            if ($product->wasChanged('status') && $product->status !== 'active') {
+                try {
+                    // mark related bundles as draft
+                    $affectedBundleIds = \DB::table('bundel_details')
+                        ->where('product_id', $product->id)
+                        ->pluck('bundel_id')
+                        ->toArray();
+
+                    if (!empty($affectedBundleIds)) {
+                        \App\Models\Api\Ecommerce\Bundel::whereIn('id', $affectedBundleIds)
+                            ->update(['status' => 'draft']);
+                    }
+
+                    // remove cart items for this product
+                    \App\Models\Api\Ecommerce\CartItem::where('product_id', $product->id)->delete();
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+            }
+        });
+
         
     }
 

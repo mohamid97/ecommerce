@@ -5,15 +5,15 @@ class UpdateVaraintDTO
 {
     public function __construct(
         public int $id,
-        public string $sku,
-        public float $sale_price,
+        public ?string $sku = null,
+        public ?float $sale_price = null,
         public ?int $stock,
         public ?string $barcode = null,
-        public ?array $titles = null,
+        public ?array $title = null,
+        public ?array $slug = null,
         public ?array $des = null,
         public ?array $meta_title = null,
         public ?array $meta_des = null,
-        public float $cost_price = 0,
         public ?float $discount = null,
         public ?string $discount_type = null,
         public ?float $length = null,
@@ -32,11 +32,12 @@ class UpdateVaraintDTO
     {
         return new self(
             $data['id'],
-            $data['sku'],
-            $data['sale_price'],
+            $data['sku'] ?? null,
+            $data['sale_price'] ?? null,
             $data['stock'] ?? null,
             $data['barcode'] ?? null,
             $data['title'] ?? null,
+            $data['slug'] ?? null,
             $data['des'] ?? null,
             $data['meta_title'] ?? null,
             $data['meta_des'] ?? null,
@@ -53,4 +54,3 @@ class UpdateVaraintDTO
         );
     }
 }       
-

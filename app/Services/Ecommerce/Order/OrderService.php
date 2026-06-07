@@ -117,34 +117,40 @@ class OrderService
      */
     public function calculateTotalsFromCart(Cart $cart, array $data = [], $user = null): array
     {
-        $total = 0.0;
+        $totalBeforeDiscount = 0.0;
         $totalAfterDiscount = 0.0;
 
         foreach ($cart->items as $cartItem) {
-            $total += (float) ($cartItem->total_before_discount ?? 0);
+            $totalBeforeDiscount += (float) ($cartItem->total_before_discount ?? 0);
             $totalAfterDiscount += (float) ($cartItem->total_after_discount ?? 0);
         }
 
+        // Use the pre-coupon base amount for both coupon and points calculations
+        $baseAmount = $totalAfterDiscount;
+
         $discountAmount = 0.0;
         if (!empty($data['coupon_code'])) {
-            $discountAmount = $this->couponService->calculateCouponDiscount($data['coupon_code'], $totalAfterDiscount);
-            $totalAfterDiscount = max(0, $totalAfterDiscount - $discountAmount);
+            $discountAmount = $this->couponService->calculateCouponDiscount($data['coupon_code'], $baseAmount);
         }
 
         $pointsAmount = 0.0;
         if (!empty($data['use_points']) && !empty($data['points_to_use']) && $user) {
             $pointsToUse = (int) $data['points_to_use'];
-            $pointsAmount = $this->pointsService->calculatePointsAmount($user, $pointsToUse, $totalAfterDiscount);
+            $pointsAmount = $this->pointsService->calculatePointsAmount($user, $pointsToUse, $baseAmount);
         }
+
+        // apply coupon to produce post-discount total (matching createOrder flow)
+        $totalAfterPreview= max(0, $baseAmount - $discountAmount - $pointsAmount);
 
         // shipping cost same as repository default
         $shippingCost = 70;
 
-        $finalTotal = $totalAfterDiscount + $shippingCost - $pointsAmount;
+        $finalTotal = ( $totalAfterPreview + $shippingCost );
 
         return [
-            'total_before_discount' => (float) $total,
+            'total_before_discount' => (float) $totalBeforeDiscount,
             'total_after_discount' => (float) $totalAfterDiscount,
+            'total_after_preview' => (float) $totalAfterPreview,
             'discount_amount' => (float) $discountAmount,
             'points_amount' => (float) $pointsAmount,
             'shipping_cost' => (float) $shippingCost,
