@@ -19,7 +19,9 @@ class ProductService
      */
     public function getProducts(array $data)
     {
-        $products = Product::with(['category', 'brand', 'industries']);
+        $products = Product::with(['category', 'brand', 'industries', 'variants' => function ($query) {
+            $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
+        }]);
 
         if (!empty($data['search'])) {
             $products->whereHas('translations', function($query) use ($data) {
@@ -145,7 +147,9 @@ class ProductService
             throw new Exception(__('main.not_found', ['model' => 'Industry']));
         }
 
-        $products = Product::with(['category', 'brand', 'industries'])
+        $products = Product::with(['category', 'brand', 'industries', 'variants' => function ($query) {
+                $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
+            }])
             ->where('status', '!=', 'draft')
             ->whereHas('industries', function ($query) use ($industry_id) {
                 $query->where('industries.id', $industry_id);
@@ -209,7 +213,9 @@ class ProductService
 
         $relatedIds = RelatedProduct::where('product_id', $product->id)->pluck('related_product_id')->toArray();
 
-        $relatedProducts = Product::with(['category', 'brand', 'industries'])
+        $relatedProducts = Product::with(['category', 'brand', 'industries', 'variants' => function ($query) {
+                $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
+            }])
             ->where('status', 'active')
             ->whereIn('id', $relatedIds);
 
@@ -228,7 +234,9 @@ class ProductService
     private function getSectionProducts(array $data, $subQuery)
     {
         $products = Product::query()
-            ->with(['category', 'brand', 'industries'])
+            ->with(['category', 'brand', 'industries', 'variants' => function ($query) {
+                $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
+            }])
             ->where('status', '!=', 'draft')
             ->whereIn('id', $subQuery);
 

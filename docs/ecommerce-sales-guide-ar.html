@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>شرح منتج Ecommerce لفريق المبيعات</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: #1f2933;
+      background: #ffffff;
+      font-family: Arial, "Tahoma", sans-serif;
+      line-height: 1.72;
+      font-size: 13.5px;
+    }
+
+    .cover {
+      min-height: 255mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      page-break-after: always;
+      border-right: 8px solid #0f766e;
+      padding: 30mm 18mm;
+    }
+
+    .eyebrow {
+      color: #0f766e;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: 34px;
+      line-height: 1.25;
+      color: #102a43;
+    }
+
+    .subtitle {
+      max-width: 620px;
+      font-size: 17px;
+      color: #334e68;
+      margin: 0 0 28px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 560px;
+      margin-top: 28px;
+    }
+
+    .meta div,
+    .note,
+    .feature,
+    .summary-box {
+      border: 1px solid #d9e2ec;
+      border-radius: 6px;
+      padding: 12px 14px;
+      background: #fbfdfe;
+    }
+
+    .meta strong,
+    .label {
+      display: block;
+      color: #0f766e;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #0f766e;
+      color: #102a43;
+      font-size: 22px;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      margin: 18px 0 8px;
+      color: #243b53;
+      font-size: 17px;
+      page-break-after: avoid;
+    }
+
+    h4 {
+      margin: 12px 0 6px;
+      color: #334e68;
+      font-size: 14.5px;
+      page-break-after: avoid;
+    }
+
+    section {
+      margin-bottom: 22px;
+    }
+
+    p {
+      margin: 0 0 8px;
+    }
+
+    ul {
+      margin: 6px 0 10px;
+      padding-right: 20px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 14px;
+      page-break-inside: avoid;
+    }
+
+    th,
+    td {
+      border: 1px solid #d9e2ec;
+      padding: 8px 9px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #edf7f5;
+      color: #102a43;
+      font-weight: 700;
+    }
+
+    .feature {
+      margin: 10px 0 12px;
+      page-break-inside: avoid;
+    }
+
+    .feature-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .feature-title h3 {
+      margin: 0;
+    }
+
+    .tag {
+      display: inline-block;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 2px 9px;
+      background: #e0f2f1;
+      color: #0f766e;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: #627d98;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-box {
+      page-break-inside: avoid;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .small {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="cover">
+      <div class="eyebrow">Cangrow Ecommerce API Platform</div>
+      <h1>شرح منتج Ecommerce لفريق المبيعات</h1>
+      <p class="subtitle">
+        مستند عملي يشرح إمكانيات منصة التجارة الإلكترونية الموجودة في المشروع، بلغة مناسبة لفريق المبيعات: ماذا يبيع المنتج، ما قيمة كل ميزة للعميل، وكيف نشرح المنتجات ذات الخيارات والمنتجات البسيطة والـ bundles والطلبات.
+      </p>
+      <div class="meta">
+        <div><strong>الجمهور المستهدف</strong>فريق المبيعات، account managers، pre-sales</div>
+        <div><strong>نوع المنتج</strong>Backend/API لمنصة Ecommerce + Admin Dashboard + CMS</div>
+        <div><strong>اللغات المدعومة</strong>عربي وإنجليزي للكتالوج والمحتوى</div>
+        <div><strong>تاريخ المراجعة</strong>8 يونيو 2026</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>ملخص المنتج</h2>
+      <p>
+        المنتج عبارة عن منصة API متكاملة لإدارة متجر إلكتروني متعدد اللغات. المنصة تغطي رحلة العميل من التصفح والبحث وحتى السلة والطلب، وتغطي رحلة الإدارة من إنشاء المنتجات والمخزون والخصومات وحتى متابعة الطلبات والإحصائيات.
+      </p>
+      <p>
+        نقطة البيع الأساسية: العميل لا يحصل على صفحة عرض منتجات فقط، بل يحصل على نظام تشغيل للمتجر: كتالوج، variants، مخزون، bundles، كوبونات، نقاط ولاء، طلبات ضيف ومستخدم، wishlist، شحن، عملاء، صلاحيات، CMS، وإحصائيات.
+      </p>
+      <div class="grid">
+        <div class="summary-box">
+          <span class="label">للعميل النهائي</span>
+          تصفح منتجات، فلترة وبحث، تفاصيل المنتج، اختيار variant، إضافة للسلة، wishlist، كوبونات، نقاط، وإتمام طلب كضيف أو مستخدم.
+        </div>
+        <div class="summary-box">
+          <span class="label">لإدارة المتجر</span>
+          إدارة منتجات ومخزون وطلبات وعملاء وخصومات وباقات وشحن وصلاحيات ومحتوى الموقع من مكان واحد.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>كيف نشرح المنتج في مكالمة مبيعات</h2>
+      <ul>
+        <li><strong>ابدأ بالقيمة:</strong> المنصة تساعد أي شركة تبيع منتجات على بناء متجر منظم، قابل للتوسع، ومناسب للغات متعددة.</li>
+        <li><strong>وضح المرونة:</strong> المنتج يمكن أن يكون بسيط بدون options، أو له options/variants مثل اللون والمقاس والحجم.</li>
+        <li><strong>اربطها بالعمليات:</strong> المخزون، الطلبات، المرتجعات، الخصومات، والنقاط كلها جزء من دورة تشغيل واحدة.</li>
+        <li><strong>طمن العميل:</strong> الطلبات تتم داخل transaction، والمخزون يتم التحقق منه قبل السلة والطلب لتقليل overselling.</li>
+        <li><strong>بيع الإدارة وليس الواجهة فقط:</strong> النظام فيه admin APIs وصلاحيات وإحصائيات ومحتوى، وبالتالي يخدم التشغيل اليومي وليس الظهور فقط.</li>
+      </ul>
+    </section>
+
+    <section class="page-break">
+      <h2>أنواع المنتجات</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>النوع</th>
+            <th>الشرح لفريق المبيعات</th>
+            <th>مثال</th>
+            <th>ما الذي يدعمه النظام</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>منتج بدون options</td>
+            <td>منتج واحد بسعر ومخزون مباشر، لا يحتاج اختيار لون أو مقاس.</td>
+            <td>كتاب، أداة واحدة، منتج ثابت.</td>
+            <td>صورة، SKU، barcode، سعر، خصم، stock، حالة، تصنيف، brand، industries، مواصفات وشحن.</td>
+          </tr>
+          <tr>
+            <td>منتج له options/variants</td>
+            <td>منتج له اختيارات، وكل اختيار نهائي يعتبر variant مستقل بسعر ومخزون وصور.</td>
+            <td>T-shirt له لون ومقاس، أو منتج زراعي له حجم عبوة.</td>
+            <td>Options، option values، توليد combinations، variant افتراضي، أسعار وخصومات ومخزون وصور لكل variant.</td>
+          </tr>
+          <tr>
+            <td>Bundle / Bundel</td>
+            <td>باقة تجمع أكثر من منتج أو variant بهدف زيادة قيمة الطلب أو بيع مجموعة جاهزة.</td>
+            <td>Starter kit، عرض مجموعة منتجات، باقة موسم.</td>
+            <td>منتجات داخل الباقة، كميات، variants مسموحة، سعر وخصم للباقة، حالة، صورة، تصنيف وbrand.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <strong>رسالة مهمة للمبيعات:</strong> عند سؤال العميل "هل المنتج ممكن يكون له option أو لا؟" الإجابة: نعم. النظام يدعم الاثنين. لو المنتج بسيط يتم بيعه مباشرة، ولو له اختيارات يتم تفعيل `has_options` وإدارة كل variant بشكل مستقل.
+      </div>
+    </section>
+
+    <section>
+      <h2>Features المتاحة</h2>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>1. إدارة المنتجات والكتالوج</h3>
+          <span class="tag">Catalog</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> إدارة كاملة للمنتجات المعروضة في المتجر مع بيانات عربية وإنجليزية، صور، وصف، SEO، تصنيف، brand، ترتيب، حالة، سعر، وخصم.</p>
+        <p><strong>القيمة البيعية:</strong> العميل يقدر ينظم كتالوج كبير ويعرضه بلغتين مع تحكم كامل في ظهور المنتجات.</p>
+        <ul>
+          <li>إنشاء وتحديث وعرض وحذف المنتجات من لوحة الإدارة.</li>
+          <li>دعم صور رئيسية ومعرض صور وbreadcrumb image وalt/title image.</li>
+          <li>ربط المنتج بـ category وbrand وindustries.</li>
+          <li>حالات المنتج: active، draft، unavailable.</li>
+          <li>خصم fixed أو percentage على المنتج.</li>
+          <li>منتجات featured، newest، last-piece.</li>
+          <li>Related products لاقتراح منتجات مرتبطة.</li>
+          <li>Public APIs لعرض قائمة المنتجات، التفاصيل، newest، last-piece، related.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>2. Options و Variants</h3>
+          <span class="tag">Product Options</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> يمكن تعريف options عامة مثل اللون أو المقاس، وقيم لكل option. بعدها يتم ربطها بالمنتج وإنشاء variants من combinations.</p>
+        <p><strong>القيمة البيعية:</strong> مناسب للمتاجر التي تبيع نفس المنتج بأشكال مختلفة مع أسعار ومخزون مختلف لكل اختيار.</p>
+        <ul>
+          <li>Option له title مترجم، code، image، ونوع قيمة `value_type` نص أو صورة.</li>
+          <li>Option values مترجمة، ويمكن أن تكون قيمة نصية أو صورة swatch.</li>
+          <li>المنتج ذو options يتطلب product_options وقيم صالحة تابعة لنفس option.</li>
+          <li>إمكانية توليد combinations للـ variants.</li>
+          <li>كل variant له SKU، barcode، status، سعر، خصم، stock، أبعاد، وزن، مدة توصيل، وصور.</li>
+          <li>إمكانية تحديد default variant.</li>
+          <li>صور عامة للـ variants وصور خاصة لكل variant.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>3. المخزون و Stock Batches</h3>
+          <span class="tag">Inventory</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> إدارة المخزون تتم من خلال batches/stock movements، سواء لمنتج بسيط أو variant.</p>
+        <p><strong>القيمة البيعية:</strong> يساعد العميل على التحكم في الكميات، تكلفة الشراء، وسعر البيع، مع تقليل بيع منتجات غير متاحة.</p>
+        <ul>
+          <li>إضافة batch بمقدار quantity، cost price، sale price، note، status.</li>
+          <li>تحديث batch وعرض تفاصيله وحذفه وتغيير حالته.</li>
+          <li>التحقق من المخزون قبل الإضافة للسلة وتحديث الكمية وإنشاء الطلب.</li>
+          <li>تسجيل تخصيص المخزون داخل order item batches.</li>
+          <li>استرجاع المخزون عند تغيير الطلب إلى refunded.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>4. السلة Cart</h3>
+          <span class="tag">Cart</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> السلة تدعم المنتجات البسيطة، منتجات variants، والـ bundles. يوجد سلة للمستخدم المسجل ومعاينة للضيف بدون حفظ دائم.</p>
+        <p><strong>القيمة البيعية:</strong> رحلة شراء مرنة: العميل يقدر يجرب السلة كضيف أو يكمل كمستخدم، والمتجر يحافظ على دقة الأسعار والمخزون.</p>
+        <ul>
+          <li>إضافة للسلة، تحديث كمية، حذف item، حذف كل السلة، عرض السلة.</li>
+          <li>استراتيجية مختلفة حسب نوع العنصر: simple product، product with option، bundle.</li>
+          <li>حساب total_before_discount و total_after_discount لكل عنصر.</li>
+          <li>Guest cart preview من payload بدون تسجيل دخول.</li>
+          <li>Admin يمكنه عرض السلات وحذف عناصر أو تفريغ سلة مستخدم.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>5. الطلبات Orders</h3>
+          <span class="tag">Checkout</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> النظام يدعم إنشاء طلبات للمستخدم المسجل من السلة الحالية، وطلبات للضيف من قائمة items مباشرة، مع preview قبل التأكيد.</p>
+        <p><strong>القيمة البيعية:</strong> يدعم conversion أعلى لأن العميل ليس مجبرا على التسجيل قبل الطلب، وفي نفس الوقت العضو يحصل على مزايا إضافية مثل النقاط وطلباته السابقة.</p>
+        <ul>
+          <li>Order preview للمستخدم والضيف لحساب الإجمالي قبل إنشاء الطلب.</li>
+          <li>حقول الطلب: الاسم/الإيميل للضيف، الهاتف، المحافظة، عنوان الشحن، طريقة الدفع.</li>
+          <li>حساب إجمالي قبل الخصم، بعد الخصم، الشحن، الكوبون، والنقاط.</li>
+          <li>إنشاء الطلب داخل database transaction.</li>
+          <li>حفظ snapshots لعناصر الطلب والباقات والـ variants.</li>
+          <li>عرض قائمة طلبات المستخدم وتفاصيل الطلب برقم الطلب.</li>
+          <li>Admin يمكنه عرض الطلبات، تفاصيل الطلب، ملخص طلبات العميل، إنشاء طلب ضيف، وتحديث status/payment status.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>6. حالة الطلب والدفع</h3>
+          <span class="tag">Operations</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> الإدارة تتحكم في حالة الطلب وحالة الدفع، مع تأثيرات تشغيلية مثل زيادة عداد المبيعات عند التسليم واسترجاع المخزون عند الاسترداد.</p>
+        <ul>
+          <li>Statuses مدعومة في الإحصائيات: pending، confirmed، processing، shipped، delivered، cancelled، refunded.</li>
+          <li>payment_status مثل paid/unpaid حسب البيانات الموجودة في النظام.</li>
+          <li>عند delivered لأول مرة يتم زيادة sales_number للمنتجات والـ variants والـ bundles.</li>
+          <li>عند refunded يتم رجوع المخزون للـ batches الأصلية.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>7. Bundles / Bundels</h3>
+          <span class="tag">Upsell</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> إنشاء باقات تحتوي على منتجات متعددة، مع تحديد كميات وربما variants مسموحة لكل منتج داخل الباقة.</p>
+        <p><strong>القيمة البيعية:</strong> ميزة قوية لرفع متوسط قيمة الطلب AOV وعمل عروض جاهزة وسهلة الفهم.</p>
+        <ul>
+          <li>إنشاء وتحديث وحذف وعرض الباقات.</li>
+          <li>صورة للباقة، title/des مترجم، category، brand، status.</li>
+          <li>خصم للباقة fixed أو percentage.</li>
+          <li>حساب سعر الباقة من مكونات المنتجات أو من خصم الباقة.</li>
+          <li>التحقق من أن منتجات الباقة active وأن بها variants متاحة عند الحاجة.</li>
+          <li>إذا منتج أو variant داخل باقة أصبح غير متاح، يمكن تحويل الباقة draft أو حذفها من السلة.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>8. Promotions و Coupons</h3>
+          <span class="tag">Marketing</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> إدارة عروض وكوبونات قابلة للربط بمنتجات أو تصنيفات أو brands أو الطلب كله، مع تواريخ صلاحية وحدود استخدام.</p>
+        <p><strong>القيمة البيعية:</strong> فريق التسويق يقدر يطلق حملات discount و coupon codes بدون تعديل تقني كل مرة.</p>
+        <ul>
+          <li>start_date و end_date، status، صورة ومكان ظهور مثل hero أو offers_section أو pop_up أو header_alert.</li>
+          <li>is_coupon لتحديد هل العرض كوبون قابل للإدخال في checkout.</li>
+          <li>coupon_code و coupon_limit.</li>
+          <li>نوع الخصم: percent، fixed، bundle، bulk، buy-x-get-y.</li>
+          <li>target: global، category، product، brand، order.</li>
+          <li>max_amount_discount لتحديد سقف الخصم.</li>
+          <li>customer_group: all، new_user، registered.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>9. Wishlist</h3>
+          <span class="tag">Retention</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> المستخدم المسجل يمكنه حفظ منتجات في wishlist، وإضافة أو حذف أو toggle.</p>
+        <p><strong>القيمة البيعية:</strong> تزيد رجوع العميل للشراء لاحقا، وتساعد في حملات remarketing أو العروض المستقبلية.</p>
+        <ul>
+          <li>Wishlist للمستخدمين المسجلين فقط.</li>
+          <li>add، toggle، remove، view.</li>
+          <li>عرض wishlist في admin للمراجعة والتحليل.</li>
+          <li>ترجع بيانات product أو variant مناسبة للواجهة.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>10. Loyalty Points</h3>
+          <span class="tag">Loyalty</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> نظام نقاط يسمح بإعداد tiers/conversion، استخدام نقاط لتقليل قيمة الطلب، ومنح نقاط بعد اكتمال الطلب المدفوع.</p>
+        <p><strong>القيمة البيعية:</strong> مناسب لزيادة تكرار الشراء وتحويل العميل من مشتري مرة واحدة إلى عميل دائم.</p>
+        <ul>
+          <li>Admin: عرض tiers، إضافة tier، حذف tier.</li>
+          <li>الطلب يدعم `use_points` و `points_to_use` للمستخدم المسجل.</li>
+          <li>يتحقق من الحد الأدنى لقيمة الطلب ومن رصيد المستخدم.</li>
+          <li>قيمة النقاط لا تتجاوز قيمة الطلب.</li>
+          <li>منح نقاط عند status = delivered و payment_status = paid.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>11. الشحن والمحافظات</h3>
+          <span class="tag">Shipping</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> الطلبات تعتمد على government_id وعنوان شحن، ويوجد إدارة لمناطق ومدن الشحن، مع بيانات شحن على مستوى المنتج أو variant.</p>
+        <ul>
+          <li>قائمة محافظات/حكومات للواجهة.</li>
+          <li>Shipment zones و cities مترجمة.</li>
+          <li>بيانات شحن المنتج: length، width، height، weight، min/max estimated delivery.</li>
+          <li>تكلفة شحن افتراضية من config، وتضاف للإجمالي النهائي.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>12. العملاء والحسابات</h3>
+          <span class="tag">Members</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> يوجد نظام members منفصل عن admin، مع OTP، تسجيل، دخول، وتحديث بيانات.</p>
+        <ul>
+          <li>send verification OTP، verify OTP، register، login.</li>
+          <li>جلب بيانات المستخدم وتحديثها للمستخدم المسجل.</li>
+          <li>Admin يمكنه عرض العملاء، تفاصيل العميل، وطلبات العميل.</li>
+          <li>الطلبات تدعم مستخدم مسجل أو guest.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>13. Dashboard Statistics</h3>
+          <span class="tag">Analytics</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> إحصائيات تشغيلية للـ admin تساعده يشوف أداء المتجر بسرعة.</p>
+        <ul>
+          <li>Overview يومي، أسبوعي، شهري، سنوي.</li>
+          <li>Recent orders ببيانات العميل والحالة والإجمالي.</li>
+          <li>نسب حالات الطلبات حسب status.</li>
+          <li>Best selling للمنتجات والـ variants والـ bundles مع quantity و revenue.</li>
+          <li>حساب profit شهري/سنوي من revenue ناقص cost و expenses.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>14. صلاحيات الإدارة</h3>
+          <span class="tag">Security</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> لوحة الإدارة محمية بـ Sanctum وصلاحيات roles/permissions، مع permission لكل عملية create/update/delete/view.</p>
+        <ul>
+          <li>Admin login منفصل.</li>
+          <li>حماية routes بـ auth:sanctum.</li>
+          <li>صلاحيات عامة للـ CRUD وصلاحيات Ecommerce مثل cart، order، points، wishlist، statistics.</li>
+          <li>مناسب لفرق تشغيل متعددة: content manager، operations، sales admin، super admin.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>15. CMS والمحتوى العام</h3>
+          <span class="tag">CMS</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> بجانب المتجر، النظام يحتوي على modules لإدارة محتوى الموقع وصفحات الشركة.</p>
+        <ul>
+          <li>Sliders، categories، brands، industries، pages، blogs، events، services، branches، locations.</li>
+          <li>About، contact، main contact، social links، media images/videos، FAQs، certificates، team، clients، feedback، achievements، our works.</li>
+          <li>Dynamic frontend endpoints لجلب محتوى، فلترة، gallery، search.</li>
+          <li>Meta settings وحقول SEO مترجمة لكثير من الكيانات.</li>
+        </ul>
+      </article>
+
+      <article class="feature">
+        <div class="feature-title">
+          <h3>16. الاستشارات والتدريب والطلبات الخارجية</h3>
+          <span class="tag">Lead Capture</span>
+        </div>
+        <p><strong>شرح المنتج:</strong> المنصة تدعم نماذج إضافية لجمع leads ورسائل خارج رحلة الشراء.</p>
+        <ul>
+          <li>Contact/send-message.</li>
+          <li>Applicant store.</li>
+          <li>Consultation form.</li>
+          <li>Training form.</li>
+          <li>هذه الميزات تفيد في بيع المنتج لعملاء يقدمون خدمات أو تدريب بجانب المنتجات.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="page-break">
+      <h2>Feature Matrix سريع</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>الميزة</th>
+            <th>متاحة للعميل</th>
+            <th>متاحة للإدارة</th>
+            <th>نقطة بيع مختصرة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>منتجات بسيطة</td><td>نعم</td><td>نعم</td><td>بيع مباشر بدون تعقيد.</td></tr>
+          <tr><td>Products with options</td><td>نعم</td><td>نعم</td><td>لون/مقاس/حجم مع variant مستقل.</td></tr>
+          <tr><td>Stock batches</td><td>غير مباشر</td><td>نعم</td><td>تحكم في المخزون والتكلفة.</td></tr>
+          <tr><td>Cart</td><td>نعم</td><td>نعم</td><td>سلة ذكية لكل أنواع المنتجات.</td></tr>
+          <tr><td>Guest cart/order</td><td>نعم</td><td>نعم</td><td>شراء أسرع بدون إجبار على التسجيل.</td></tr>
+          <tr><td>Coupons</td><td>نعم</td><td>نعم</td><td>حملات تسويقية قابلة للقياس.</td></tr>
+          <tr><td>Bundles</td><td>نعم</td><td>نعم</td><td>رفع متوسط قيمة الطلب.</td></tr>
+          <tr><td>Wishlist</td><td>نعم للمسجل</td><td>عرض فقط</td><td>زيادة الرجوع والاحتفاظ بالعميل.</td></tr>
+          <tr><td>Points</td><td>نعم للمسجل</td><td>نعم</td><td>ولاء وتكرار شراء.</td></tr>
+          <tr><td>Orders lifecycle</td><td>عرض وتتبع أساسي</td><td>نعم</td><td>تشغيل يومي منظم.</td></tr>
+          <tr><td>Statistics</td><td>لا</td><td>نعم</td><td>قرارات مبنية على أرقام.</td></tr>
+          <tr><td>CMS</td><td>عرض</td><td>نعم</td><td>إدارة محتوى الموقع مع المتجر.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>سيناريوهات بيع جاهزة</h2>
+      <h3>سيناريو 1: متجر منتجات بسيطة</h3>
+      <p>نشرح أن العميل يقدر يبدأ بسرعة بمنتجات لها صور وسعر ومخزون وتصنيفات وخصومات، بدون الحاجة لتعقيد variants.</p>
+
+      <h3>سيناريو 2: متجر ملابس أو منتجات لها أحجام</h3>
+      <p>نركز على options و variants: كل لون/مقاس له SKU ومخزون وسعر وصور، والعميل في الواجهة يختار الاختيار المناسب.</p>
+
+      <h3>سيناريو 3: متجر يريد عروض وباقات</h3>
+      <p>نبيع bundles و promotions: باقات جاهزة، كوبونات، خصومات بنسبة أو قيمة ثابتة، وسقف خصم وحدود استخدام.</p>
+
+      <h3>سيناريو 4: عميل يهتم بالتشغيل والمخزون</h3>
+      <p>نركز على stock batches، order status، refund stock restore، statistics، best selling، profit monthly/annually.</p>
+
+      <h3>سيناريو 5: شركة لديها محتوى وخدمات بجانب المتجر</h3>
+      <p>نوضح أن المنتج ليس Ecommerce فقط، بل معه CMS لإدارة الصفحات والمدونة والفريق والفروع والاستشارات والتدريب.</p>
+    </section>
+
+    <section>
+      <h2>ملاحظات مهمة قبل البيع النهائي</h2>
+      <ul>
+        <li>المشروع Backend/API وليس storefront UI أو admin UI كامل داخل هذا الريبو.</li>
+        <li>Payment gateway غير ظاهر كتكامل جاهز؛ الموجود هو `payment_method` و `payment_status` وإدارة حالة الدفع.</li>
+        <li>بعض أسماء routes والكود بها spelling قديم مثل `bundel` و `varaint` و `verfiy`؛ يفضل عدم ذكرها للعميل إلا في تسليم API documentation.</li>
+        <li>الاختبارات الآلية الموجودة قليلة، لذلك قبل إطلاق production ينصح بعمل test coverage للـ cart/order/stock/coupon/points.</li>
+        <li>الشحن حاليا يعتمد على government/address وتكلفة افتراضية من config، وأي قواعد شحن متقدمة تحتاج scope منفصل.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>الخلاصة لفريق المبيعات</h2>
+      <p>
+        هذا المنتج مناسب كقاعدة قوية لمتجر إلكتروني قابل للتوسع. أقوى نقاطه: تعدد اللغات، دعم المنتجات البسيطة والـ variants، إدارة المخزون والطلبات، الباقات والعروض، الشراء كضيف أو مستخدم، loyalty points، وإدارة محتوى الموقع. عند العرض على العميل، ركز على أن المنصة تغطي التشغيل الكامل للمتجر وليس فقط عرض المنتجات.
+      </p>
+      <p class="small muted">
+        تم إعداد هذا المستند بعد مراجعة routes، services، models، requests، وملف PRD داخل المشروع بتاريخ 8 يونيو 2026.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

@@ -30,7 +30,9 @@ class ProductService extends BaseModelService
     public function store()
     {
 
+    if(isset($this->data['discount']) && isset($this->data['discount_type'])){
         $this->validateDiscount($this->data['discount_type'], $this->data['discount'] , $this->data['sale_price']);
+    }
         $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
         $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
@@ -42,11 +44,8 @@ class ProductService extends BaseModelService
         if($product->has_options){
             $product->update(['status' => 'draft']);
             $storeProductService->addProductOption($this->data['product_options'] , $product);
-        }
-             
+        }         
         $this->syncIndustries($product);
-
-
         $storeProductService->storeProductShipment($this->data , $product->id);
         
 
@@ -64,7 +63,10 @@ class ProductService extends BaseModelService
     
     public function update($id){
 
-        $this->validateDiscount($this->data['discount_type'], $this->data['discount'] , $this->data['sale_price']);
+        if(isset($this->data['discount']) && isset($this->data['discount_type'])){
+          $this->validateDiscount($this->data['discount_type'], $this->data['discount'] , $this->data['sale_price']);
+
+        }
             
 
         $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
@@ -74,6 +76,7 @@ class ProductService extends BaseModelService
         $oldHasOptions = (bool) $existingProduct->has_options;
 
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
+       
         $product = parent::update($id , $this->getBasicColumn(['product_image','breadcrumb', 'sku', 'barcode', 'sale_price', 'discount', 'discount_type', 'status','has_options' , 'order' , 'brand_id','category_id']));
         $this->processTranslations($product, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
         

@@ -59,6 +59,7 @@ class OrderService
             // $order->total = $total;
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
+            $order->shipping_cost = $order->shipping_cost ?? (float) config('setting.shipping_cost', 70);
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
             //  dd($order);
@@ -100,6 +101,7 @@ class OrderService
 
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
+            $order->shipping_cost = $order->shipping_cost ?? (float) config('frontend.shipping_cost', 70);
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
 
@@ -142,8 +144,8 @@ class OrderService
         // apply coupon to produce post-discount total (matching createOrder flow)
         $totalAfterPreview= max(0, $baseAmount - $discountAmount - $pointsAmount);
 
-        // shipping cost same as repository default
-        $shippingCost = 70;
+        // shipping cost from config (reads env via config/frontend.php)
+        $shippingCost = (float) config('setting.shipping_cost', 70);
 
         $finalTotal = ( $totalAfterPreview + $shippingCost );
 
