@@ -7,6 +7,7 @@ use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\LastPiece;
 use App\Models\Api\Ecommerce\NewProduct;
 use App\Models\Api\Ecommerce\ProductVariant;
+use App\Models\Api\Admin\RelatedProduct;
 use Exception;
 
 class ProductService
