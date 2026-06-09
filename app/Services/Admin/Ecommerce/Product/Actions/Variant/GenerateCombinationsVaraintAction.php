@@ -3,6 +3,7 @@
 namespace App\Services\Admin\Ecommerce\Product\Actions\Variant;
 
 use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\ProductVariant;
 
 class GenerateCombinationsVaraintAction
 {
@@ -47,10 +48,32 @@ class GenerateCombinationsVaraintAction
         // Generate combinations AFTER collecting all options
         $combinations = $this->generateCombinations($optionsArray);
 
-        return [     
+        // Build a set of existing variant option_value_id signatures for this product
+        $existingSignatures = ProductVariant::where('product_id', $product->id)
+            ->with('variants')
+            ->get()
+            ->map(function ($variant) {
+                $ids = $variant->variants->pluck('option_value_id')->filter()->map(fn($id) => (int)$id)->sort()->values()->all();
+                return implode(',', $ids);
+            })->filter()->values()->all();
+
+        $existingSignatures = array_flip($existingSignatures);
+
+        // Filter out combinations that already have a variant created
+        $filtered = array_filter($combinations, function ($combination) use ($existingSignatures) {
+            $ids = array_map('intval', $combination['option_value_ids'] ?? []);
+            sort($ids);
+            $signature = implode(',', $ids);
+            return !isset($existingSignatures[$signature]);
+        });
+
+        // Re-index filtered combinations
+        $filtered = array_values($filtered);
+
+        return [
             'product_id' => $product->id,
-            'total_combinations' => count($combinations),
-            'combinations' => $combinations
+            'total_combinations' => count($filtered),
+            'combinations' => $filtered
         ];
     }
 
