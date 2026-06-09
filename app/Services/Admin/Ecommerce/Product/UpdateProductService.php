@@ -10,8 +10,8 @@ class UpdateProductService
 {
     private $productId;
 
-
-    public function updateProductOption($data, $product , DeleteEmptyProductOptionService $deleteEmptyProductOption): void
+    public function __construct(protected DeleteEmptyProductOptionService $deleteEmptyProductOption) {}
+    public function updateProductOption($data, $product): void
     {
         $this->productId = $product->id;
         
@@ -43,7 +43,7 @@ class UpdateProductService
         }
 
 
-        $deleteEmptyProductOption->deleteEmptyOptions($this->productId);
+        $this->deleteEmptyProductOption->deleteEmptyOptions($this->productId);
          // check if product has option make product active
         if($product->options()->count() > 0){
             $product->update(['status' => 'active']);

@@ -19,6 +19,9 @@ class OrderAllRequest extends FormRequest
             'user_id' => 'nullable|integer|exists:users,id',
             'order_number' => 'nullable|string',
             'search' => 'nullable|string',
+            'from' => 'nullable|date',
+            'to' => 'nullable|date|after_or_equal:from',
+            'payment_status' => 'nullable|string|in:paid,unpaid,refunded',
             'orderDirection' => 'nullable|in:asc,desc',
             'orderBy' => 'nullable|string|max:255',
         ];

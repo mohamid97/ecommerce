@@ -28,8 +28,10 @@ class StoreProductService
         
     // }
 
+    public function __construct(protected DeleteEmptyProductOptionService $deleteEmptyProductOption) {}
 
-    public function addProductOption($data , $product , DeleteEmptyProductOptionService $deleteEmptyProductOption):void{
+
+    public function addProductOption($data , $product):void{
 
         foreach ($data as $option) {
 
@@ -60,7 +62,7 @@ class StoreProductService
             
         }
         
-        $deleteEmptyProductOption->deleteEmptyOptions($product->id);
+        $this->deleteEmptyProductOption->deleteEmptyOptions($product->id);
 
         // check if product has option make product active
         if($product->options()->count() > 0){

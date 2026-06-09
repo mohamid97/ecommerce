@@ -15,6 +15,7 @@ class Category extends Model implements TranslatableContract
     public $translationModel = 'App\Models\Api\Admin\CategoryTranslation';
 
     
+    
     protected function serializeDate(\DateTimeInterface $date)
     {
       return $date->format('Y-m-d'); 
@@ -40,6 +41,9 @@ class Category extends Model implements TranslatableContract
         return $this->hasMany(Service::class , 'category_id');
 
     }
+
+
+
     
     
 }

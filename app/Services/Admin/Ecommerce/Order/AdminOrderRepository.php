@@ -37,6 +37,18 @@ class AdminOrderRepository
             $query->where('user_id', $filters['user_id']);
         }
 
+        if (!empty($filters['payment_status'])) {
+            $query->where('payment_status', $filters['payment_status']);
+        }
+
+        if (!empty($filters['from'])) {
+            $query->whereDate('created_at', '>=', $filters['from']);
+        }
+
+        if (!empty($filters['to'])) {
+            $query->whereDate('created_at', '<=', $filters['to']);
+        }
+
         if (!empty($filters['order_number'])) {
             $query->where('order_number', $filters['order_number']);
         }
@@ -54,7 +66,7 @@ class AdminOrderRepository
                             ->orWhere('username', 'like', "%{$search}%");
                     });
             });
-        }
+        }   
 
         if (!empty($filters['orderDirection']) && in_array($filters['orderDirection'], ['asc', 'desc'])) {
             return $query->orderBy($filters['orderBy'] ?? 'created_at', $filters['orderDirection'])->paginate($filters['paginate'] ?? 15);
