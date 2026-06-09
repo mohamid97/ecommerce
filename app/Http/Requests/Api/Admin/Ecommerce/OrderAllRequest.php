@@ -14,12 +14,13 @@ class OrderAllRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'per_page' => 'nullable|integer|min:1|max:200',
+            'paginate' => 'nullable|integer|min:1|max:200',
             'status' => 'nullable|string',
             'user_id' => 'nullable|integer|exists:users,id',
             'order_number' => 'nullable|string',
             'search' => 'nullable|string',
-            'sort' => 'nullable|in:asc,desc',
+            'orderDirection' => 'nullable|in:asc,desc',
+            'orderBy' => 'nullable|string|max:255',
         ];
     }
 }

@@ -44,7 +44,8 @@ class AdminOrderRepository
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('guest_name', 'like', "%{$search}%")
+                $q->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('guest_name', 'like', "%{$search}%")
                     ->orWhere('guest_email', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($uq) use ($search) {
                         $uq->where('first_name', 'like', "%{$search}%")
@@ -55,11 +56,11 @@ class AdminOrderRepository
             });
         }
 
-        if (!empty($filters['sort']) && in_array($filters['sort'], ['asc', 'desc'])) {
-            return $query->orderBy('created_at', $filters['sort'])->paginate($filters['per_page'] ?? 15);
+        if (!empty($filters['orderDirection']) && in_array($filters['orderDirection'], ['asc', 'desc'])) {
+            return $query->orderBy($filters['orderBy'] ?? 'created_at', $filters['orderDirection'])->paginate($filters['paginate'] ?? 15);
         }
 
-        return $query->latest()->paginate($filters['per_page'] ?? 15);
+        return $query->latest()->paginate($filters['paginate'] ?? 15);
     }
 
     /**
