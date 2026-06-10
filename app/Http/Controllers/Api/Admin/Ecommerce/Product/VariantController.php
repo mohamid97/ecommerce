@@ -26,6 +26,9 @@ use App\Services\Admin\Ecommerce\Product\Actions\Variant\StoreVaraintAction;
 use App\Services\Admin\Ecommerce\Product\Actions\Variant\UpdateVaraintAction;
 use App\Services\Admin\Ecommerce\Product\UpdateProductService;
 use Symfony\Component\HttpFoundation\Request;
+use App\Imports\VariantsImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\Api\Admin\Ecommerce\Product\Variant\ImportVariantsRequest;
 
 class VariantController extends Controller
 {
@@ -137,6 +140,21 @@ class VariantController extends Controller
         }
 
         return $this->error(__('main.no_id'));
+    }
+
+    // import variants from XLSX
+    public function importVariants(ImportVariantsRequest $request)
+    {
+        try {
+            $file = $request->file('file');
+
+            // Note: requires maatwebsite/excel package installed
+            $defaultProductId = $request->input('default_product_id');
+            Excel::import(new VariantsImport($defaultProductId), $file);
+            return $this->success([], __('main.import_started'));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
     }
 
 

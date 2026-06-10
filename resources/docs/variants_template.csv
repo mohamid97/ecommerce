@@ -1,0 +1,4 @@
+,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,
+product_id,sku,barcode,stock,sale_price,discount_value,discount_type,weight,status,title,meta_title,meta_des,option_1_id,option_1_value_id,option_2_id,option_2_value_id,option_3_id,option_3_value_id,option_4_id,option_4_value_id,option_5_id,option_5_value_id
+5,SKU-T-R-S,12345670123,0,99.99,0,,0.5,active,Red Shirt,Red Shirt - Meta,Meta desc for red shirt,1,1,,,,,,,,

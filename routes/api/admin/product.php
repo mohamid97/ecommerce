@@ -45,6 +45,7 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('view-variant' , 'VariantController@viewVariant')->middleware('checkPermision:view');
     Route::post('delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
     Route::post('make-default' , 'VariantController@makeDefault')->middleware('checkPermision:update');
+    Route::post('import-variants' , 'VariantController@importVariants')->middleware('checkPermision:create');
 
 
 

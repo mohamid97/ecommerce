@@ -39,6 +39,20 @@ class ProductService
                 $query->where('industries.id', $data['industry_id']);
             });
         }
+        if(!empty($data['industry_slug'])){
+            $products->whereHas('industries', function ($query) use ($data) {
+                $query->whereHas('translations', function($query) use ($data) {
+                    $query->where('slug', $data['industry_slug']);
+                });
+            });
+        }
+
+        // same for category_slug
+        if(!empty($data['category_slug'])){
+            $products->whereHas('category.translations', function($query) use ($data) {
+                $query->where('slug', $data['category_slug']);
+            });
+        }
 
         if (!empty($data['sort']) && in_array($data['sort'], ['asc', 'desc'])) {
             if (!empty($data['sort_by']) && in_array($data['sort_by'], ['created_at', 'sale_price', 'id', 'discount', 'order'])) {
@@ -47,6 +61,7 @@ class ProductService
                 $products->orderBy('created_at', $data['sort']);
             }
         }
+
 
         $products->where('status', '!=', 'draft');
         $paginate = (!empty($data['paginate']) && ($data['paginate'] >= 1 && $data['paginate'] <= 100)) ? $data['paginate'] : 10;
