@@ -37,6 +37,7 @@ StoreBundelAction{
         $this->validateBundel->validateBundelDetails($bundel->id, $data);
         
         $this->StoreBundelDetails($bundel->id , $data);
+
         if($data->status == 'active'){
             $this->checkBundleProductsStatus->execute($bundel);
         }
@@ -51,7 +52,9 @@ StoreBundelAction{
 
 
     private function StoreBundelDetails($bundel_id , $data){
+
             foreach($data->products as $item){
+
 
                 BundelDetails::create([
                     'bundel_id'   => $bundel_id,

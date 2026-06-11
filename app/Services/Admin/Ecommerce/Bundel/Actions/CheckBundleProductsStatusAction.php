@@ -11,8 +11,10 @@ class CheckBundleProductsStatusAction
 {
     public function execute(Bundel $bundel): void
     {
-        $bundleDetails = $bundel->bundleDetails;
+        $bundleDetails = $bundel->bundelDetails;
+    //    dd($bundleDetails);
         foreach ($bundleDetails as $bundleDetail) {
+
             // the product can has varant
             if ($bundleDetail->variant_ids != null) {
                 $variants = ProductVariant::whereIn('id', $bundleDetail->variant_ids)->get();
