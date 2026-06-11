@@ -20,6 +20,7 @@ StoreBundelAction{
         
         $translation = app(TranslationService::class);
 
+        dd($data->bundle_image);
         $bundel = Bundel::create([
             'price' => null,
             'discount' => $data->discount,
