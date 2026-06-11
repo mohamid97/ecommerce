@@ -52,8 +52,7 @@ StoreBundelAction{
 
 
     private function StoreBundelDetails($bundel_id , $data){
-               
-            
+                        
             foreach($data->products as $item){
 
                 BundelDetails::create([
