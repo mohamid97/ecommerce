@@ -229,15 +229,28 @@ class ProductService
 
         $relatedIds = RelatedProduct::where('product_id', $product->id)->pluck('related_product_id')->toArray();
 
-        $relatedProducts = Product::with(['category', 'brand', 'industries', 'variants' => function ($query) {
-                $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
-            }])
-            ->where('status', 'active')
-            ->whereIn('id', $relatedIds);
+        $variantsRelation = function ($query) {
+            $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
+        };
+
+        $relatedProductsQuery = Product::with(['category', 'brand', 'industries', 'variants' => $variantsRelation])
+            ->where('status', 'active');
+
+        if (!empty($relatedIds)) {
+            $relatedProductsQuery = $relatedProductsQuery->whereIn('id', $relatedIds);
+        }
 
         $paginate = (!empty($data['paginate']) && ($data['paginate'] >= 1 && $data['paginate'] <= 100)) ? $data['paginate'] : 10;
 
-        return $relatedProducts->paginate($paginate);
+        // If there are no explicit related products, fall back to products from the same category
+        if (empty($relatedIds) || !$relatedProductsQuery->exists()) {
+            $relatedProductsQuery = Product::with(['category', 'brand', 'industries', 'variants' => $variantsRelation])
+                ->where('status', 'active')
+                ->where('category_id', $product->category_id)
+                ->where('id', '!=', $product->id);
+        }
+
+        return $relatedProductsQuery->paginate($paginate);
     }
 
     /**
