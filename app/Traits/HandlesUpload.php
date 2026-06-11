@@ -12,7 +12,7 @@ trait HandlesUpload
      */
     public function uploadFile($file, string $directory = 'uploads', string $disk = 'public'): ?string
     {
-        if (!$file || !$file->isValid()) {
+        if (!$file) {
             return null;
         }
 
