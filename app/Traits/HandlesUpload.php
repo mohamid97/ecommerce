@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 
 trait HandlesUpload
 {
@@ -12,9 +13,12 @@ trait HandlesUpload
      */
     public function uploadFile($file, string $directory = 'uploads', string $disk = 'public'): ?string
     {
-        if (!$file) {
-            return null;
-        }
+        // need here if not file return null because in update we may not send new image
+
+    if (!($file instanceof UploadedFile) || !$file->isValid()) {
+        return null;
+    }
+
 
         $filename = Str::random(20) . '.' . $file->getClientOriginalExtension();
         return $file->storeAs($directory, $filename, $disk);

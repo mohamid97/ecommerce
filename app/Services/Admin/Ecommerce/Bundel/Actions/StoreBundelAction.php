@@ -20,14 +20,13 @@ StoreBundelAction{
         
         $translation = app(TranslationService::class);
 
-        return $data->bundle_image;
         $bundel = Bundel::create([
             'price' => null,
             'discount' => $data->discount,
             'discount_type' => $data->discount_type,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
-            'bundle_image' => $this->uploadImage($data->bundle_image ,'bundel' , 'public'),
+            'bundle_image' => $this->uploadFile($data->bundle_image ,'bundel' , 'public'),
             //'status' => $data->status,
         ]);
 
