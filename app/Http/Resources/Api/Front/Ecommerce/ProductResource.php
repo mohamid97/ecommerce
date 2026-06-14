@@ -17,7 +17,60 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         $defaultVaraint = $this->getDefaultVaraint();
-        $priceSource = $this->has_options && $defaultVaraint ? $defaultVaraint : $this;
+
+        // detect requested price range (frontend uses `from` and `to`)
+        $min = null;
+        $max = null;
+        if ($request->filled('from') && is_numeric($request->input('from'))) {
+            $min = (float) $request->input('from');
+        }
+        if ($request->filled('to') && is_numeric($request->input('to'))) {
+            $max = (float) $request->input('to');
+        }
+
+        // if product has options and a range was requested, try to find a variant matching the range
+        $selectedVariant = null;
+        if ($this->has_options && ($min !== null || $max !== null)) {
+            $variants = $this->relationLoaded('variants')
+                ? $this->variants->where('status', '!=', 'draft')
+                : $this->variants()->where('status', '!=', 'draft')->get();
+
+            $matched = $variants->filter(function ($v) use ($min, $max) {
+                if ($min !== null && $v->sale_price < $min) {
+                    return false;
+                }
+                if ($max !== null && $v->sale_price > $max) {
+                    return false;
+                }
+                return true;
+            });
+
+            if ($matched->isNotEmpty()) {
+                $selectedVariant = $matched->firstWhere('is_default', true) ?? $matched->first();
+            }
+        }
+
+        $priceSource = $selectedVariant ?? ($this->has_options && $defaultVaraint ? $defaultVaraint : $this);
+
+        // compute overall min/max prices (variants or product)
+        $minPrice = null;
+        $maxPrice = null;
+        if ($this->has_options) {
+            $variants = $this->relationLoaded('variants')
+                ? $this->variants->where('status', '!=', 'draft')
+                : $this->variants()->where('status', '!=', 'draft')->get();
+
+            if ($variants->isNotEmpty()) {
+                $minPrice = (float) $variants->min('sale_price');
+                $maxPrice = (float) $variants->max('sale_price');
+            } else {
+                $minPrice = $maxPrice = (float) $this->sale_price;
+            }
+        } else {
+            $minPrice = $maxPrice = (float) $this->sale_price;
+        }
+
+        $displayVariant = $selectedVariant ?? $defaultVaraint;
 
         return[
             'id' => $this->id,
@@ -25,27 +78,29 @@ class ProductResource extends JsonResource
             'slug'=>$this->getColumnLang('slug'),
             'des' => $this->des,
             'sale_price' => (float) $priceSource->sale_price,
-            'discount_price' => (float) ($defaultVaraint ? $defaultVaraint->discount_value : $this->discount),
+            'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
             'discount_type' => $priceSource->discount_type,
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
+            'price_min' => $minPrice,
+            'price_max' => $maxPrice,
             'on_demand' => $this->on_demand,
             'sku' => $priceSource->sku,
             'has_options' => $this->has_options,
             'product_image' => $this->getImageUrl($this->product_image),
             'breadcrumb' => $this->getImageUrl($this->breadcrumb),
-            'status' => $this->has_options && $defaultVaraint ? $defaultVaraint->status : $this->status,
-            'stock' => $this->has_options && $defaultVaraint ? $defaultVaraint->stock : $this->stock,
-            'default_varaint' => $this->has_options && $defaultVaraint ? [
-                'id' => $defaultVaraint->id,
-                'title' => $defaultVaraint->title,
-                'sku' => $defaultVaraint->sku,
-                'sale_price' => (float) $defaultVaraint->sale_price,
-                'discount' => (float) $defaultVaraint->discount_value,
-                'discount_type' => $defaultVaraint->discount_type,
-                'price_after_discount' => (float) $defaultVaraint->getDiscountPrice(),
-                'stock' => $defaultVaraint->stock,
-                'status' => $defaultVaraint->status,
-                'is_default' => (bool) $defaultVaraint->is_default,
+            'status' => $this->has_options ? ($priceSource->status ?? $this->status) : $this->status,
+            'stock' => $this->has_options ? ($priceSource->stock ?? $this->stock) : $this->stock,
+            'default_varaint' => $this->has_options && $displayVariant ? [
+                'id' => $displayVariant->id,
+                'title' => $displayVariant->title,
+                'sku' => $displayVariant->sku,
+                'sale_price' => (float) $displayVariant->sale_price,
+                'discount' => (float) ($displayVariant->discount_value ?? $displayVariant->discount ?? 0),
+                'discount_type' => $displayVariant->discount_type,
+                'price_after_discount' => (float) $displayVariant->getDiscountPrice(),
+                'stock' => $displayVariant->stock,
+                'status' => $displayVariant->status,
+                'is_default' => (bool) $displayVariant->is_default,
             ] : null,
             // return slug also and id
             'category' => $this->whenLoaded('category', function () {

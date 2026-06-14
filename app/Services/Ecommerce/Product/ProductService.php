@@ -54,6 +54,42 @@ class ProductService
             });
         }
 
+        // price range filter: frontend will send `from` and `to` as bounds
+        $min = null;
+        $max = null;
+        if (isset($data['from']) && is_numeric($data['from'])) {
+            $min = (float) $data['from'];
+        }
+        if (isset($data['to']) && is_numeric($data['to'])) {
+            $max = (float) $data['to'];
+        }
+
+        if ($min !== null || $max !== null) {
+            $products->where(function ($q) use ($min, $max) {
+                // products without options -> use product sale_price
+                $q->where(function ($q2) use ($min, $max) {
+                    $q2->where('has_options', false);
+                    if ($min !== null) {
+                        $q2->where('sale_price', '>=', $min);
+                    }
+                    if ($max !== null) {
+                        $q2->where('sale_price', '<=', $max);
+                    }
+                });
+
+                // OR products with variants that have prices in range
+                $q->orWhereHas('variants', function ($vq) use ($min, $max) {
+                    $vq->where('status', '!=', 'draft');
+                    if ($min !== null) {
+                        $vq->where('sale_price', '>=', $min);
+                    }
+                    if ($max !== null) {
+                        $vq->where('sale_price', '<=', $max);
+                    }
+                });
+            });
+        }
+
         if (!empty($data['sort']) && in_array($data['sort'], ['asc', 'desc'])) {
             if (!empty($data['sort_by']) && in_array($data['sort_by'], ['created_at', 'sale_price', 'id', 'discount', 'order'])) {
                 $products->orderBy($data['sort_by'], $data['sort']);
