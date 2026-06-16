@@ -145,4 +145,7 @@ class ProductResource extends JsonResource
             ?? $variants->firstWhere('is_default', 1)
             ?? $variants->first();
     }
+
+
+    
 }

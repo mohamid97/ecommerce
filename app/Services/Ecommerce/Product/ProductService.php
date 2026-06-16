@@ -70,7 +70,7 @@ class ProductService
                 $q->where(function ($q2) use ($min, $max) {
                     $q2->where('has_options', false);
                     if ($min !== null) {
-                        $q2->where('sale_price', '>=', $min);
+                         $q2->where('sale_price', '>=', $min);
                     }
                     if ($max !== null) {
                         $q2->where('sale_price', '<=', $max);
