@@ -13,7 +13,17 @@ class Feedback extends Model implements TranslatableContract
 
 
     protected $table = 'feedbacks';
-    protected $fillable = ['feedback_image' , 'breadcrumb'];
+    public const TYPE_ABOUT = 'about';
+    public const TYPE_TRAIN = 'train';
+    public const TYPE_CONSULT = 'consult';
+
+    public static array $types = [
+      self::TYPE_ABOUT,
+      self::TYPE_TRAIN,
+      self::TYPE_CONSULT,
+    ];
+
+    protected $fillable = ['feedback_image' , 'breadcrumb', 'type'];
     public $translatedAttributes = ['title' , 'small_des' , 'des' , 'meta_title' , 'meta_des'];
     public $translationForeignKey = 'feedback_id';
     public $translationModel = 'App\Models\Api\Admin\FeedbackTranslation';

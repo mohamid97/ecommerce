@@ -26,6 +26,7 @@ class FeedbackStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'type' => 'nullable|in:about,train,consult',
             'breadcrumb'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'feedback_image'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'title' => 'required|array|min:1',

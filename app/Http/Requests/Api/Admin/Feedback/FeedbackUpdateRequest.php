@@ -27,6 +27,7 @@ class FeedbackUpdateRequest extends FormRequest
     {
         return [
             'id'=>'required|integer|exists:feedbacks,id',
+            'type' => 'nullable|in:about,train,consult',
             'feedback_image'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'breadcrumb'=>'nullable|image|mimes:jpeg,png,webp,jpg,gif|max:5000',
             'title' => 'required|array|min:1',

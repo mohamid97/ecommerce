@@ -30,9 +30,10 @@ class FeedbackService extends BaseModelService{
     public function store()
     {
 
-        $this->uploadSingleImage(['breadcrumb' , 'feedback_image'], 'uploads/feedbacks');  
-        $feed = parent::store($this->getBasicColumn(['feedback_image','breadcrumb']));
-        $this->processTranslations($feed, $this->data, ['title', 'small_des' ,'des','meta_des' , 'meta_title']);  
+        $this->uploadSingleImage(['breadcrumb' , 'feedback_image'], 'uploads/feedbacks');
+        $this->data['type'] = $this->data['type'] ?? \App\Models\Api\Admin\Feedback::TYPE_ABOUT;
+        $feed = parent::store($this->getBasicColumn(['feedback_image','breadcrumb','type']));
+        $this->processTranslations($feed, $this->data, ['title', 'small_des' ,'des','meta_des' , 'meta_title']);
         return $feed;
         
     }
@@ -41,8 +42,8 @@ class FeedbackService extends BaseModelService{
 
     public function update($id){ 
 
-        $this->uploadSingleImage(['breadcrumb' , 'feedback_image'], 'uploads/feedbacks');  
-        $feed = parent::update($id , $this->getBasicColumn(['feedback_image','breadcrumb']));
+        $this->uploadSingleImage(['breadcrumb' , 'feedback_image'], 'uploads/feedbacks');
+        $feed = parent::update($id , $this->getBasicColumn(['feedback_image','breadcrumb','type']));
         $this->processTranslations($feed, $this->data, ['title', 'small_des' ,'des','meta_des' , 'meta_title']);
         return $feed;
         

@@ -34,6 +34,7 @@ class FeedbackResource extends JsonResource
             'des' => $this->getColumnLang('des'),
             'meta_title' => $this->getColumnLang('meta_title'),
             'meta_des' => $this->getColumnLang('meta_des'),
+            'type' => $this->type,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,
         ];
