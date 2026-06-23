@@ -25,6 +25,7 @@ class CustomProductVaraintsResource extends JsonResource
                 ];
             }),
             'option_ids'=>$this->variants->pluck('option_value_id'),
+                'moq' => (int) $this->moq,
             'option' => $this->variants
                     ->map(function ($variant) {
                         return $variant->optionValue->option->title . ' ' . $variant->optionValue->title;

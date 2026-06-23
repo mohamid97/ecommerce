@@ -4,6 +4,8 @@ namespace App\Services\Ecommerce\Order;
 
 use App\Models\Api\Ecommerce\Cart;
 use App\Models\Api\Ecommerce\Order;
+use App\Models\Api\Admin\Product;
+use App\Models\Api\Ecommerce\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Services\Ecommerce\Order\CouponService;
 use App\Services\Ecommerce\Order\PointsService;
@@ -17,6 +19,25 @@ class OrderService
         protected CouponService $couponService,
         protected PointsService $pointsService
     ) {}
+
+
+    // check MOQ Multiple of a number for a given product/variant context for un authenticated user
+    public function checkMoqForGuest($productId, $variantId, $quantity)
+    {
+        if ($variantId) {
+            $variant = ProductVariant::find($variantId);
+            $moq = $variant->moq ?? 1;
+        } else {
+            $product = Product::find($productId);
+            $moq = $product->moq ?? 1;
+        }
+        if ($quantity < $moq || $quantity % $moq !== 0) {
+            throw new \Exception("Quantity must be a multiple of the minimum order quantity ($moq).");
+        }
+
+    }
+ 
+
     /**
      * Create order from user's cart with stock validation and allocations.
      * Returns created Order.

@@ -20,6 +20,7 @@ class SimpleProductStrategy implements CartStrategyInterface
 
     public function validate(AddToCartDTO $dto): void
     {
+        $this->action->validateMOQ('product',$dto->product_id, $dto->quantity);
         $this->action->checkProductExists($dto->product_id);
         
         // If the product actually has variations, they MUST provide a variant_id.

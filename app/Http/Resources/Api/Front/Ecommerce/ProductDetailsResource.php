@@ -33,6 +33,7 @@ class ProductDetailsResource extends JsonResource
             'discount_type' => $defaultVaraintModel?->discount_type,
             'on_demand' => $this->on_demand,
             'sku' => $defaultVaraintModel?->sku,
+            'moq' => $defaultVaraintModel?->moq ?? 1,
             'has_options' => $this->has_options,
             'product_image' => $this->getImageUrl($this->product_image),
             'breadcrumb' => $this->getImageUrl($this->breadcrumb),
@@ -59,7 +60,7 @@ class ProductDetailsResource extends JsonResource
                 return $this->options?->map(function ($productOption) {
                     return [
                         'option' => $productOption->option ? [
-                           'id' => $productOption->option->id,
+                            'id' => $productOption->option->id,
                             'title' => $productOption->option->title ?? null,
                         ] : null,
                         'values' => $productOption?->values->map(function ($value) {

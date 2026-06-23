@@ -94,8 +94,11 @@ class OrderController extends Controller
                         'variant_id' => $item['variant_id'] ?? null,
                         'quantity' => $item['quantity'],
                     ];
+                    $this->service->checkMoqForGuest($item['product_id'], $item['variant_id'] ?? null, $item['quantity']);
                 }
             }
+
+
 
             $cart = app(\App\Services\Ecommerce\Cart\CartService::class)->mapGuestCartData([
                 'products' => $products,

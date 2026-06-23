@@ -24,6 +24,7 @@ class VarinatDetailsResource extends JsonResource
             'discount_type' => $this->discount_type,
 
             'status' => $this->status,
+            'moq' => (int) $this->moq,
             'product'=>$this->whenLoaded('product' , function(){
                 return [
                     'id'=>$this->product->id,

@@ -20,6 +20,7 @@ class VaraintDetailsResource extends JsonResource
             'sale_price' =>  (float)$this->sale_price,
             'price_after_discount' => (float)$this->getDiscountPrice(),
             'stock' => $this->stock,
+            'moq' => (int) $this->moq,
             'discount' => (float) $this->discount_value,
             'discount_type' => $this->discount_type,
             'status' => $this->status,

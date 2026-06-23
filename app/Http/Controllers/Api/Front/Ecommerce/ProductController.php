@@ -51,7 +51,7 @@ class ProductController extends Controller
 
             return $this->success(new ProductDetailsResource($product), __('main.show_successfully', ['model' => 'Product']));
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 404);
+            return $this->error($e->getMessage(), 500);
         }
     }
 

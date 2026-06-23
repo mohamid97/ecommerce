@@ -78,6 +78,7 @@ class ProductResource extends JsonResource
             'slug'=>$this->getColumnLang('slug'),
             'des' => $this->des,
             'sale_price' => (float) $priceSource->sale_price,
+            'moq' => $priceSource->moq ?? $this->moq ?? 1,
             'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
             'discount_type' => $priceSource->discount_type,
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
@@ -101,6 +102,7 @@ class ProductResource extends JsonResource
                 'stock' => $displayVariant->stock,
                 'status' => $displayVariant->status,
                 'is_default' => (bool) $displayVariant->is_default,
+                'moq' => $displayVariant->moq ?? 1,
             ] : null,
             // return slug also and id
             'category' => $this->whenLoaded('category', function () {

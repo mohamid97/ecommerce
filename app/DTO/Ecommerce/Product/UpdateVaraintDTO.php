@@ -20,9 +20,10 @@ class UpdateVaraintDTO
         public ?float $weight = null,
         public ?float $width = null,
         public ?float $height = null,
+        public ?int $moq = null,
         public int $delivery_time = 0,
         public int $max_time = 0,
-        public ?array $images = null,
+        public ?array $image_ids = null,
 
         
 
@@ -47,9 +48,10 @@ class UpdateVaraintDTO
             $data['weight'] ?? null,
             $data['width'] ?? null,
             $data['height'] ?? null,
+            $data['moq'] ?? null,
             $data['delivery_time'] ?? 0,
             $data['max_time'] ?? 0,
-            $data['images'] ?? null,
+            $data['image_ids'] ?? null
             
         );
     }

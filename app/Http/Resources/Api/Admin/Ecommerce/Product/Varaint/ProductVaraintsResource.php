@@ -21,6 +21,7 @@ class ProductVaraintsResource extends JsonResource
             'sale_price'=>$this->sale_price,
             'price_after_discount' => $this->getDiscountPrice(),
             'stock'=>$this->stock,
+            'moq' => (int) $this->moq,
             'status'=>$this->status,
             'is_default'=>(bool) $this->is_default,
             'option_ids'=>$this->variants->pluck('option_value_id'),

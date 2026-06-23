@@ -298,4 +298,40 @@ class CartAction
 
         $dto->bundle_items = $resolvedItems;
     }
+
+
+
+    // validate MOQ for product or variant
+    public function validateMOQ(string $type, int $id, int $quantity): void
+    {
+        if ($type === 'product') {
+            $product = Product::find($id);
+            if (!$product) {
+                throw new ModelNotFoundException(
+                    __('main.model_not_founded', ['model' => 'Product'])
+                );
+            }
+            $moq = $product->moq ?? 1;
+        } elseif ($type === 'variant') {
+            $variant = ProductVariant::find($id);
+            if (!$variant) {
+                throw new ModelNotFoundException(
+                    __('main.model_not_founded', ['model' => 'Product Variant'])
+                );
+            }
+            $moq = $variant->moq ?? 1;
+        } else {
+            throw new \InvalidArgumentException('Invalid type for MOQ validation');
+        }
+
+        if ($quantity < $moq) {
+            throw new \Exception(__('main.minimum_order_quantity_not_met', ['moq' => $moq]));
+        }
+
+
+    }
+
+
+
+
 }

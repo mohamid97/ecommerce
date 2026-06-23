@@ -22,6 +22,7 @@ class StoreVaraintAction
             'discount_type' => $dto->discountType,
             'sku' => $dto->sku,
             'barcode' => $dto->barcode,
+            'moq' => $dto->moq ?? 1,
             'length' => $dto->length,
             'weight' => $dto->weight,
             'width' => $dto->width,

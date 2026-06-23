@@ -16,6 +16,7 @@ class UpdateVaraintAction
             'discount_type' => $dto->discount_type,
             'sku' => $dto->sku,
             'barcode' => $dto->barcode,
+            'moq' => $dto->moq,
             'length' => $dto->length,
             'weight' => $dto->weight,
             'width' => $dto->width,
@@ -31,9 +32,9 @@ class UpdateVaraintAction
         $this->updateVariantTranslations($dto, $productVaraint);
 
         // update variant images
-        if($dto->images){
+        if($dto->image_ids){
             ProductVaraintImages::where('variant_id', $productVaraint->id)->delete();
-            foreach($dto->images as $imageId){
+            foreach($dto->image_ids as $imageId){
                 ProductVaraintImages::create([
                     'variant_id' => $productVaraint->id,
                     'image_id' => $imageId,
