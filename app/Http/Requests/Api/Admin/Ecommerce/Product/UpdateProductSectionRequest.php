@@ -20,6 +20,7 @@ class UpdateProductSectionRequest extends FormRequest
     {
         return [
             'id' => 'required|exists:products,id',
+            'variant_id' => 'nullable|exists:product_variants,id',
         ];
     }
 

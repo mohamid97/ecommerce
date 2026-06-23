@@ -61,12 +61,27 @@ class ProductController extends Controller
 
     public function addLastPiece(UpdateProductSectionRequest $request)
     {
-        return $this->addSectionProduct($request->id, LastPiece::class);
+        // if variant_id provided, ensure it belongs to product
+        if ($request->filled('variant_id')) {
+            $variant = ProductVariant::find($request->variant_id);
+            if (! $variant || $variant->product_id !== (int) $request->id) {
+                return $this->error(__('main.invalid_variant_for_product'));
+            }
+        }
+
+        return $this->addSectionProduct($request->id, LastPiece::class, $request->variant_id ?? null);
     }
 
     public function deleteLastPiece(UpdateProductSectionRequest $request)
     {
-        return $this->deleteSectionProduct($request->id, LastPiece::class);
+        if ($request->filled('variant_id')) {
+            $variant = ProductVariant::find($request->variant_id);
+            if (! $variant || $variant->product_id !== (int) $request->id) {
+                return $this->error(__('main.invalid_variant_for_product'));
+            }
+        }
+
+        return $this->deleteSectionProduct($request->id, LastPiece::class, $request->variant_id ?? null);
     }
 
     public function addNewest(UpdateProductSectionRequest $request)
@@ -143,15 +158,21 @@ public function filterProduct(Request $request)
     return $this->error(__('main.not_founded') ,404);
 }
 
-    private function addSectionProduct(int $productId, string $modelClass)
+    private function addSectionProduct(int $productId, string $modelClass, ?int $variantId = null)
     {
-        $modelClass::firstOrCreate(['product_id' => $productId]);
+        $attributes = ['product_id' => $productId, 'variant_id' => $variantId];
+        $modelClass::firstOrCreate($attributes);
         return $this->success(__('main.stored_successfully', ['model' => 'Product']));
     }
 
-    private function deleteSectionProduct(int $productId, string $modelClass)
+    private function deleteSectionProduct(int $productId, string $modelClass, ?int $variantId = null)
     {
-        $modelClass::where('product_id', $productId)->delete();
+        $query = $modelClass::where('product_id', $productId);
+        if ($variantId !== null) {
+            $query->where('variant_id', $variantId);
+        }
+        $query->delete();
+
         return $this->success(__('main.updated_successfully'));
     }
 

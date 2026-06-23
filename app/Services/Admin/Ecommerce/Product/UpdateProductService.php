@@ -5,6 +5,8 @@ namespace App\Services\Admin\Ecommerce\Product;
 use App\Models\Api\Ecommerce\ProductOption;
 use App\Models\Api\Ecommerce\ProductOptionValue;
 use App\Models\Api\Ecommerce\ProductShipement;
+use App\Models\Api\Ecommerce\ProductVariant;
+use Illuminate\Support\Facades\DB;
 
 class UpdateProductService
 {
@@ -63,12 +65,31 @@ class UpdateProductService
     {
         // Get incoming value IDs for this option
         $incomingValueIds = collect($option['value_ids'] ?? [])->toArray();
-
-        
-        // Delete values that are not in the incoming data
-        ProductOptionValue::where('product_option_id', $productOption->id)
+        // Determine which option_value_ids will be removed
+        $toDeleteValueIds = ProductOptionValue::where('product_option_id', $productOption->id)
             ->whereNotIn('option_value_id', $incomingValueIds)
-            ->delete();
+            ->pluck('option_value_id')
+            ->toArray();
+
+        if (!empty($toDeleteValueIds)) {
+            // Find variant IDs that reference these option value ids and belong to this product
+            $variantIds = DB::table('variant_option_values')
+                ->whereIn('option_value_id', $toDeleteValueIds)
+                ->join('product_variants', 'variant_option_values.product_variant_id', '=', 'product_variants.id')
+                ->where('product_variants.product_id', $this->productId)
+                ->pluck('product_variant_id')
+                ->unique()
+                ->toArray();
+
+            if (!empty($variantIds)) {
+                ProductVariant::whereIn('id', $variantIds)->delete();
+            }
+
+            // Now delete the product option values
+            ProductOptionValue::where('product_option_id', $productOption->id)
+                ->whereIn('option_value_id', $toDeleteValueIds)
+                ->delete();
+        }
         
         // Create or update option values
         foreach ($option['value_ids'] ?? [] as $value) {
@@ -77,9 +98,7 @@ class UpdateProductService
                     'product_option_id' => $productOption->id,
                     'option_value_id'   => $value,
                 ],
-                [
-
-                ]
+                []
             );
         }
 
