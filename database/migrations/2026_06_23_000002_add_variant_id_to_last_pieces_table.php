@@ -9,6 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('last_pieces', function (Blueprint $table) {
+            // drop foreign key on product_id first (it relies on the unique index)
+            $table->dropForeign(['product_id']);
+
             // drop existing unique index on product_id
             $table->dropUnique(['product_id']);
 
@@ -20,6 +23,9 @@ return new class extends Migration
 
             // add composite unique constraint for product_id + variant_id
             $table->unique(['product_id', 'variant_id']);
+
+            // re-create foreign key on product_id (now composite unique exists)
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
@@ -29,6 +35,7 @@ return new class extends Migration
             $table->dropUnique(['product_id', 'variant_id']);
             $table->dropForeign(['variant_id']);
             $table->dropColumn('variant_id');
+
             // restore unique on product_id
             $table->unique('product_id');
         });
