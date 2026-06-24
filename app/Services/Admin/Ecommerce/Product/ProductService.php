@@ -9,6 +9,9 @@ use App\Traits\StoreMultiLang;
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\Admin\Ecommerce\Product\StoreProductService;
 use App\Services\Admin\Ecommerce\Product\UpdateProductService;
+use Illuminate\Support\Facades\DB;
+use App\Models\Api\Ecommerce\Bundel;
+use App\Models\Api\Ecommerce\CartItem;
 class ProductService extends BaseModelService
 {
     use StoreMultiLang , HandlesImage;
@@ -151,7 +154,7 @@ class ProductService extends BaseModelService
     private function deactivateProductBundlesAndDeleteItemCart($productId){
         $productBundles = DB::table('bundle_details')->where('product_id', $productId)->get();
         foreach($productBundles as $productBundle){
-            $bundle = Bundle::find($productBundle->bundle_id);
+            $bundle = Bundel::find($productBundle->bundle_id);
             $bundle->update(['status' => 'draft']);
             
         }

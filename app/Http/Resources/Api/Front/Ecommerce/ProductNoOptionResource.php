@@ -31,6 +31,7 @@ class ProductNoOptionResource extends JsonResource
     
             'on_demand' => $this->on_demand,
             'sku' => $this->sku,
+            'moq' => $this->moq,
             'has_options' => false,
             'product_image' => $this->getImageUrl($this->product_image),
             'breadcrumb' => $this->getImageUrl($this->breadcrumb),
