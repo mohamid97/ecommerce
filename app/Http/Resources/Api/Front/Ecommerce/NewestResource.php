@@ -6,7 +6,7 @@ use App\Traits\HandlesUpload;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class WishlistResource extends JsonResource
+class NewestResource extends JsonResource
 {
     use HandlesUpload;
 
@@ -17,47 +17,43 @@ class WishlistResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $product = $this->product;
-        $resolvedVariant = $this->resolveVariant();
-        $priceSource = $resolvedVariant ?? $product;
+        $selectedVariantId = $this->getSelectedVariantId();
+        $variants = $this->getVariants();
+        $resolvedVariant = $this->resolveVariant($variants, $selectedVariantId);
+        $priceSource = $this->has_options && $resolvedVariant ? $resolvedVariant : $this;
 
         $minPrice = null;
         $maxPrice = null;
-        if ($product?->has_options) {
-            $variants = $product->relationLoaded('variants')
-                ? $product->variants->where('status', '!=', 'draft')
-                : $product->variants()->where('status', '!=', 'draft')->get();
-
+        if ($this->has_options) {
             if ($variants->isNotEmpty()) {
                 $minPrice = (float) $variants->min('sale_price');
                 $maxPrice = (float) $variants->max('sale_price');
             } else {
-                $minPrice = $maxPrice = (float) $product->sale_price;
+                $minPrice = $maxPrice = (float) $this->sale_price;
             }
         } else {
-            $minPrice = $maxPrice = (float) $product?->sale_price;
+            $minPrice = $maxPrice = (float) $this->sale_price;
         }
 
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'product_id' => $this->product_id,
-            'variant_id' => $resolvedVariant?->id,
-            'title' => $product?->title,
-            'slug' => $product?->slug,
-            'sale_price' => (float) ($priceSource->sale_price ?? 0),
-            'moq' => $priceSource->moq ?? $product?->moq ?? 1,
+            'title' => $this->title,
+            'slug' => $this->getColumnLang('slug'),
+            'sale_price' => (float) $priceSource->sale_price,
+            'moq' => $priceSource->moq ?? $this->moq ?? 1,
             'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
             'discount_type' => $priceSource->discount_type,
-            'price_after_discount' => (float) ($priceSource->getDiscountPrice() ?? 0),
+            'price_after_discount' => (float) $priceSource->getDiscountPrice(),
             'price_min' => $minPrice,
             'price_max' => $maxPrice,
+            'on_demand' => $this->on_demand,
             'sku' => $priceSource->sku,
-            'has_options' => (bool) $product?->has_options,
-            'product_image' => $this->getImageUrl($product?->product_image),
-            'status' => $product?->status,
-            'stock' => $resolvedVariant?->stock ?? $product?->stock,
-            'default_varaint' => $resolvedVariant ? [
+            'has_options' => $this->has_options,
+            'product_image' => $this->getImageUrl($this->product_image),
+            'status' => $this->has_options ? ($priceSource->status ?? $this->status) : $this->status,
+            'stock' => $this->has_options ? ($priceSource->stock ?? $this->stock) : $this->stock,
+            'variant_id' => $resolvedVariant?->id,
+            'default_varaint' => $this->has_options && $resolvedVariant ? [
                 'id' => $resolvedVariant->id,
                 'title' => $resolvedVariant->title,
                 'sku' => $resolvedVariant->sku,
@@ -75,23 +71,36 @@ class WishlistResource extends JsonResource
         ];
     }
 
-    private function resolveVariant(): mixed
+    private function getSelectedVariantId(): ?int
     {
-        $product = $this->product;
-        if (!$product?->has_options) {
+        if (!$this->has_options) {
             return null;
         }
 
-        $variants = $product->relationLoaded('variants')
-            ? $product->variants->where('status', '!=', 'draft')
-            : $product->variants()->where('status', '!=', 'draft')->get();
+        $selectedVariantId = $this->getAttribute('selected_variant_id');
 
-        if ($variants->isEmpty()) {
+        return is_numeric($selectedVariantId) ? (int) $selectedVariantId : null;
+    }
+
+    private function getVariants()
+    {
+        if (!$this->has_options) {
+            return collect();
+        }
+
+        return $this->relationLoaded('variants')
+            ? $this->variants->where('status', '!=', 'draft')
+            : $this->variants()->where('status', '!=', 'draft')->get();
+    }
+
+    private function resolveVariant($variants, ?int $selectedVariantId = null)
+    {
+        if (!$this->has_options || $variants->isEmpty()) {
             return null;
         }
 
-        if ($this->variant_id) {
-            $selectedVariant = $variants->firstWhere('id', $this->variant_id);
+        if ($selectedVariantId !== null) {
+            $selectedVariant = $variants->firstWhere('id', $selectedVariantId);
             if ($selectedVariant) {
                 return $selectedVariant;
             }

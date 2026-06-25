@@ -76,7 +76,7 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug'=>$this->getColumnLang('slug'),
-            'des' => $this->des,
+            // 'des' => $this->des,
             'sale_price' => (float) $priceSource->sale_price,
             'moq' => $priceSource->moq ?? $this->moq ?? 1,
             'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
@@ -88,7 +88,7 @@ class ProductResource extends JsonResource
             'sku' => $priceSource->sku,
             'has_options' => $this->has_options,
             'product_image' => $this->getImageUrl($this->product_image),
-            'breadcrumb' => $this->getImageUrl($this->breadcrumb),
+            // 'breadcrumb' => $this->getImageUrl($this->breadcrumb),
             'status' => $this->has_options ? ($priceSource->status ?? $this->status) : $this->status,
             'stock' => $this->has_options ? ($priceSource->stock ?? $this->stock) : $this->stock,
             'default_varaint' => $this->has_options && $displayVariant ? [
@@ -105,29 +105,29 @@ class ProductResource extends JsonResource
                 'moq' => $displayVariant->moq ?? 1,
             ] : null,
             // return slug also and id
-            'category' => $this->whenLoaded('category', function () {
-                return [
-                    'id' => $this->category->id,
-                    'title' => $this->category->title,
-                    'slug' => $this->category->slug,
-                ];
-            }),
-            'brand'    => $this->whenLoaded('brand', function () {
-                return [
-                    'id' => $this->brand->id,
-                    'title' => $this->brand->title,
-                    'slug' => $this->brand->slug,
-                ];
-            }),
-            'industries' => $this->whenLoaded('industries', function () {
-                return $this->industries->map(function ($industry) {
-                    return [
-                        'id' => $industry->id,
-                        'title' => $industry->title,
-                        'slug' => $industry->slug,
-                    ];
-                });
-            }),
+            // 'category' => $this->whenLoaded('category', function () {
+            //     return [
+            //         'id' => $this->category->id,
+            //         'title' => $this->category->title,
+            //         'slug' => $this->category->slug,
+            //     ];
+            // }),
+            // 'brand'    => $this->whenLoaded('brand', function () {
+            //     return [
+            //         'id' => $this->brand->id,
+            //         'title' => $this->brand->title,
+            //         'slug' => $this->brand->slug,
+            //     ];
+            // }),
+            // 'industries' => $this->whenLoaded('industries', function () {
+            //     return $this->industries->map(function ($industry) {
+            //         return [
+            //             'id' => $industry->id,
+            //             'title' => $industry->title,
+            //             'slug' => $industry->slug,
+            //         ];
+            //     });
+            // }),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];

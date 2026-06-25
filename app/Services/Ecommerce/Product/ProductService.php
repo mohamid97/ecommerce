@@ -144,7 +144,7 @@ class ProductService
     public function getLastPieceProducts(array $data)
     {
         $subQuery = LastPiece::query()->select('product_id');
-        return $this->getSectionProducts($data, $subQuery);
+        return $this->getSectionProducts($data, $subQuery, LastPiece::class);
     }
 
     /**
@@ -156,7 +156,7 @@ class ProductService
     public function getNewestProducts(array $data)
     {
         $subQuery = NewProduct::query()->select('product_id');
-        return $this->getSectionProducts($data, $subQuery);
+        return $this->getSectionProducts($data, $subQuery, NewProduct::class);
     }
 
     /**
@@ -296,7 +296,7 @@ class ProductService
      * @param  mixed  $subQuery
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    private function getSectionProducts(array $data, $subQuery)
+    private function getSectionProducts(array $data, $subQuery, string $sectionModelClass)
     {
         $products = Product::query()
             ->with(['category', 'brand', 'industries', 'variants' => function ($query) {
@@ -307,6 +307,13 @@ class ProductService
 
         $paginate = (!empty($data['paginate']) && ($data['paginate'] >= 1 && $data['paginate'] <= 100)) ? $data['paginate'] : 10;
 
-        return $products->paginate($paginate);
+        $products = $products->paginate($paginate);
+
+        $products->getCollection()->each(function ($product) use ($sectionModelClass) {
+            $sectionEntry = $sectionModelClass::query()->where('product_id', $product->id)->first();
+            $product->setAttribute('selected_variant_id', $sectionEntry?->variant_id);
+        });
+
+        return $products;
     }
 }
