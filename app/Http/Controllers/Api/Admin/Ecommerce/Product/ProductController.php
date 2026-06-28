@@ -61,37 +61,42 @@ class ProductController extends Controller
 
     public function addLastPiece(UpdateProductSectionRequest $request)
     {
-        // if variant_id provided, ensure it belongs to product
-        if ($request->filled('variant_id')) {
-            $variant = ProductVariant::find($request->variant_id);
-            if (! $variant || $variant->product_id !== (int) $request->id) {
-                return $this->error(__('main.invalid_variant_for_product'));
-            }
+        $variantId = $this->resolveVariantId($request, (int) $request->id);
+        if ($variantId instanceof \Illuminate\Http\JsonResponse) {
+            return $variantId;
         }
 
-        return $this->addSectionProduct($request->id, LastPiece::class, $request->variant_id ?? null);
+        return $this->addSectionProduct($request->id, LastPiece::class, $variantId);
     }
 
     public function deleteLastPiece(UpdateProductSectionRequest $request)
     {
-        if ($request->filled('variant_id')) {
-            $variant = ProductVariant::find($request->variant_id);
-            if (! $variant || $variant->product_id !== (int) $request->id) {
-                return $this->error(__('main.invalid_variant_for_product'));
-            }
+        $variantId = $this->resolveVariantId($request, (int) $request->id);
+        if ($variantId instanceof \Illuminate\Http\JsonResponse) {
+            return $variantId;
         }
 
-        return $this->deleteSectionProduct($request->id, LastPiece::class, $request->variant_id ?? null);
+        return $this->deleteSectionProduct($request->id, LastPiece::class, $variantId);
     }
 
     public function addNewest(UpdateProductSectionRequest $request)
     {
-        return $this->addSectionProduct($request->id, NewProduct::class);
+        $variantId = $this->resolveVariantId($request, (int) $request->id);
+        if ($variantId instanceof \Illuminate\Http\JsonResponse) {
+            return $variantId;
+        }
+
+        return $this->addSectionProduct($request->id, NewProduct::class, $variantId);
     }
 
     public function deleteNewest(UpdateProductSectionRequest $request)
     {
-        return $this->deleteSectionProduct($request->id, NewProduct::class);
+        $variantId = $this->resolveVariantId($request, (int) $request->id);
+        if ($variantId instanceof \Illuminate\Http\JsonResponse) {
+            return $variantId;
+        }
+
+        return $this->deleteSectionProduct($request->id, NewProduct::class, $variantId);
     }
 
     public function newestProducts(Request $request)
@@ -174,6 +179,51 @@ public function filterProduct(Request $request)
         $query->delete();
 
         return $this->success(__('main.updated_successfully'));
+    }
+
+    /**
+     * Resolve variant id for a given product based on request input.
+     * - If `variant_id` provided, validate it belongs to the product.
+     * - If not provided and product has options, return default variant if any,
+     *   otherwise return first variant. If no variant exists, return error response.
+     * - If product does not have options, return null.
+     *
+     * Returns int|null or JsonResponse on error.
+     */
+    private function resolveVariantId(Request $request, int $productId)
+    {
+        if ($request->filled('variant_id')) {
+            $variant = ProductVariant::find($request->variant_id);
+            if (! $variant || $variant->product_id !== $productId) {
+                return $this->error(__('main.invalid_variant_for_product'));
+            }
+
+            return (int) $request->variant_id;
+        }
+
+        $product = Product::find($productId);
+        if (! $product) {
+            return $this->error(__('main.model_not_found_id', ['model' => 'Product', 'id' => $productId]));
+        }
+
+        if ($product->has_options) {
+            $defaultVariant = ProductVariant::where('product_id', $productId)
+                ->where('is_default', 1)
+                ->first();
+
+            if ($defaultVariant) {
+                return $defaultVariant->id;
+            }
+
+            $first = ProductVariant::where('product_id', $productId)->first();
+            if ($first) {
+                return $first->id;
+            }
+
+            return $this->error(__('main.invalid_variant_for_product'));
+        }
+
+        return null;
     }
 
     private function sectionProducts(Request $request, $productsSubQuery, string $responseKey)
