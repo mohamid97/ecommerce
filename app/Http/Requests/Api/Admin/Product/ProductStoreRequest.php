@@ -81,7 +81,7 @@ class ProductStoreRequest extends FormRequest
             'weight'=>'nullable|numeric|min:0',
             'min_estimated_delivery'=>'nullable|numeric|min:0',
             'max_estimated_delivery'=>'nullable|numeric|min:0',
-            'moq'=>'nullable|integer|min:1',
+            'moq'=>'required|integer|min:1',
 
 
 
