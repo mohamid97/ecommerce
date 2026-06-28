@@ -24,13 +24,14 @@ class OrderService
     // check MOQ Multiple of a number for a given product/variant context for un authenticated user
     public function checkMoqForGuest($productId, $variantId, $quantity)
     {
+
+        $product = Product::find($productId);
+        $moq = $product->moq ?? 1;
+
         if ($variantId) {
             $variant = ProductVariant::find($variantId);
-            $moq = $variant->moq ?? 1;
-        } else {
-            $product = Product::find($productId);
-            $moq = $product->moq ?? 1;
-        }
+            $moq = $variant->moq ?? $moq;
+        } 
         if ($quantity < $moq || $quantity % $moq !== 0) {
             throw new \Exception("Quantity must be a multiple of the minimum order quantity ($moq).");
         }

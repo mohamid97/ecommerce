@@ -16,7 +16,7 @@ class UpdateVaraintAction
             'discount_type' => $dto->discount_type,
             'sku' => $dto->sku,
             'barcode' => $dto->barcode,
-            'moq' => $dto->moq,
+            'moq' => $dto->moq ?? null,
             'length' => $dto->length,
             'weight' => $dto->weight,
             'width' => $dto->width,

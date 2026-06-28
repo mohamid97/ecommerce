@@ -19,7 +19,7 @@ class ProductWithOptionStrategy implements CartStrategyInterface
 
     public function validate(AddToCartDTO $dto): void
     {
-        $this->action->validateMOQ('variant',$dto->variant_id, $dto->quantity);
+        //$this->action->validateMOQ('variant',$dto->variant_id, $dto->quantity);
         $this->action->checkProductExists($dto->product_id);
         $this->action->checkProductHasOption();
         $this->action->checkVariantExists($dto->variant_id);

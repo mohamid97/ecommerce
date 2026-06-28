@@ -94,13 +94,14 @@ class ProductResource extends JsonResource
             'default_varaint' => $this->has_options && $displayVariant ? [
                 'id' => $displayVariant->id,
                 'title' => $displayVariant->title,
-                'sku' => $displayVariant->sku,
-                'sale_price' => (float) $displayVariant->sale_price,
-                'discount' => (float) ($displayVariant->discount_value ?? $displayVariant->discount ?? 0),
-                'discount_type' => $displayVariant->discount_type,
-                'price_after_discount' => (float) $displayVariant->getDiscountPrice(),
-                'stock' => $displayVariant->stock,
-                'status' => $displayVariant->status,
+                'variant_name' => $this->buildVariantName($displayVariant),
+                // 'sku' => $displayVariant->sku,
+                // 'sale_price' => (float) $displayVariant->sale_price,
+                // 'discount' => (float) ($displayVariant->discount_value ?? $displayVariant->discount ?? 0),
+                // 'discount_type' => $displayVariant->discount_type,
+                // 'price_after_discount' => (float) $displayVariant->getDiscountPrice(),
+                // 'stock' => $displayVariant->stock,
+                // 'status' => $displayVariant->status,
                 'is_default' => (bool) $displayVariant->is_default,
                 'moq' => $displayVariant->moq ?? 1,
             ] : null,
@@ -146,6 +147,25 @@ class ProductResource extends JsonResource
         return $variants->firstWhere('is_default', true)
             ?? $variants->firstWhere('is_default', 1)
             ?? $variants->first();
+    }
+
+    private function buildVariantName($variant)
+    {
+        if (!$variant) {
+            return null;
+        }
+
+        $options = $variant->options()->with('option')->get();
+
+        if ($options->isEmpty()) {
+            return $variant->title;
+        }
+
+        $optionNames = $options->map(function ($option) {
+            return $option->option->title . ': ' . $option->value;
+        });
+
+        return $variant->title . ' (' . $optionNames->implode(', ') . ')';
     }
 
 

@@ -55,7 +55,7 @@ class ProductController extends Controller
 
         return $this->error(__('main.no_id'));
 
-    }
+    } 
 
 
 

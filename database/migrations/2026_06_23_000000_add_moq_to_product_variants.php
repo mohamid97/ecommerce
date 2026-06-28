@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('product_variants', function (Blueprint $table) {
             if (!Schema::hasColumn('product_variants', 'moq')) {
-                $table->integer('moq')->default(1)->after('stock');
+                $table->integer('moq')->after('stock')->nullable();
             }
         });
     }
