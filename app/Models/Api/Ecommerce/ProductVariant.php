@@ -88,6 +88,7 @@ class ProductVariant extends Model implements TranslatableContract
             }
         });
     }
+    
 
     protected $fillable = ['product_id','is_default', 'sku' , 'barcode'  , 'status' , 'stock' , 'sales_number' , 'sale_price' , 'discount_value' , 'discount_type' , 'length' , 'width' , 'height' , 'weight' , 'delivery_time' , 'max_time' , 'images', 'moq'];
     protected $casts = [
