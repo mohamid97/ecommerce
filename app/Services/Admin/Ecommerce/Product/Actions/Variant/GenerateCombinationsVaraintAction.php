@@ -31,18 +31,17 @@ class GenerateCombinationsVaraintAction
         $optionsArray = [];
         
         foreach ($product->options as $productOption) {
-            $optionName = $productOption->option->title; // e.g., "اللون"
-            
+            $optionName = $productOption->option->title; // e.g., "اللون"            
             $values = $productOption->values->map(function ($productOptionValue) {
                 return [
                     'id' => $productOptionValue->optionValue->id,
                     'value' => $productOptionValue->optionValue->title
                 ];
             })->toArray();
-
             if (!empty($values)) {
                 $optionsArray[$optionName] = $values;
             }
+            
         }
 
         // Generate combinations AFTER collecting all options

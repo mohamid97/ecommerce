@@ -52,7 +52,8 @@ class ProductResource extends JsonResource
 
         $priceSource = $selectedVariant ?? ($this->has_options && $defaultVaraint ? $defaultVaraint : $this);
 
-        // compute overall min/max prices (variants or product)
+        
+        //compute overall min/max prices (variants or product)
         $minPrice = null;
         $maxPrice = null;
         if ($this->has_options) {
@@ -93,8 +94,8 @@ class ProductResource extends JsonResource
             'stock' => $this->has_options ? ($priceSource->stock ?? $this->stock) : $this->stock,
             'default_varaint' => $this->has_options && $displayVariant ? [
                 'id' => $displayVariant->id,
-                'title' => $displayVariant->title,
-                'variant_name' => $this->buildVariantName($displayVariant),
+                // 'title' => $displayVariant->title,
+                'variant_name' => $displayVariant->getVariantFullNameAttribute(),
                 // 'sku' => $displayVariant->sku,
                 // 'sale_price' => (float) $displayVariant->sale_price,
                 // 'discount' => (float) ($displayVariant->discount_value ?? $displayVariant->discount ?? 0),
@@ -149,24 +150,7 @@ class ProductResource extends JsonResource
             ?? $variants->first();
     }
 
-    private function buildVariantName($variant)
-    {
-        if (!$variant) {
-            return null;
-        }
 
-        $options = $variant->options()->with('option')->get();
-
-        if ($options->isEmpty()) {
-            return $variant->title;
-        }
-
-        $optionNames = $options->map(function ($option) {
-            return $option->option->title . ': ' . $option->value;
-        });
-
-        return $variant->title . ' (' . $optionNames->implode(', ') . ')';
-    }
 
 
     
