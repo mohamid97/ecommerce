@@ -71,6 +71,7 @@ class ProductDetailsResource extends JsonResource
             'has_options'=>$this->has_options ? true :false,
             'status'=>$this->status,
             'on_demand'=>$this->on_demand ? true :false,
+            'moq'=> $this->moq ?? 1,
             'options' => $this->whenLoaded('options', function () {
 
                 return $this->options->map(function ($productOption) {
