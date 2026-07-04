@@ -28,6 +28,12 @@ class BundelController extends Controller
             return $this->success(BundelResource::collection($bundels) , __('main.success'));
 
         }catch(\Exception $e){
+            \Log::channel('bundle')->error('Get Bundles failed.', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
             return $this->error($e->getMessage() , 500);
         }
 
