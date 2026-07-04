@@ -41,6 +41,8 @@ class BundelController extends Controller
             return $this->success(new BundeDetailsResource($details) , __('main.stored_successfully' , ['model'=>'Bundel']));
 
         }catch(\Exception $e){
+            // need to log error in special error log file
+           \Log::channel('bundle')->error($e->getMessage());
             DB::rollBack();
             return $this->error($e->getMessage() , 500);
         }
@@ -56,6 +58,7 @@ class BundelController extends Controller
             return $this->success(new BundeDetailsResource($details) , __('main.updated_successfully' , ['model'=>'Bundel']));
 
         }catch(\Exception $e){
+            \Log::channel('bundle')->error($e->getMessage());
             DB::rollBack();
             return $this->error($e->getMessage() , 500);
         }
@@ -69,6 +72,7 @@ class BundelController extends Controller
 
             return $this->success(new BundelResource($bundel), __('main.updated_successfully', ['model' => 'Bundel']));
         } catch (\Exception $e) {
+            \Log::channel('bundle')->error($e->getMessage());
             return $this->error($e->getMessage(), 500);
         }
     }
@@ -83,6 +87,7 @@ class BundelController extends Controller
             return $this->success(null , __('main.deleted_successfully' , ['model'=>'Bundel']));
 
         }catch(\Exception $e){
+            \Log::channel('bundle')->error($e->getMessage());
             DB::rollBack();
             return $this->error($e->getMessage() , 500);
         }

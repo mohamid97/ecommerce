@@ -72,6 +72,11 @@ return [
             'days' => 14,
             'replace_placeholders' => true,
         ],
+        'bundle' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/admin/bundle.log'),
+            'level' => 'error',
+        ],
 
         'slack' => [
             'driver' => 'slack',
