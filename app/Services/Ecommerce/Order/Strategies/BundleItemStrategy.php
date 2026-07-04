@@ -9,6 +9,7 @@ use App\Models\Api\Ecommerce\OrderItem;
 use App\Models\Api\Ecommerce\OrderItemBatch;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\Bundel;
+use App\Models\Api\Ecommerce\BundelDetails;
 use App\Models\Api\Ecommerce\OrderItemBundelItem;
 use App\Services\Ecommerce\Order\OrderRepository;
 
@@ -87,7 +88,7 @@ class BundleItemStrategy implements CartItemStrategyInterface
 
         // persist selected bundle items for this order item
         foreach ($bundle?->bundelDetails ?? [] as $detail) {
-            $selected = $cartItem->cartBundelItems->firstWhere('product_id', $detail->product_id);
+            $selected = $this->findSelectedBundleItem($cartItem->cartBundelItems, $detail);
 
             $productId = $detail->product_id;
             $variantId = $selected?->variant_id ?? null;
@@ -104,7 +105,7 @@ class BundleItemStrategy implements CartItemStrategyInterface
 
         // allocate stock for each bundel detail
         foreach ($bundle?->bundelDetails ?? [] as $detail) {
-            $selected = $cartItem->cartBundelItems->firstWhere('product_id', $detail->product_id);
+            $selected = $this->findSelectedBundleItem($cartItem->cartBundelItems, $detail);
 
             $subProduct = null;
             $subVariant = null;
@@ -112,8 +113,9 @@ class BundleItemStrategy implements CartItemStrategyInterface
                 $subProduct = $selected->product;
                 $subVariant = $selected->variant;
             } else {
-                if (!empty($detail->variant_ids) && is_array($detail->variant_ids)) {
-                    $subVariant = ProductVariant::find($detail->variant_ids[0]);
+                $detailVariantIds = $detail->selectedVariantIds();
+                if (!empty($detailVariantIds)) {
+                    $subVariant = ProductVariant::find($detailVariantIds[0]);
                     $subProduct = $subVariant?->product;
                 } else {
                     $subProduct = $detail->product;
@@ -176,6 +178,21 @@ class BundleItemStrategy implements CartItemStrategyInterface
 
 
 
+    private function findSelectedBundleItem($bundleItems, BundelDetails $detail)
+    {
+        return $bundleItems->first(function ($selected) use ($detail) {
+            if ((int) ($selected->product_id ?? 0) !== (int) $detail->product_id) {
+                return false;
+            }
+
+            if (empty($selected->variant_id)) {
+                return empty($detail->selectedVariantIds());
+            }
+
+            return in_array((string) $selected->variant_id, $detail->selectedVariantIds(), true);
+        });
+    }
+
     private function getBundlePrice(CartItem $cartItem , Bundel $bundle): array
     {
         // can not use  getBundlePrice as this take first varaint price without checking user selection in cart
@@ -187,7 +204,8 @@ class BundleItemStrategy implements CartItemStrategyInterface
             $selected = $cartItem->cartBundelItems->firstWhere('product_id', $d->product_id);
 
             if($selected->variant_id){
-                if(!in_array($selected->variant_id , $d->variant_ids)){
+                $allowedVariantIds = $d->selectedVariantIds();
+                if(!in_array((string) $selected->variant_id, $allowedVariantIds, true)){
                     throw new \Exception(__('main.invalid_bundle_selection'));
                 }
                 $v = $d->getVariants()->where('id', $selected->variant_id)->first();

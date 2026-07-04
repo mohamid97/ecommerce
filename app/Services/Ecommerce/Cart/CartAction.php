@@ -64,11 +64,9 @@ class CartAction
      * Verify that the given product is listed inside this bundle's details.
      * Stores the matching BundelDetails row for further variant checks.
      */
-    public function checkProductBelongsToBundle(int $productId): void
+    public function checkProductBelongsToBundle(int $productId, ?int $variantId = null): void
     {
-        $this->bundelDetail = BundelDetails::where('bundel_id', $this->bundel->id)
-            ->where('product_id', $productId)
-            ->first();
+        $this->bundelDetail = $this->findBundleDetailForSelection($productId, $variantId);
 
         if (!$this->bundelDetail) {
             throw new ModelNotFoundException(
@@ -77,14 +75,35 @@ class CartAction
         }
     }
 
+    public function findBundleDetailForSelection(int $productId, ?int $variantId = null): ?BundelDetails
+    {
+        if (!$this->bundel) {
+            return null;
+        }
+
+        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId): bool {
+            if ((int) $detail->product_id !== $productId) {
+                return false;
+            }
+
+            if ($variantId === null) {
+                return true;
+            }
+
+            $allowedVariantIds = $detail->selectedVariantIds();
+
+            return in_array((string) $variantId, $allowedVariantIds, true);
+        });
+    }
+
     /**
      * Verify that the variant is among the allowed variant_ids for this bundle detail.
      */
     public function checkVariantBelongsToBundle(int $variantId): void
     {
-        $allowedVariants = $this->bundelDetail->variant_ids ?? [];
+        $allowedVariants = $this->bundelDetail?->selectedVariantIds() ?? [];
 
-        if (!in_array($variantId, $allowedVariants, true)) {
+        if (!in_array((string) $variantId, $allowedVariants, true)) {
             throw new \Exception(
                 __('main.model_not_founded', ['model' => 'Variant in Bundle'])
             );
@@ -166,25 +185,16 @@ class CartAction
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
 
-            // Find the matching bundle detail scoped to this bundle
+            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId);
+
             if ($variantId) {
-
-
-                $bundleDetail = $bundle->bundelDetails
-                    ->where('product_id', $productId)
-                    ->first(fn($d) => in_array($variantId, $d->variant_ids ?? []));
-
-                $variant           = ProductVariant::find($variantId);
-                $price             = $variant?->sale_price         ?? 0;
-                $discountPrice     = $variant?->getDiscountPrice() ?? 0;
+                $variant = ProductVariant::find($variantId);
+                $price = $variant?->sale_price ?? 0;
+                $discountPrice = $variant?->getDiscountPrice() ?? 0;
             } else {
-                $bundleDetail = $bundle->bundelDetails
-                    ->where('product_id', $productId)
-                    ->first();
-
-                $product           = Product::find($productId);
-                $price             = $product?->sale_price         ?? 0;
-                $discountPrice     = $product?->getDiscountPrice() ?? 0;
+                $product = Product::find($productId);
+                $price = $product?->sale_price ?? 0;
+                $discountPrice = $product?->getDiscountPrice() ?? 0;
             }
 
             if (!$bundleDetail) {

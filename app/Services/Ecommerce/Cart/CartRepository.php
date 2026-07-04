@@ -172,7 +172,19 @@ class CartRepository
 
         foreach ($cartItem->cartBundelItems as $item) {
             $bundleDetail = $bundle?->bundelDetails
-                ?->firstWhere('product_id', $item->product_id);
+                ?->first(function ($detail) use ($item) {
+                    if ((int) $detail->product_id !== (int) $item->product_id) {
+                        return false;
+                    }
+
+                    if (empty($item->variant_id)) {
+                        return true;
+                    }
+
+                    $allowedVariantIds = $detail->selectedVariantIds();
+
+                    return in_array((string) $item->variant_id, $allowedVariantIds, true);
+                });
 
             if (!$bundleDetail) {
                 continue;

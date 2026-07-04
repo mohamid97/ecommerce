@@ -30,30 +30,15 @@ class BundleStrategy implements CartStrategyInterface
                 'bundle_items' => __('main.bundle_items_are_required')
             ]);
         }
-        // Ensure payload contains exactly the products declared in the bundle
-        $providedProductIds = array_values(array_filter(array_map(fn($i) => $i['product_id'] ?? null, $dto->bundle_items)));
+        $requiredDetailCount = $this->action->bundel->bundelDetails->count();
 
-        if (count($providedProductIds) !== count(array_unique($providedProductIds))) {
-            throw ValidationException::withMessages([
-                'bundle_items' => __('main.duplicate_products_in_bundle_items')
-            ]);
-        }
-
-        $requiredProductIds = $this->action->bundel->bundelDetails->pluck('product_id')->toArray();
-
-        $missing = array_diff($requiredProductIds, $providedProductIds);
-        if (!empty($missing)) {
+        if (count($dto->bundle_items) !== $requiredDetailCount) {
             throw ValidationException::withMessages([
                 'bundle_items' => __('main.missing_products_in_bundle_items')
             ]);
         }
 
-        $extra = array_diff($providedProductIds, $requiredProductIds);
-        if (!empty($extra)) {
-            throw ValidationException::withMessages([
-                'bundle_items' => __('main.invalid_products_in_bundle_items')
-            ]);
-        }
+        $matchedDetailIds = [];
 
         // Validate each item and check stock using bundle detail quantity * requested bundle quantity
         foreach ($dto->bundle_items as $item) {
@@ -64,7 +49,18 @@ class BundleStrategy implements CartStrategyInterface
             $this->action->checkProductExists($productId);
 
             // 3. Product must belong to this bundle (sets bundelDetail on action)
-            $this->action->checkProductBelongsToBundle($productId);
+            $this->action->checkProductBelongsToBundle($productId, $variantId);
+
+            $detailId = $this->action->bundelDetail?->getKey();
+            if ($detailId !== null && in_array($detailId, $matchedDetailIds, true)) {
+                throw ValidationException::withMessages([
+                    'bundle_items' => __('main.duplicate_products_in_bundle_items')
+                ]);
+            }
+
+            if ($detailId !== null) {
+                $matchedDetailIds[] = $detailId;
+            }
 
             // get per-bundle required qty from bundle detail
             $perBundleQty = $this->action->bundelDetail->quantity ?? 1;
@@ -84,6 +80,12 @@ class BundleStrategy implements CartStrategyInterface
             } else {
                 $this->action->checkStock($totalRequestedQty);
             }
+        }
+
+        if (count($matchedDetailIds) !== $requiredDetailCount) {
+            throw ValidationException::withMessages([
+                'bundle_items' => __('main.missing_products_in_bundle_items')
+            ]);
         }
     }
 
