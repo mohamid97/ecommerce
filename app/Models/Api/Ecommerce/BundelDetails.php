@@ -44,14 +44,21 @@ class BundelDetails extends Model
         }
 
         if (is_string($ids)) {
-            $ids = json_decode($ids, true);
+            $decoded = json_decode($ids, true);
+            $ids = $decoded === null ? $ids : $decoded;
+        }
+
+        if (is_string($ids) || is_int($ids) || is_float($ids)) {
+            return array_values(array_filter([(string) $ids]));
         }
 
         if (!is_array($ids)) {
             return [];
         }
 
-        return array_values(array_filter($ids));
+        return array_values(array_filter(array_map(function ($id) {
+            return is_scalar($id) ? (string) $id : null;
+        }, $ids)));
     }
 
     public function hasVariantSelection(): bool

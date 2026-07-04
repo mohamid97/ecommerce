@@ -94,16 +94,13 @@ class Bundel extends Model implements TranslatableContract
         $details = $this->bundelDetails()->with('product')->get();
 
         foreach ($details as $detail) {
-            if (!empty($detail->variant_ids)) {
-               if(!is_array($detail->variant_ids)){
-                $varaintsIds = json_decode($detail->variant_ids, true);
-               }else{
-                $varaintsIds = $detail->variant_ids;
-               }
-                $variant = ProductVariant::find($varaintsIds[0]);
+            $variantIds = $detail->selectedVariantIds();
 
-                $discountPrice   = $variant?->getDiscountPrice() ?? 0;
-                $price           = $variant?->sale_price ?? 0;
+            if (!empty($variantIds)) {
+                $variant = ProductVariant::find($variantIds[0]);
+
+                $discountPrice = $variant?->getDiscountPrice() ?? 0;
+                $price = $variant?->sale_price ?? 0;
             } else {
                 $discountPrice = $detail->product?->getDiscountPrice() ?? 0;
                 $price = $detail->product?->sale_price ?? 0;
