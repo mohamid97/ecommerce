@@ -48,14 +48,13 @@ class BundelDetailsResourc extends JsonResource
                     // dd($detail->getVariants());
                     return [
                         
-                        // 'id' => $detail->id,
-
+                            'bundle_item_id' => $detail->id,
                             'id'=>$detail->product->id,
                             'title'=>$detail->product->title,
                             'sale_price'=>(float) $detail->product->sale_price,
                             'status'=>$detail->product->status,
                             'stock'=>$detail->product->stock,
-                            'price_afte_discount'=>(float) $detail->product->getDiscountPrice(),
+                            'price_after_discount'=>(float) $detail->product->getDiscountPrice(),
                             'discount'=>(float) $detail->product->discount,
                             'discount_type'=> $detail->product->discount_type,
                             'product_image'=>$this->getImageUrl($detail->product->image),
@@ -64,6 +63,7 @@ class BundelDetailsResourc extends JsonResource
                                     ->flatMap(function ($variant) {
                                         return $variant->variants->map(function ($variantOptionValue) {
                                             return [
+
                                                 'option_id' => $variantOptionValue->optionValue->option?->id,
                                                 'value_id' => $variantOptionValue->optionValue->id,
                                                 'option_title' => $variantOptionValue->optionValue->option?->title,
@@ -85,27 +85,28 @@ class BundelDetailsResourc extends JsonResource
                                 return $pairs->groupBy('option_id')->map(function ($group) use ($allVariantValueIds) {
                                     $first = $group->first();
                                     return [
-                                        'option_id' => $first['option_id'],
-                                        'option_title' => $first['option_title'] ?? null,
+                                        'option'=>['id' => $first['option_id'], 'title' => $first['option_title'] ?? null],
+                                        // 'option_id' => $first['option_id'],
+                                        // 'option_title' => $first['option_title'] ?? null,
                                         'values' => $group->map(function ($item) use ($allVariantValueIds) {
                                             return [
-                                                'value_id' => $item['value_id'],
-                                                'value_title' => $item['value_title'] ?? null,
+                                                'id' => $item['value_id'],
+                                                'title' => $item['value_title'] ?? null,
                                                 // 'selected' => in_array($item['value_id'], $allVariantValueIds, true),
                                             ];
                                         })->values(),
                                     ];
                                 })->values();
                             })(),
-                            'product_varaints' => $detail->getVariants()->map(function ($variant) {
+                            'product_variants' => $detail->getVariants()->map(function ($variant) {
                                 //  dd('dsds' , $variant);
                                     return [
                                         'id' => $variant->id,
                                         'title' => $variant->title,
-                                        'sale_price'=>$variant->sale_price,
-                                        'price_after_discount'=>$variant->getDiscountPrice(),
+                                        'sale_price'=>(float) $variant->sale_price,
+                                        'price_after_discount'=>(float) $variant->getDiscountPrice(),
                                         'discount_type'=>$variant->discount_type,
-                                        'discount'=>$variant->discount_value,
+                                        'discount'=>(float) $variant->discount_value,
                                         'stock'=>$variant->stock,
                                         'status'=>$variant->status,
                                         // 'image'=>$this->getImageUrl($variant->image),
@@ -115,7 +116,7 @@ class BundelDetailsResourc extends JsonResource
                                                 'value_id'=>$variant->optionValue->id,
                                             ];
                                         }),
-                                        'price_after_discount'=>$variant->getDiscountPrice(),
+                                        // 'price_after_discount'=>$variant->getDiscountPrice(),
                                     ];
                             }),
                             'product_quantity' => $detail->quantity,

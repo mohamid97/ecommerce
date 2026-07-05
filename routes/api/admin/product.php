@@ -29,6 +29,7 @@ Route::namespace('Ecommerce\Product')->group(function () {
     Route::post('batch-details' , 'StockController@batchDetails')->middleware('checkPermision:view');
     Route::post('get-batches' , 'StockController@getBatches')->middleware('checkPermision:view');
     Route::post('add-stock' , 'StockController@addStock')->middleware('checkPermision:create');
+    Route::post('bulk-add-stock' , 'StockController@bulkAddStock')->middleware('checkPermision:create');
     Route::post('update-stock' , 'StockController@updateStock')->middleware('checkPermision:update');
 
 

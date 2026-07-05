@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Api\Admin\Ecommerce\Product;
 
 use App\Http\Controllers\Controller;
 use App\DTO\Ecommerce\Product\AddStockDTO;
+use App\DTO\Ecommerce\Product\BulkAddStockDTO;
 use App\DTO\Ecommerce\Product\UpdateStockDTO;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Stock\AddStockRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\Product\Stock\BulkAddStockRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Stock\StockDetailsRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Stock\UpdateStatusRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\Stock\UpdateStockRequest;
 use App\Http\Resources\Api\Admin\Ecommerce\Product\Stock\StockDetailsResource;
 use App\Http\Resources\Api\Admin\Ecommerce\Product\Stock\StocksResource;
+use App\Services\Admin\Ecommerce\Product\Actions\Stock\BulkStoreStockAction;
 use App\Services\Admin\Ecommerce\Product\Actions\Stock\DeleteStockAction;
 use App\Services\Admin\Ecommerce\Product\Actions\Stock\DetailsStockAction;
 use App\Services\Admin\Ecommerce\Product\Actions\Stock\StoreStockAction;
@@ -26,6 +29,7 @@ class StockController extends Controller
     public function __construct(
         private DetailsStockAction $detailsStockAction , 
         private StoreStockAction $storeStockAction,
+        private BulkStoreStockAction $bulkStoreStockAction,
         private UpdateStockAction $updateStockAction,
         private DeleteStockAction $deleteStockAction,
         ){}
@@ -60,6 +64,24 @@ class StockController extends Controller
 
 
     } // end add stock
+
+    public function bulkAddStock(BulkAddStockRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $dto = BulkAddStockDTO::fromRequest($request->validated());
+            $stocks = $this->bulkStoreStockAction->addStocks($dto);
+            DB::commit();
+
+            return $this->success(
+                StockDetailsResource::collection($stocks),
+                __('main.stored_successfully', ['model' => 'Stock'])
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage(), 500);
+        }
+    }
 
 
     // update Stock
