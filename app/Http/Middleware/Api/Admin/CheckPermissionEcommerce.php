@@ -17,7 +17,7 @@ class CheckPermissionEcommerce
      */
     public function handle(Request $request, Closure $next , $permission , $action): Response
     {
-                   
+                //    dd($permission , $action);
             $permission = $action . ' ' . strtolower($permission);
         
             if ($request->user()->type = 'admin' && $request->user()?->can($permission)) {

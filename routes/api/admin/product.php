@@ -24,13 +24,13 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
     // stocks
-    Route::post('update-batch-status' , 'StockController@updateStatus')->middleware('checkPermision:update');
-    Route::post('delete-batch' , 'StockController@deleteBatch')->middleware('checkPermision:delete');
-    Route::post('batch-details' , 'StockController@batchDetails')->middleware('checkPermision:view');
-    Route::post('get-batches' , 'StockController@getBatches')->middleware('checkPermision:view');
-    Route::post('add-stock' , 'StockController@addStock')->middleware('checkPermision:create');
-    Route::post('bulk-add-stock' , 'StockController@bulkAddStock')->middleware('checkPermision:create');
-    Route::post('update-stock' , 'StockController@updateStock')->middleware('checkPermision:update');
+    Route::post('update-batch-status' , 'StockController@updateStatus')->middleware('checkEcommercePermision:product,update');
+    Route::post('delete-batch' , 'StockController@deleteBatch')->middleware('checkEcommercePermision:product,delete');
+    Route::post('batch-details' , 'StockController@batchDetails')->middleware('checkEcommercePermision:product,view');
+    Route::post('get-batches' , 'StockController@getBatches')->middleware('checkEcommercePermision:product,view');
+    Route::post('add-stock' , 'StockController@addStock')->middleware('checkEcommercePermision:product,create');
+    Route::post('bulk-store-stock' , 'StockController@bulkAddStock')->middleware('checkEcommercePermision:product,create');
+    Route::post('update-stock' , 'StockController@updateStock')->middleware('checkEcommercePermision:product,update');
 
 
 
@@ -39,15 +39,15 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
     // variants
-    Route::post('bulk-store-variants' , 'BulkVariantController@storeBulkVariants')->middleware('checkPermision:create');
-    Route::post('variants-combinations' , 'VariantController@variantsCombinations')->middleware('checkPermision:view');
-    Route::post('store-variant' , 'VariantController@storeVariant')->middleware('checkPermision:create');
-    Route::post('update-variant','VariantController@updateVariant')->middleware('checkPermision:update');
-    Route::post('varints-product' , 'VariantController@varintsProduct')->middleware('checkPermision:view');
-    Route::post('view-variant' , 'VariantController@viewVariant')->middleware('checkPermision:view');
-    Route::post('delete-variant' , 'VariantController@deleteVariant')->middleware('checkPermision:delete'); 
-    Route::post('make-default' , 'VariantController@makeDefault')->middleware('checkPermision:update');
-    Route::post('import-variants' , 'VariantController@importVariants')->middleware('checkPermision:create');
+    Route::post('bulk-store-variants' , 'BulkVariantController@storeBulkVariants')->middleware('checkEcommercePermision:product,create');
+    Route::post('variants-combinations' , 'VariantController@variantsCombinations')->middleware('checkEcommercePermision:product,create');
+    Route::post('store-variant' , 'VariantController@storeVariant')->middleware('checkEcommercePermision:product,create');
+    Route::post('update-variant','VariantController@updateVariant')->middleware('checkEcommercePermision:product,update');
+    Route::post('varints-product' , 'VariantController@varintsProduct')->middleware('checkEcommercePermision:product,view');
+    Route::post('view-variant' , 'VariantController@viewVariant')->middleware('checkEcommercePermision:product,view');
+    Route::post('delete-variant' , 'VariantController@deleteVariant')->middleware('checkEcommercePermision:product,delete'); 
+    Route::post('make-default' , 'VariantController@makeDefault')->middleware('checkEcommercePermision:product,update');
+    Route::post('import-variants' , 'VariantController@importVariants')->middleware('checkEcommercePermision:product,create');
 
 
 
@@ -60,12 +60,12 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
     // general and special image for variant
-    Route::post('store-general-image' , 'GalleryController@storeGeneralImage')->middleware('checkPermision:create');
-    Route::post('store-special-image' , 'GalleryController@storeSpecialImage')->middleware('checkPermision:create');
-    Route::post('get-general-images' , 'GalleryController@generalImages')->middleware('checkPermision:view');
-    Route::post('get-special-images' , 'GalleryController@specialImages')->middleware('checkPermision:view');
-    Route::post('delete-general-image' , 'GalleryController@deleteGeneralImage')->middleware('checkPermision:delete');
-    Route::post('delete-special-image' , 'GalleryController@deleteSpecialImage')->middleware('checkPermision:delete');
+    Route::post('store-general-image' , 'GalleryController@storeGeneralImage')->middleware('checkEcommercePermision:product,create');
+    Route::post('store-special-image' , 'GalleryController@storeSpecialImage')->middleware('checkEcommercePermision:product,create');
+    Route::post('get-general-images' , 'GalleryController@generalImages')->middleware('checkEcommercePermision:product,view');
+    Route::post('get-special-images' , 'GalleryController@specialImages')->middleware('checkEcommercePermision:product,view');
+    Route::post('delete-general-image' , 'GalleryController@deleteGeneralImage')->middleware('checkEcommercePermision:product,delete');
+    Route::post('delete-special-image' , 'GalleryController@deleteSpecialImage')->middleware('checkEcommercePermision:product,delete');
 
 
 
@@ -74,7 +74,7 @@ Route::namespace('Ecommerce\Product')->group(function () {
 
 
     // filter product with varaints
-    Route::post('filter-product-varaints' , 'VariantController@filterProductaraints')->middleware('checkPermision:view');
+    Route::post('filter-product-varaints' , 'VariantController@filterProductaraints')->middleware('checkEcommercePermision:product,view');
 
 
 

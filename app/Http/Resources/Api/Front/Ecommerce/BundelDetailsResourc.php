@@ -57,7 +57,7 @@ class BundelDetailsResourc extends JsonResource
                             'price_after_discount'=>(float) $detail->product->getDiscountPrice(),
                             'discount'=>(float) $detail->product->discount,
                             'discount_type'=> $detail->product->discount_type,
-                            'product_image'=>$this->getImageUrl($detail->product->image),
+                            'product_image'=>$this->getImageUrl($detail?->product?->product_image),
                             'options' => (function () use ($detail) {
                                 $pairs = $detail->product?->variants
                                     ->flatMap(function ($variant) {
@@ -135,8 +135,6 @@ class BundelDetailsResourc extends JsonResource
     }
 
 
-
-
     protected function buildVariantName($variant)
     {
         return $variant->variants
@@ -158,6 +156,8 @@ class BundelDetailsResourc extends JsonResource
             ->filter()
             ->implode(' ');
     }
+
+    
 
 
 
