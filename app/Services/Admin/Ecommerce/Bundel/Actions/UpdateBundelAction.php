@@ -13,6 +13,7 @@ class UpdateBundelAction{
         public ValidateBundel $validateBundel
     ) {}
     public function updateBundel($data){
+    
         $translation = app(TranslationService::class);
         $bundel = Bundel::where('id', $data->id)->firstOrFail();
 
@@ -25,7 +26,7 @@ class UpdateBundelAction{
             'bundle_image' => $this->uploadImage($data->bundle_image, 'bundel', 'public'),
             'status' => $data->status,
         ]);
-
+ 
         $translation->storeTranslations($bundel, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
         $this->validateBundel->validateBundelDetails($bundel->id, $data);
         $this->updateBundelDetails($bundel->id , $data);

@@ -14,8 +14,9 @@ trait HandlesUpload
     public function uploadFile($file, string $directory = 'uploads', string $disk = 'public'): ?string
     {
         // need here if not file return null because in update we may not send new image
-
+     
     if (!($file instanceof UploadedFile) || !$file->isValid()) {
+      
         return null;
     }
 
@@ -55,6 +56,7 @@ trait HandlesUpload
      */
     public function uploadImage($image, string $directory = 'uploads/images', string $disk = 'public'): ?string
     {
+    
         return $this->uploadFile($image, $directory, $disk);
     }
 

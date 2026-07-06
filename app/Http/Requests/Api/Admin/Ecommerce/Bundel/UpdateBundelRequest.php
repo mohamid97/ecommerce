@@ -33,7 +33,7 @@ class UpdateBundelRequest extends FormRequest
             'discount_type' => 'nullable|in:fixed,percentage|required_with:discount',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
-            'bundle_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'bundle_image' => 'nullable|image|mimes:jpeg,webp,png,jpg,gif|max:2048',
             'status' => 'nullable|in:active,draft,unavailable',
             'products' => 'required|array',
             'products.*.product_id' => [

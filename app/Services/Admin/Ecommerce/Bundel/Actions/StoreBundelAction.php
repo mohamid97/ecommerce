@@ -6,11 +6,11 @@ use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\BundelDetails;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Services\Admin\Common\TranslationService;
-use App\Traits\HandlesImage;
+use App\Traits\HandlesUpload;
 
 class 
 StoreBundelAction{
-    use HandlesImage;
+     use HandlesUpload;
 
     public function __construct(
         public ValidateBundel $validateBundel,
@@ -26,11 +26,11 @@ StoreBundelAction{
             'discount_type' => $data->discount_type,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
-            'bundle_image' => $this->uploadFile($data->bundle_image ,'bundel' , 'public'),
+            'bundle_image' => $this->uploadImage($data->bundle_image, 'bundel', 'public'),
             //'status' => $data->status,
         ]);
 
-        
+      
 
         $translation->storeTranslations($bundel, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
  

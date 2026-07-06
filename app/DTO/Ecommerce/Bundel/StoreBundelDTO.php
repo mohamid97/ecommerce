@@ -9,12 +9,12 @@ class StoreBundelDTO{
             public ?string $discount_type,
             public ?int $category_id,
             public ?int $brand_id,
-            public ?string $bundle_image = null,
+            public $bundle_image,
             public string $status,
             public array $title,
-            public ?array $des = null,
-            public ?array $meta_title = null,
-            public ?array $meta_des = null,
+            public ?array $des,
+            public ?array $meta_title,
+            public ?array $meta_des,
             public array $products,
 
         

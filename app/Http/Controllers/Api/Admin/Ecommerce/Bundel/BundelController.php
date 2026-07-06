@@ -41,7 +41,7 @@ class BundelController extends Controller
     public function storeBundel(StoreBundelRequest $request){
         try{
             DB::beginTransaction();
-            $dto = StoreBundelDTO::fromRequest($request->all());      
+            $dto = StoreBundelDTO::fromRequest($request->all());  
             $details = $this->service->storeBundel($dto);
             DB::commit();
             return $this->success(new BundeDetailsResource($details) , __('main.stored_successfully' , ['model'=>'Bundel']));
@@ -56,7 +56,10 @@ class BundelController extends Controller
     }
 
     public function updateBundel(UpdateBundelRequest $request){
+                  
+
         try{
+          
             DB::beginTransaction();
             $dto = UpdateBundelDTO::fromRequest($request->all());
             $details = $this->service->updateBundel($dto);
