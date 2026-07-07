@@ -99,7 +99,7 @@ class CartRepository
     {
         $cart = Cart::where('user_id', $userId)->first();
 
-        if (!$cart) {
+        if (! $cart) {
             return;
         }
 
@@ -121,7 +121,7 @@ class CartRepository
 
     public function updateCartItemQuantity(CartItem $cartItem, int $quantity): Cart
     {
-        if (!empty($cartItem->bundel_id)) {
+        if (! empty($cartItem->bundel_id)) {
             $bundlePriceData = $this->getBundleTotalsFromCartItem($cartItem);
 
             $cartItem->update([
@@ -129,7 +129,7 @@ class CartRepository
                 'total_before_discount' => $bundlePriceData['total_price'] * $quantity,
                 'total_after_discount' => $bundlePriceData['total_discount_price'] * $quantity,
             ]);
-        } elseif (!empty($cartItem->variant_id)) {
+        } elseif (! empty($cartItem->variant_id)) {
             $variant = ProductVariant::findOrFail($cartItem->variant_id);
 
             $cartItem->update([
@@ -169,28 +169,40 @@ class CartRepository
         $totalDiscountPrice = 0.0;
 
         $bundle = $cartItem->bundel()->with('bundelDetails')->first();
+        $consumedDetailIds = [];
 
         foreach ($cartItem->cartBundelItems as $item) {
-            $bundleDetail = $bundle?->bundelDetails
-                ?->first(function ($detail) use ($item) {
-                    if ((int) $detail->product_id !== (int) $item->product_id) {
-                        return false;
-                    }
+            $bundleDetail = null;
 
-                    if (empty($item->variant_id)) {
-                        return true;
-                    }
+            foreach ($bundle?->bundelDetails ?? [] as $detail) {
+                if (! empty($consumedDetailIds) && in_array((int) $detail->getKey(), $consumedDetailIds, true)) {
+                    continue;
+                }
 
-                    $allowedVariantIds = $detail->selectedVariantIds();
+                if ((int) $detail->product_id !== (int) $item->product_id) {
+                    continue;
+                }
 
-                    return in_array((string) $item->variant_id, $allowedVariantIds, true);
-                });
+                if (empty($item->variant_id)) {
+                    $bundleDetail = $detail;
+                    break;
+                }
 
-            if (!$bundleDetail) {
+                $allowedVariantIds = $detail->selectedVariantIds();
+
+                if (in_array((string) $item->variant_id, $allowedVariantIds, true)) {
+                    $bundleDetail = $detail;
+                    break;
+                }
+            }
+
+            if (! $bundleDetail) {
                 continue;
             }
 
-            if (!empty($item->variant_id)) {
+            $consumedDetailIds[] = (int) $bundleDetail->getKey();
+
+            if (! empty($item->variant_id)) {
                 $variant = ProductVariant::find($item->variant_id);
                 $price = $variant?->sale_price ?? 0;
                 $discountPrice = $variant?->getDiscountPrice() ?? 0;
@@ -214,13 +226,11 @@ class CartRepository
         ];
     }
 
-
-
     public function removeFromCartWiteItem(int $cartItemId): void
     {
         $cartItem = CartItem::find($cartItemId);
 
-        if (!$cartItem) {
+        if (! $cartItem) {
             return;
         }
 

@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 class BundleStrategy implements CartStrategyInterface
 {
     public function __construct(
-        protected CartAction     $action,
+        protected CartAction $action,
         protected CartRepository $repo
     ) {}
 
@@ -27,14 +27,14 @@ class BundleStrategy implements CartStrategyInterface
 
         if (empty($dto->bundle_items)) {
             throw ValidationException::withMessages([
-                'bundle_items' => __('main.bundle_items_are_required')
+                'bundle_items' => __('main.bundle_items_are_required'),
             ]);
         }
         $requiredDetailCount = $this->action->bundel->bundelDetails->count();
 
         if (count($dto->bundle_items) !== $requiredDetailCount) {
             throw ValidationException::withMessages([
-                'bundle_items' => __('main.missing_products_in_bundle_items')
+                'bundle_items' => __('main.missing_products_in_bundle_items'),
             ]);
         }
 
@@ -49,15 +49,9 @@ class BundleStrategy implements CartStrategyInterface
             $this->action->checkProductExists($productId);
 
             // 3. Product must belong to this bundle (sets bundelDetail on action)
-            $this->action->checkProductBelongsToBundle($productId, $variantId);
+            $this->action->checkProductBelongsToBundle($productId, $variantId, $matchedDetailIds);
 
             $detailId = $this->action->bundelDetail?->getKey();
-            if ($detailId !== null && in_array($detailId, $matchedDetailIds, true)) {
-                throw ValidationException::withMessages([
-                    'bundle_items' => __('main.duplicate_products_in_bundle_items')
-                ]);
-            }
-
             if ($detailId !== null) {
                 $matchedDetailIds[] = $detailId;
             }
@@ -67,9 +61,9 @@ class BundleStrategy implements CartStrategyInterface
             $totalRequestedQty = $dto->quantity * $perBundleQty;
 
             // 4. Require variant if product has options
-            if ($this->action->product->has_options && !$variantId) {
+            if ($this->action->product->has_options && ! $variantId) {
                 throw ValidationException::withMessages([
-                    'variant_id' => __('main.variant_is_required_for_this_product') . " (Product ID: $productId)"
+                    'variant_id' => __('main.variant_is_required_for_this_product')." (Product ID: $productId)",
                 ]);
             }
 
@@ -84,7 +78,7 @@ class BundleStrategy implements CartStrategyInterface
 
         if (count($matchedDetailIds) !== $requiredDetailCount) {
             throw ValidationException::withMessages([
-                'bundle_items' => __('main.missing_products_in_bundle_items')
+                'bundle_items' => __('main.missing_products_in_bundle_items'),
             ]);
         }
     }
@@ -92,17 +86,7 @@ class BundleStrategy implements CartStrategyInterface
     public function store(int $userId, AddToCartDTO $dto): mixed
     {
         $priceData = $this->action->getBundlePriceWithData($dto);
-        return $this->repo->createOrUpdateCard($userId, $dto , $priceData);
+
+        return $this->repo->createOrUpdateCard($userId, $dto, $priceData);
     }
-
-
-
-
-
-
-
-
-
-
-    
 }

@@ -5,17 +5,20 @@ namespace App\Services\Ecommerce\Cart;
 use App\DTO\Ecommerce\Cart\AddToCartDTO;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\Bundel;
-use App\Models\Api\Ecommerce\CartItem;
 use App\Models\Api\Ecommerce\BundelDetails;
+use App\Models\Api\Ecommerce\CartItem;
 use App\Models\Api\Ecommerce\ProductVariant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CartAction
 {
-    public ?Product        $product       = null;
-    public ?Bundel         $bundel        = null;
-    public ?BundelDetails  $bundelDetail  = null;
-    public ?ProductVariant $variant       = null;
+    public ?Product $product = null;
+
+    public ?Bundel $bundel = null;
+
+    public ?BundelDetails $bundelDetail = null;
+
+    public ?ProductVariant $variant = null;
 
     // ── Existence checks ────────────────────────────────────────────────────
 
@@ -23,7 +26,7 @@ class CartAction
     {
         $this->product = Product::active()->find($productId);
 
-        if (!$this->product) {
+        if (! $this->product) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Product'])
             );
@@ -38,7 +41,7 @@ class CartAction
             ->where('status', 'active')
             ->find($bundelId);
 
-        if (!$this->bundel || !$this->bundel->hasOnlyActiveItems()) {
+        if (! $this->bundel || ! $this->bundel->hasOnlyActiveItems()) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Bundle'])
             );
@@ -51,7 +54,7 @@ class CartAction
     {
         $this->variant = ProductVariant::where('status', 'active')->find($variantId);
 
-        if (!$this->variant) {
+        if (! $this->variant) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Product Variant'])
             );
@@ -64,25 +67,29 @@ class CartAction
      * Verify that the given product is listed inside this bundle's details.
      * Stores the matching BundelDetails row for further variant checks.
      */
-    public function checkProductBelongsToBundle(int $productId, ?int $variantId = null): void
+    public function checkProductBelongsToBundle(int $productId, ?int $variantId = null, array $consumedDetailIds = []): void
     {
-        $this->bundelDetail = $this->findBundleDetailForSelection($productId, $variantId);
+        $this->bundelDetail = $this->findBundleDetailForSelection($productId, $variantId, $consumedDetailIds);
 
-        if (!$this->bundelDetail) {
+        if (! $this->bundelDetail) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Product in Bundle'])
             );
         }
     }
 
-    public function findBundleDetailForSelection(int $productId, ?int $variantId = null): ?BundelDetails
+    public function findBundleDetailForSelection(int $productId, ?int $variantId = null, array $consumedDetailIds = []): ?BundelDetails
     {
-        if (!$this->bundel) {
+        if (! $this->bundel) {
             return null;
         }
 
-        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId): bool {
+        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $consumedDetailIds): bool {
             if ((int) $detail->product_id !== $productId) {
+                return false;
+            }
+
+            if (! empty($consumedDetailIds) && in_array((int) $detail->getKey(), $consumedDetailIds, true)) {
                 return false;
             }
 
@@ -103,7 +110,7 @@ class CartAction
     {
         $allowedVariants = $this->bundelDetail?->selectedVariantIds() ?? [];
 
-        if (!in_array((string) $variantId, $allowedVariants, true)) {
+        if (! in_array((string) $variantId, $allowedVariants, true)) {
             throw new \Exception(
                 __('main.model_not_founded', ['model' => 'Variant in Bundle'])
             );
@@ -120,7 +127,7 @@ class CartAction
      */
     public function checkProductHasOption(): void
     {
-        if (!$this->product->has_options) {
+        if (! $this->product->has_options) {
             throw new \Exception(__('main.product_has_no_options'));
         }
     }
@@ -133,7 +140,7 @@ class CartAction
             ->where('id', $this->variant->id)
             ->first();
 
-        if (!$productVariant || $productVariant->stock < $quantity) {
+        if (! $productVariant || $productVariant->stock < $quantity) {
             throw new \Exception(__('main.insufficient_stock_for_selected_variant'));
         }
     }
@@ -154,7 +161,7 @@ class CartAction
             })
             ->first();
 
-        if (!$cartItem) {
+        if (! $cartItem) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Cart Item'])
             );
@@ -163,29 +170,27 @@ class CartAction
         return $cartItem;
     }
 
-
-
-
     // get bundle price data
     public function getBundlePriceWithData($dto): array
     {
         $bundle = Bundel::with('bundelDetails')->find($dto->bundel_id);
 
-        if (!$bundle) {
+        if (! $bundle) {
             return [
-                'total_price'          => 0.0,
+                'total_price' => 0.0,
                 'total_discount_price' => 0.0,
             ];
         }
 
-        $totalPrice         = 0.0;
+        $totalPrice = 0.0;
         $totalDiscountPrice = 0.0;
+        $consumedDetailIds = [];
 
         foreach ($dto->bundle_items as $item) {
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
 
-            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId);
+            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $consumedDetailIds);
 
             if ($variantId) {
                 $variant = ProductVariant::find($variantId);
@@ -197,12 +202,13 @@ class CartAction
                 $discountPrice = $product?->getDiscountPrice() ?? 0;
             }
 
-            if (!$bundleDetail) {
+            if (! $bundleDetail) {
                 continue; // skip if this product isn't part of the bundle
             }
 
-            $qty                = $bundleDetail->quantity;
-            $totalPrice         += $price         * $qty;
+            $consumedDetailIds[] = (int) $bundleDetail->getKey();
+            $qty = $bundleDetail->quantity;
+            $totalPrice += $price * $qty;
             $totalDiscountPrice += $discountPrice * $qty;
         }
 
@@ -211,18 +217,17 @@ class CartAction
         }
 
         return [
-            'total_price'          => $totalPrice,
+            'total_price' => $totalPrice,
             'total_discount_price' => $totalDiscountPrice,
         ];
-        
+
     }
 
-
     // check cart item exists
-    public function checkCartItemExists($userId ,  $cartItemId): void
+    public function checkCartItemExists($userId, $cartItemId): void
     {
         $cartItem = CartItem::with('cart')->find($cartItemId);
-        if (!$cartItem) {
+        if (! $cartItem) {
             throw new ModelNotFoundException(
                 __('main.model_not_founded', ['model' => 'Cart Item'])
             );
@@ -233,12 +238,7 @@ class CartAction
             );
         }
 
-        
-
-
     }
-
-
 
     // ── Variant resolution ───────────────────────────────────────────────────
 
@@ -253,7 +253,7 @@ class CartAction
     {
         $product = Product::find($dto->product_id);
 
-        if (!$product || !$product->has_options) {
+        if (! $product || ! $product->has_options) {
             // Simple product — nothing to resolve
             return;
         }
@@ -263,7 +263,7 @@ class CartAction
             ->orderByDesc('is_default') // is_default=1 floats to the top
             ->first();
 
-        if (!$variant) {
+        if (! $variant) {
             throw new \Exception(__('main.product_has_no_variants'));
         }
 
@@ -284,7 +284,7 @@ class CartAction
             $productId = $item['product_id'] ?? null;
             $variantId = $item['variant_id'] ?? null;
 
-            if ($productId && !$variantId) {
+            if ($productId && ! $variantId) {
                 $product = Product::find($productId);
 
                 if ($product && $product->has_options) {
@@ -293,9 +293,9 @@ class CartAction
                         ->orderByDesc('is_default')
                         ->first();
 
-                    if (!$variant) {
+                    if (! $variant) {
                         throw new \Exception(
-                            __('main.product_has_no_variants') . " (Product ID: {$productId})"
+                            __('main.product_has_no_variants')." (Product ID: {$productId})"
                         );
                     }
 
@@ -309,14 +309,12 @@ class CartAction
         $dto->bundle_items = $resolvedItems;
     }
 
-
-
     // validate MOQ for product or variant
     public function validateMOQ(string $type, int $id, int $quantity): void
     {
         if ($type === 'product') {
             $product = Product::find($id);
-            if (!$product) {
+            if (! $product) {
                 throw new ModelNotFoundException(
                     __('main.model_not_founded', ['model' => 'Product'])
                 );
@@ -324,7 +322,7 @@ class CartAction
             $moq = $product->moq ?? 1;
         } elseif ($type === 'variant') {
             $variant = ProductVariant::find($id);
-            if (!$variant) {
+            if (! $variant) {
                 throw new ModelNotFoundException(
                     __('main.model_not_founded', ['model' => 'Product Variant'])
                 );
@@ -338,10 +336,5 @@ class CartAction
             throw new \Exception(__('main.minimum_order_quantity_not_met', ['moq' => $moq]));
         }
 
-
     }
-
-
-
-
 }
