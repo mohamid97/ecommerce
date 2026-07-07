@@ -73,6 +73,7 @@ class GuestCartViewRequest extends FormRequest
             'bundles.*.bundel_id' => 'required|integer|exists:bundels,id',
             'bundles.*.quantity' => 'required|integer|min:1|max:50',
             'bundles.*.bundle_items' => 'required|array|min:1',
+            'bundle_items.*.bundle_item_id'=>'required|integer|exists:bundel_details,id',
             'bundles.*.bundle_items.*.product_id' => 'required|integer|exists:products,id',
             'bundles.*.bundle_items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
         ];
@@ -103,12 +104,13 @@ class GuestCartViewRequest extends FormRequest
                         foreach ($bundleItems as $iIndex => $item) {
                             $productId = $item['product_id'] ?? null;
                             $variantId = $item['variant_id'] ?? null;
+                            $bundleItemId = $item['bundle_item_id'] ?? null;
 
-                            if (!$productId) {
+                            if (!$productId || !$bundleItemId) {
                                 continue;
                             }
 
-                            $matchingDetail = $bundleDetails->firstWhere('product_id', $productId);
+                            $matchingDetail = $bundleDetails->firstWhere('product_id', $productId)->where('id', $bundleItemId);
 
                             if (!$matchingDetail) {
                                 $validator->errors()->add(

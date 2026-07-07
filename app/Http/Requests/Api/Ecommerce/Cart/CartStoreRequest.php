@@ -31,6 +31,7 @@ class CartStoreRequest extends FormRequest
             'quantity'     => 'required|integer|min:1|max:50',
             'bundle_items' => 'nullable|array',
             'bundle_items.*.product_id' => 'nullable|integer|exists:products,id',
+            'bundle_items.*.bundle_item_id'=>'required|integer|exists:bundel_details,id',
             'bundle_items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
         ];
     }
@@ -49,12 +50,13 @@ class CartStoreRequest extends FormRequest
                 foreach ($bundleItems as $index => $item) {
                     $productId = $item['product_id'] ?? null;
                     $variantId = $item['variant_id'] ?? null;
+                    $bundleItemId = $item['bundle_item_id'] ?? null;
 
-                    if (!$productId) {
+                    if (!$productId || !$bundleItemId) {
                         continue;
                     }
 
-                    $matchingDetail = $bundleDetails->firstWhere('product_id', $productId);
+                    $matchingDetail = $bundleDetails->firstWhere('product_id', $productId)->where('id', $bundleItemId);
 
                     if (!$matchingDetail) {
                         $validator->errors()->add(
