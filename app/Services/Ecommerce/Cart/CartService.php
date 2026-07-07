@@ -75,7 +75,11 @@ class CartService
 
             foreach ($cartItem->cartBundelItems as $bundleItem) {
                 $this->action->checkProductExists($bundleItem->product_id);
-                $this->action->checkProductBelongsToBundle($bundleItem->product_id);
+                $this->action->checkProductBelongsToBundle(
+                    $bundleItem->product_id,
+                    $bundleItem->variant_id,
+                    $bundleItem->bundle_item_id
+                );
 
                 $perBundleQty = $this->action->bundelDetail->quantity ?? 1;
                 $totalRequestedQty = $dto->quantity * $perBundleQty;
@@ -114,7 +118,7 @@ class CartService
 
         foreach ($data['bundles'] ?? [] as $bundleData) {
             $dto = AddToCartDTO::fromRequest([
-                'bundel_id' => $bundleData['bundle_id'],
+                'bundel_id' => $bundleData['bundel_id'] ?? $bundleData['bundle_id'],
                 'quantity' => $bundleData['quantity'],
                 'bundle_items' => $bundleData['bundle_items'] ?? [],
             ]);
@@ -204,6 +208,7 @@ class CartService
 
             $bundleItem = new CartBundelItem([
                 'cart_item_id' => null,
+                'bundle_item_id' => $bundleItemData['bundle_item_id'] ?? null,
                 'product_id' => $product->id,
                 'variant_id' => $variant?->id,
             ]);

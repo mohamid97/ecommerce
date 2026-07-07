@@ -56,7 +56,10 @@ class CartStoreRequest extends FormRequest
                         continue;
                     }
 
-                    $matchingDetail = $bundleDetails->firstWhere('product_id', $productId)->where('id', $bundleItemId);
+                    $matchingDetail = $bundleDetails
+                        ->where('product_id', $productId)
+                        ->where('id', $bundleItemId)
+                        ->first();
 
                     if (!$matchingDetail) {
                         $validator->errors()->add(

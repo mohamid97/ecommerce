@@ -11,6 +11,7 @@ class CartBundelItem extends Model
     use HasFactory;
     protected $fillable = [
         'cart_item_id',
+        'bundle_item_id',
         'product_id',
         'variant_id'
 
@@ -30,6 +31,11 @@ class CartBundelItem extends Model
     public function variant()
     {
         return $this->belongsTo(ProductVariant::class);
+    }
+
+    public function bundleDetail()
+    {
+        return $this->belongsTo(BundelDetails::class, 'bundle_item_id');
     }
 
 

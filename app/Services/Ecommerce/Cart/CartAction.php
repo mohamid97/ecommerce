@@ -64,9 +64,9 @@ class CartAction
      * Verify that the given product is listed inside this bundle's details.
      * Stores the matching BundelDetails row for further variant checks.
      */
-    public function checkProductBelongsToBundle(int $productId, ?int $variantId = null): void
+    public function checkProductBelongsToBundle(int $productId, ?int $variantId = null, ?int $bundleItemId = null): void
     {
-        $this->bundelDetail = $this->findBundleDetailForSelection($productId, $variantId);
+        $this->bundelDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
 
         if (!$this->bundelDetail) {
             throw new ModelNotFoundException(
@@ -75,13 +75,17 @@ class CartAction
         }
     }
 
-    public function findBundleDetailForSelection(int $productId, ?int $variantId = null): ?BundelDetails
+    public function findBundleDetailForSelection(int $productId, ?int $variantId = null, ?int $bundleItemId = null): ?BundelDetails
     {
         if (!$this->bundel) {
             return null;
         }
 
-        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId): bool {
+        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
+            if ($bundleItemId !== null && (int) $detail->getKey() !== $bundleItemId) {
+                return false;
+            }
+
             if ((int) $detail->product_id !== $productId) {
                 return false;
             }
@@ -184,8 +188,9 @@ class CartAction
         foreach ($dto->bundle_items as $item) {
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
+            $bundleItemId = $item['bundle_item_id'] ?? null;
 
-            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId);
+            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
 
             if ($variantId) {
                 $variant = ProductVariant::find($variantId);
@@ -283,15 +288,30 @@ class CartAction
         foreach ($dto->bundle_items as $item) {
             $productId = $item['product_id'] ?? null;
             $variantId = $item['variant_id'] ?? null;
+            $bundleItemId = $item['bundle_item_id'] ?? null;
 
             if ($productId && !$variantId) {
                 $product = Product::find($productId);
 
                 if ($product && $product->has_options) {
-                    $variant = ProductVariant::where('product_id', $productId)
+                    $allowedVariantIds = [];
+
+                    if ($bundleItemId) {
+                        $allowedVariantIds = BundelDetails::where('id', $bundleItemId)
+                            ->where('product_id', $productId)
+                            ->first()
+                            ?->selectedVariantIds() ?? [];
+                    }
+
+                    $variantQuery = ProductVariant::where('product_id', $productId)
                         ->where('status', 'active')
-                        ->orderByDesc('is_default')
-                        ->first();
+                        ->orderByDesc('is_default');
+
+                    if (!empty($allowedVariantIds)) {
+                        $variantQuery->whereIn('id', $allowedVariantIds);
+                    }
+
+                    $variant = $variantQuery->first();
 
                     if (!$variant) {
                         throw new \Exception(

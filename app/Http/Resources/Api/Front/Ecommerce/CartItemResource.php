@@ -28,6 +28,7 @@ class CartItemResource extends JsonResource
                    
                     return [
                         'id' => $item->id,
+                        'bundle_item_id' => $item->bundle_item_id,
                         'product_id' => $item->product_id,
                         'product' => $item->product?->title,
                         'product_image' => $this->getImageUrl($item->product?->product_image),
@@ -35,9 +36,11 @@ class CartItemResource extends JsonResource
                         'variant_id' => $item->variant_id,
                         'variant' => $item->variant?->title,
                         'varaint_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,
-                        'quantity' => BundelDetails::where('bundel_id', $this->bundel_id)
-                            ->where('product_id', $item->product_id)
-                            ->value('quantity') ?? 1,
+                        'quantity' => $item->bundleDetail?->quantity
+                            ?? BundelDetails::where('bundel_id', $this->bundel_id)
+                                ->where('product_id', $item->product_id)
+                                ->value('quantity')
+                            ?? 1,
                     ];
                 }),
                 'total_before_discount' => (float) $this->total_before_discount,

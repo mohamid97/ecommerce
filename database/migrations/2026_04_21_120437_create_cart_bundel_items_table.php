@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cart_bundel_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cart_item_id')->constrained('cart_items')->cascadeOnDelete();
+            $table->foreignId('bundle_item_id')->nullable()->constrained('bundel_details')->cascadeOnDelete();
             $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('variant_id')->nullable();
             // foreging key

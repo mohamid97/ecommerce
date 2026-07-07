@@ -73,7 +73,7 @@ class GuestCartViewRequest extends FormRequest
             'bundles.*.bundel_id' => 'required|integer|exists:bundels,id',
             'bundles.*.quantity' => 'required|integer|min:1|max:50',
             'bundles.*.bundle_items' => 'required|array|min:1',
-            'bundle_items.*.bundle_item_id'=>'required|integer|exists:bundel_details,id',
+            'bundles.*.bundle_items.*.bundle_item_id'=>'required|integer|exists:bundel_details,id',
             'bundles.*.bundle_items.*.product_id' => 'required|integer|exists:products,id',
             'bundles.*.bundle_items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
         ];
@@ -110,7 +110,10 @@ class GuestCartViewRequest extends FormRequest
                                 continue;
                             }
 
-                            $matchingDetail = $bundleDetails->firstWhere('product_id', $productId)->where('id', $bundleItemId);
+                            $matchingDetail = $bundleDetails
+                                ->where('product_id', $productId)
+                                ->where('id', $bundleItemId)
+                                ->first();
 
                             if (!$matchingDetail) {
                                 $validator->errors()->add(

@@ -181,6 +181,10 @@ class BundleItemStrategy implements CartItemStrategyInterface
     private function findSelectedBundleItem($bundleItems, BundelDetails $detail)
     {
         return $bundleItems->first(function ($selected) use ($detail) {
+            if (!empty($selected->bundle_item_id)) {
+                return (int) $selected->bundle_item_id === (int) $detail->getKey();
+            }
+
             if ((int) ($selected->product_id ?? 0) !== (int) $detail->product_id) {
                 return false;
             }
@@ -201,7 +205,11 @@ class BundleItemStrategy implements CartItemStrategyInterface
         $price_after_discount = 0;
         foreach ($bundle->bundelDetails as $d) {
             //
-            $selected = $cartItem->cartBundelItems->firstWhere('product_id', $d->product_id);
+            $selected = $this->findSelectedBundleItem($cartItem->cartBundelItems, $d);
+
+            if (!$selected) {
+                throw new \Exception(__('main.invalid_bundle_selection'));
+            }
 
             if($selected->variant_id){
                 $allowedVariantIds = $d->selectedVariantIds();

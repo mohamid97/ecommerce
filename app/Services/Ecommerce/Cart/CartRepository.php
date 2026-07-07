@@ -46,6 +46,7 @@ class CartRepository
             $bundleItemRows = [];
             foreach ($dto->bundle_items as $item) {
                 $bundleItemRows[] = [
+                    'bundle_item_id' => $item['bundle_item_id'] ?? null,
                     'product_id' => $item['product_id'],
                     'variant_id' => $item['variant_id'] ?? null,
                 ];
@@ -173,6 +174,10 @@ class CartRepository
         foreach ($cartItem->cartBundelItems as $item) {
             $bundleDetail = $bundle?->bundelDetails
                 ?->first(function ($detail) use ($item) {
+                    if (!empty($item->bundle_item_id)) {
+                        return (int) $detail->getKey() === (int) $item->bundle_item_id;
+                    }
+
                     if ((int) $detail->product_id !== (int) $item->product_id) {
                         return false;
                     }

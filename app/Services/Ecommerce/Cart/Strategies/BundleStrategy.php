@@ -44,12 +44,13 @@ class BundleStrategy implements CartStrategyInterface
         foreach ($dto->bundle_items as $item) {
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
+            $bundleItemId = $item['bundle_item_id'] ?? null;
 
             // 2. Product must exist and be active
             $this->action->checkProductExists($productId);
 
             // 3. Product must belong to this bundle (sets bundelDetail on action)
-            $this->action->checkProductBelongsToBundle($productId, $variantId);
+            $this->action->checkProductBelongsToBundle($productId, $variantId, $bundleItemId);
 
             $detailId = $this->action->bundelDetail?->getKey();
             if ($detailId !== null && in_array($detailId, $matchedDetailIds, true)) {
