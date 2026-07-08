@@ -28,7 +28,7 @@ class CartStoreRequest extends FormRequest
             'product_id'   => 'nullable|integer|exists:products,id',
             'variant_id'   => 'nullable|integer|exists:product_variants,id',
             'bundel_id'    => 'nullable|required_without:product_id|integer|exists:bundels,id',
-            'quantity'     => 'required|integer|min:1|max:50',
+            'quantity'     => 'required|integer|min:1|max:50000',
             'bundle_items' => 'nullable|array',
             'bundle_items.*.product_id' => 'nullable|integer|exists:products,id',
             'bundle_items.*.bundle_item_id'=>'required|integer|exists:bundel_details,id',
