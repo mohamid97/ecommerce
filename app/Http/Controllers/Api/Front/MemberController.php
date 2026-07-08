@@ -131,6 +131,16 @@ class MemberController extends Controller
         }
     }
 
+    public function logout(Request $request)
+    {
+        try {
+            $request->user()->currentAccessToken()->delete();
+            return $this->success(null, __('main.logged_out_successfully'));
+        } catch (Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
     // public function completeProfile(CompleteProfileRequest $request)
     // {
     //     try {

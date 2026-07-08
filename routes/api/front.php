@@ -14,6 +14,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('/verfiy-otp', 'verfiyOtp');
         Route::post('/register', 'register');
         Route::post('/login', 'login');
+        Route::post('/logout', 'logout')->middleware('auth:sanctum');
 
 
     });
