@@ -26,7 +26,9 @@ class OrderResource extends JsonResource
             'discount' => (float) ($this->discount ?? 0),
             'discount_type' => $this->discount_type ?? null,
             'coupon_code' => $this->coupon_code ?? null,
-            'total' => (float) $this->total_after_discount,
+            'total_before_discount' => (float) $this->total_before_discount,
+            'total_after_discount' => (float) $this->total_after_discount,
+            'total' => (float) ($this->total ?? $this->total_after_discount + $this->shipping_cost + $this->tax),
             'payment_status' => $this->payment_status ?? 'unpaid',
             'items' => $this->items->map(function ($item) {
                 $payload = [
