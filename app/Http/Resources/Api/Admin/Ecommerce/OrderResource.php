@@ -53,7 +53,7 @@ class OrderResource extends JsonResource
             'coupon_code' => $this->coupon_code ?? null,
             'total_before_discount' => (float) $this->total_before_discount,
             'total_after_discount' => (float) $this->total_after_discount,
-            'total' => (float) ($this->total_after_discount ?? $this->total),
+            'total' => (float) ($this->total  ?? $this->total_after_discount + $this->shipping_cost + $this->tax),
             'created_at' => $this->created_at?->format('Y-m-d'),
             'updated_at' => $this->updated_at?->format('Y-m-d'),
             'delivered_at' => $this->delivered_at,

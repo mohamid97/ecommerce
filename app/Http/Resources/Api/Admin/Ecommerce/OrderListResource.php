@@ -21,7 +21,7 @@ class OrderListResource extends JsonResource
             'status' => $this->status,
             'payment_status' => $this->payment_status ?? 'unpaid',
             'payment_method' => $this->payment_method,
-            'total' => (float) ($this->total_after_discount ?? $this->total),
+            'total' => (float) ($this->total  ?? $this->total_after_discount + $this->shipping_cost + $this->tax),
             'points_earned' => (int) ($this->points_earned ?? 0),
             'items_count' => $this->items_count ?? null,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
