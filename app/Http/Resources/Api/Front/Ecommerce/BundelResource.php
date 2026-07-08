@@ -37,9 +37,13 @@ class BundelResource extends JsonResource
                 ];
             }),
             'title'=>$this->getColumnLang('title'),
-            // need to make slug from title if has no slug in translation table
-            'slug'=> $this->getColumnLang('slug') ?? str($this->getColumnLang('title'))->slug(),
-            'created_at'=>$this->created_at->format('Y-m-d'),
+            // need to make slug from title if has no slug in translation table 
+'slug' => $this->getColumnLang('slug')
+    ?: (
+        app()->getLocale() === 'ar'
+            ? preg_replace('/\s+/u', '-', trim($this->getColumnLang('title')))
+            : Str::slug($this->getColumnLang('title'))
+    ),            'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),
         ];
     }
