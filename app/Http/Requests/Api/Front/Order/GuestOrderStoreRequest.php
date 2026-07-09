@@ -24,7 +24,7 @@ class GuestOrderStoreRequest extends FormRequest
             'items.*.product_id' => 'nullable|integer|exists:products,id',
             'items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
             'items.*.bundel_id' => 'nullable|integer|exists:bundels,id',
-            'items.*.quantity' => 'required|integer|min:1|max:50',
+            'items.*.quantity' => 'required|integer|min:1|max:50000',
             'items.*.bundle_items' => 'nullable|array',
             'items.*.bundle_items.*.product_id' => 'required_with:items.*.bundel_id|integer|exists:products,id',
             'items.*.bundle_items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
