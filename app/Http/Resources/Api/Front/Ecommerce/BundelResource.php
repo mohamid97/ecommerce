@@ -44,8 +44,10 @@ class BundelResource extends JsonResource
         ];
     }
 
-    protected function createSlugFromTitle(array $title): string
+    // need also can validate null value
+    protected function createSlugFromTitle(?array $title): string
     {
-        return strtolower(str_replace(' ', '-', $title['en'] ?? $title['ar'] ?? ''));
+      
+        return (is_array($title)) ? strtolower(str_replace(' ', '-', $title['en'] ?? $title['ar'] ?? '')) : '';
     }
 }
