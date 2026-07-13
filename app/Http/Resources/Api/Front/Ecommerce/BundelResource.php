@@ -14,6 +14,9 @@ class BundelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $title = $this->getColumnLang('title');
+        $slug = $this->getColumnLang('slug');
+
         return [
             'id'=>$this->id,
             'status'=>$this->status,
@@ -36,18 +39,31 @@ class BundelResource extends JsonResource
                     'id'=>$this->brand->id,
                 ];
             }),
-            'title'=>$this->getColumnLang('title'),
-            // need to make slug from title if has no slug in translation table 
-            'slug'=> $this->getColumnLang('slug') ?? $this->createSlugFromTitle($this->getColumnLang('title')),
+            'title' => $title,
+            // Create a fallback slug when the translation does not provide one.
+            'slug' => filled($slug) ? $slug : $this->createSlugFromTitle($title),
             'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),
         ];
     }
 
-    // need also can validate null value
-    protected function createSlugFromTitle(?array $title): string
+    /**
+     * Build a slug from the English title, falling back to Arabic.
+     *
+     * @param array<string, mixed>|string|null $title
+     */
+    protected function createSlugFromTitle(array|string|null $title): ?string
     {
-      
-        return (is_array($title)) ? strtolower(str_replace(' ', '-', $title['en'] ?? $title['ar'] ?? '')) : '';
+        if (is_array($title)) {
+            $title = filled($title['en'] ?? null)
+                ? $title['en']
+                : ($title['ar'] ?? null);
+        }
+
+        if (! is_string($title) || trim($title) === '') {
+            return null;
+        }
+
+        return strtolower((string) preg_replace('/\s+/u', '-', trim($title)));
     }
 }
