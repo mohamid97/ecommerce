@@ -75,17 +75,14 @@ class CartAction
         }
     }
 
-    public function findBundleDetailForSelection(int $productId, ?int $variantId = null, ?int $bundleItemId = null)
+    public function findBundleDetailForSelection(Bundel $bundle , int $productId, ?int $variantId = null, ?int $bundleItemId = null)
     {
-        if (!$this->bundel) {
-            return null;
-        }
 
 
-        $bundleDetail =   BundelDetails::where('bundel_id', $this->bundel->id)
+        $bundleDetail =  BundelDetails::where('bundel_id', $bundle->id)
             ->where('product_id', $productId)
             ->where('id' , $bundleItemId)->first();
-           
+           dd($bundleDetail);
 
         // need to all ids of variant_ids and check if variantId inside it write code
         $variantIds = $bundleDetail->variant_ids ?? [];
@@ -211,7 +208,7 @@ class CartAction
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
             $bundleItemId = $item['bundle_item_id'] ?? null;
-            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
+            $bundleDetail = $this->findBundleDetailForSelection($bundle, $productId, $variantId, $bundleItemId);
             dd('hh' , $bundleDetail,$productId, $variantId, $bundleItemId);
             if ($variantId) {
                 $variant = ProductVariant::find($variantId);
