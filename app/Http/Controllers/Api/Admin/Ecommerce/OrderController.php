@@ -94,11 +94,13 @@ class OrderController extends Controller
             return $this->success(null, __('main.deleted_successfully', ['model' => 'Order']));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
-        }
+        }       
+            
     }
-
-
-
     
+
+
+
+
 
 }
