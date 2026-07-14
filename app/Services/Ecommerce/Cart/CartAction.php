@@ -208,7 +208,7 @@ class CartAction
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
             $bundleItemId = $item['bundle_item_id'] ?? null;
-            dd('mohamedtest' , $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId));
+            dd('mohamedtest' , $productId, $variantId, $bundleItemId , $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId));
             $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
             dd('hh' , $bundleDetail,$productId, $variantId, $bundleItemId);
             if ($variantId) {
