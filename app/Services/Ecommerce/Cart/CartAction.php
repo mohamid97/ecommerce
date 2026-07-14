@@ -89,12 +89,11 @@ class CartAction
 
         // need to all ids of variant_ids and check if variantId inside it write code
         $variantIds = $bundleItemDetails->variant_ids ?? [];
-        dd('truefalse' ,$variantId , $variantIds, in_array($variantId, $variantIds));
         if ($variantId && !in_array($variantId, $variantIds)) {
             return null;
         }
 
-        return $bundleItem;
+        return $bundleItemDetails;
 
 
 
