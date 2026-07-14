@@ -75,7 +75,7 @@ class CartAction
         }
     }
 
-    public function findBundleDetailForSelection(int $productId, ?int $variantId = null, ?int $bundleItemId = null): ?BundelDetails
+    public function findBundleDetailForSelection(int $productId, ?int $variantId = null, ?int $bundleItemId = null)
     {
         if (!$this->bundel) {
             return null;
@@ -90,7 +90,6 @@ class CartAction
         // need to all ids of variant_ids and check if variantId inside it write code
         $variantIds = $bundleItemDetails->variant_ids ?? [];
         if ($variantId && !in_array($variantId, $variantIds)) {
-            dd('in null');
             return null;
         }
 
