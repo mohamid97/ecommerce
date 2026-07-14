@@ -66,4 +66,7 @@ class BundelResource extends JsonResource
 
         return strtolower((string) preg_replace('/\s+/u', '-', trim($title)));
     }
+
+
+    
 }
