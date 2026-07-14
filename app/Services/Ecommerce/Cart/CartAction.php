@@ -191,7 +191,7 @@ class CartAction
             $bundleItemId = $item['bundle_item_id'] ?? null;
 
             $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
-            dd('hh' , $bundleDetail);
+            dd('hh' , $bundleDetail,$productId, $variantId, $bundleItemId);
             if ($variantId) {
                 $variant = ProductVariant::find($variantId);
                 $price = $variant?->sale_price ?? 0;
