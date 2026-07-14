@@ -82,7 +82,7 @@ class CartAction
         }
 
 
-        $bundleItem = $this->bundel->bundelDetails->where(['id'=> $bundleItemId, 'product_id' => $productId]);
+        $bundleItem = $this->bundel->bundelDetails->where(['id'=> $bundleItemId, 'product_id' => $productId])->first();
         dd('test' , $bundleItem , $productId , $variantId , $bundleItemId);
 
         // need to all ids of variant_ids and check if variantId inside it write code
@@ -91,7 +91,7 @@ class CartAction
             return null;
         }
 
-        return $bundleItem->first();
+        return $bundleItem;
 
 
 
