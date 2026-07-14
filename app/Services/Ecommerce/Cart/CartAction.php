@@ -83,8 +83,9 @@ class CartAction
 
 
         $bundleItem = $this->bundel->bundelDetails->where(['id'=> $bundleItemId, 'product_id' => $productId]);
+        dd('test' , $bundleItem , $productId , $variantId , $bundleItemId);
 
-         // need to all ids of variant_ids and check if variantId inside it write code
+        // need to all ids of variant_ids and check if variantId inside it write code
          $variantIds = $bundleItem->pluck('variant_ids')->flatten()->filter()->unique()->toArray();
         if ($variantId && !in_array($variantId, $variantIds)) {
             return null;
