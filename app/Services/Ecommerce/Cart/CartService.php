@@ -180,6 +180,7 @@ class CartService
     {
         $bundle = Bundel::with('bundelDetails')->findOrFail($dto->bundel_id);
         $priceData = $this->action->getBundlePriceWithData($dto);
+        dd('priceData' , $priceData);
 
         $item = new CartItem([
             'cart_id' => null,
