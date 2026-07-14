@@ -81,23 +81,38 @@ class CartAction
             return null;
         }
 
-        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
-            if ($bundleItemId !== null && (int) $detail->getKey() !== $bundleItemId) {
-                return false;
-            }
 
-            if ((int) $detail->product_id !== $productId) {
-                return false;
-            }
+        $bundleItem = $this->bundel->bundelDetails->where(['id'=> $bundleItemId, 'product_id' => $productId]);
 
-            if ($variantId === null) {
-                return true;
-            }
+         // need to all ids of variant_ids and check if variantId inside it write code
+         $variantIds = $bundleItem->pluck('variant_ids')->flatten()->filter()->unique()->toArray();
+        if ($variantId && !in_array($variantId, $variantIds)) {
+            return null;
+        }
 
-            $allowedVariantIds = $detail->selectedVariantIds();
+        return $bundleItem->first();
 
-            return in_array((string) $variantId, $allowedVariantIds, true);
-        });
+
+
+
+
+        // return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
+        //     if ($bundleItemId !== null && (int) $detail->getKey() !== $bundleItemId) {
+        //         return false;
+        //     }
+
+        //     if ((int) $detail->product_id !== $productId) {
+        //         return false;
+        //     }
+
+        //     if ($variantId === null) {
+        //         return true;
+        //     }
+
+        //     $allowedVariantIds = $detail->selectedVariantIds();
+
+        //     return in_array((string) $variantId, $allowedVariantIds, true);
+        // });
     }
 
     /**
