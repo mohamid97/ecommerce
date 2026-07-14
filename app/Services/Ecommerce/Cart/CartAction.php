@@ -174,7 +174,7 @@ class CartAction
     public function getBundlePriceWithData($dto): array
     {
         $bundle = Bundel::with('bundelDetails')->find($dto->bundel_id);
-
+        dd('bundle' , $bundle);
         if (!$bundle) {
             return [
                 'total_price'          => 0.0,
