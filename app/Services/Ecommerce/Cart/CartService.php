@@ -127,6 +127,9 @@ class CartService
             $items->push($this->makeGuestBundleItem($dto));
         }
 
+
+        dd($items);
+
         $cart = new Cart([
             'user_id' => null,
             'status' => null,
