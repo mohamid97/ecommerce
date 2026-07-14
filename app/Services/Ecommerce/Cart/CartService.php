@@ -127,9 +127,6 @@ class CartService
             $items->push($this->makeGuestBundleItem($dto));
         }
 
-
-        dd($items);
-
         $cart = new Cart([
             'user_id' => null,
             'status' => null,
@@ -180,7 +177,6 @@ class CartService
     {
         $bundle = Bundel::with('bundelDetails')->findOrFail($dto->bundel_id);
         $priceData = $this->action->getBundlePriceWithData($dto);
-        dd('priceData' , $priceData);
 
         $item = new CartItem([
             'cart_id' => null,

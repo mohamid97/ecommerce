@@ -75,48 +75,29 @@ class CartAction
         }
     }
 
-    public function findBundleDetailForSelection(Bundel $bundle , int $productId, ?int $variantId = null, ?int $bundleItemId = null)
+    public function findBundleDetailForSelection(int $productId, ?int $variantId = null, ?int $bundleItemId = null): ?BundelDetails
     {
-
-
-        $bundleDetail =  BundelDetails::where('bundel_id', $bundle->id)
-            ->where('product_id', $productId)
-            ->where('id' , $bundleItemId)->first();
-           dd($bundleDetail);
-
-        // need to all ids of variant_ids and check if variantId inside it write code
-        $variantIds = $bundleDetail->variant_ids ?? [];
-        // dd($variantId, $variantIds , in_array($variantId, $variantIds));
-        if ($variantId && in_array($variantId, $variantIds)) {
-            return $bundleDetail;
+        if (!$this->bundel) {
+            return null;
         }
 
-        return false;
+        return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
+            if ($bundleItemId !== null && (int) $detail->getKey() !== $bundleItemId) {
+                return false;
+            }
 
-   
+            if ((int) $detail->product_id !== $productId) {
+                return false;
+            }
 
+            if ($variantId === null) {
+                return true;
+            }
 
-        // return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
-        //     if ($bundleItemId !== null && (int) $detail->getKey() !== $bundleItemId) {
-        //         return false;
-        //     }
+            $allowedVariantIds = $detail->selectedVariantIds();
 
-        //     if ((int) $detail->product_id !== $productId) {
-        //         return false;
-        //     }
-
-        //     if ($variantId === null) {
-        //         return true;
-        //     }
-
-        //     $allowedVariantIds = $detail->selectedVariantIds();
-
-        //     return in_array((string) $variantId, $allowedVariantIds, true);
-        // });
-
-
-
-
+            return in_array((string) $variantId, $allowedVariantIds, true);
+        });
     }
 
     /**
@@ -193,7 +174,7 @@ class CartAction
     public function getBundlePriceWithData($dto): array
     {
         $bundle = Bundel::with('bundelDetails')->find($dto->bundel_id);
-      
+
         if (!$bundle) {
             return [
                 'total_price'          => 0.0,
@@ -201,15 +182,21 @@ class CartAction
             ];
         }
 
+        // Guest-cart validation and pricing can be resolved through different
+        // CartAction instances. Ensure this instance has the bundle relation
+        // before matching the submitted bundle items.
+        $this->bundel = $bundle;
+
         $totalPrice         = 0.0;
         $totalDiscountPrice = 0.0;
-       
+
         foreach ($dto->bundle_items as $item) {
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
             $bundleItemId = $item['bundle_item_id'] ?? null;
-            $bundleDetail = $this->findBundleDetailForSelection($bundle, $productId, $variantId, $bundleItemId);
-            dd('hh' , $bundleDetail,$productId, $variantId, $bundleItemId);
+
+            $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
+
             if ($variantId) {
                 $variant = ProductVariant::find($variantId);
                 $price = $variant?->sale_price ?? 0;
