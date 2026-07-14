@@ -90,13 +90,12 @@ class CartAction
         // need to all ids of variant_ids and check if variantId inside it write code
         $variantIds = $bundleItemDetails->variant_ids ?? [];
         if ($variantId && !in_array($variantId, $variantIds)) {
+            dd('in null');
             return null;
         }
 
+        dd('not in null');
         return $bundleItemDetails;
-
-
-
 
 
         // return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
@@ -116,6 +115,10 @@ class CartAction
 
         //     return in_array((string) $variantId, $allowedVariantIds, true);
         // });
+
+
+
+
     }
 
     /**
