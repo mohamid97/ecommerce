@@ -7,6 +7,8 @@ use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\Order as OrderModel;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\StockMovment;
+use App\Models\Api\Ecommerce\Promotion;
+use App\Models\User;
 use App\Services\Ecommerce\Order\OrderService as EcommerceOrderService;
 use App\Services\Ecommerce\Order\PointsService;
 use App\Services\Admin\User\UserService;
@@ -64,6 +66,7 @@ class AdminOrderService
         return DB::transaction(function () use ($data) {
             $order = $this->repository->findByIdOrNumber($data);
             $wasEverDelivered = !is_null($order->delivered_at);
+            $wasRefunded = $order->status === 'refunded';
 
             $order->status = $data['status'];
             $order->payment_status = $data['payment_status'];
@@ -80,7 +83,7 @@ class AdminOrderService
             }
 
             // Restore stock when an order is refunded.
-            if ($order->status === 'refunded') {
+            if (!$wasRefunded && $order->status === 'refunded') {
                 $this->restoreStockForRefundedOrder($order);
             }
 
@@ -88,6 +91,33 @@ class AdminOrderService
             app(PointsService::class)->awardPointsForCompletedPaidOrder($order);
 
             return $order->fresh('user');
+        });
+    }
+
+    /**
+     * Permanently delete an order while reversing every effect created by it.
+     * Refunded orders have already had their stock restored, so that step is
+     * intentionally skipped for them.
+     */
+    public function deleteOrder(array $data): void
+    {
+        DB::transaction(function () use ($data) {
+            $order = $this->repository->findForDeletion($data);
+
+            if ($order->status !== 'refunded') {
+                $this->restoreStockForRefundedOrder($order);
+            }
+
+            if ($order->delivered_at) {
+                $this->decreaseSalesNumbersForDeletedOrder($order);
+            }
+
+            $this->reversePointsForDeletedOrder($order);
+            $this->releaseCouponUsageForDeletedOrder($order);
+
+            // order_items, order_item_batches, and order_item_bundel_items
+            // are removed by their database cascade constraints.
+            $this->repository->delete($order);
         });
     }
 
@@ -205,6 +235,108 @@ class AdminOrderService
             if (!empty($item->product_id)) {
                 Product::whereKey($item->product_id)->increment('sales_number', $orderItemQty);
             }
+        }
+    }
+
+    private function decreaseSalesNumbersForDeletedOrder(OrderModel $order): void
+    {
+        foreach ($order->items as $item) {
+            $orderItemQty = (int) ($item->quantity ?? 0);
+
+            if ($orderItemQty <= 0) {
+                continue;
+            }
+
+            if (!empty($item->bundel_id)) {
+                $this->decreaseSalesNumber(Bundel::class, $item->bundel_id, $orderItemQty);
+
+                if ($item->orderBundelItems->isNotEmpty()) {
+                    foreach ($item->orderBundelItems as $bundleItem) {
+                        $salesQty = $orderItemQty * max((int) ($bundleItem->quantity ?? 0), 0);
+
+                        if (!empty($bundleItem->variant_id)) {
+                            $this->decreaseSalesNumber(ProductVariant::class, $bundleItem->variant_id, $salesQty);
+                        } elseif (!empty($bundleItem->product_id)) {
+                            $this->decreaseSalesNumber(Product::class, $bundleItem->product_id, $salesQty);
+                        }
+                    }
+
+                    continue;
+                }
+
+                foreach ((array) data_get($item->bundel_snapshot, 'details', []) as $detail) {
+                    $salesQty = $orderItemQty * max((int) ($detail['quantity'] ?? 0), 0);
+                    $variantId = $detail['selected_variant_id'] ?? null;
+
+                    if ($variantId) {
+                        $this->decreaseSalesNumber(ProductVariant::class, $variantId, $salesQty);
+                    } elseif (!empty($detail['product_id'])) {
+                        $this->decreaseSalesNumber(Product::class, $detail['product_id'], $salesQty);
+                    }
+                }
+
+                continue;
+            }
+
+            if (!empty($item->variant_id)) {
+                $this->decreaseSalesNumber(ProductVariant::class, $item->variant_id, $orderItemQty);
+            } elseif (!empty($item->product_id)) {
+                $this->decreaseSalesNumber(Product::class, $item->product_id, $orderItemQty);
+            }
+        }
+    }
+
+    private function decreaseSalesNumber(string $model, int $id, int $quantity): void
+    {
+        if ($quantity <= 0) {
+            return;
+        }
+
+        $record = $model::query()->lockForUpdate()->find($id);
+
+        if (!$record) {
+            return;
+        }
+
+        $record->sales_number = max(0, (int) ($record->sales_number ?? 0) - $quantity);
+        $record->save();
+    }
+
+    private function reversePointsForDeletedOrder(OrderModel $order): void
+    {
+        if (!$order->user_id) {
+            return;
+        }
+
+        $user = User::query()->lockForUpdate()->find($order->user_id);
+
+        if (!$user) {
+            return;
+        }
+
+        $user->points = max(
+            0,
+            (int) ($user->points ?? 0)
+                + (int) ($order->points_used ?? 0)
+                - (int) ($order->points_earned ?? 0)
+        );
+        $user->save();
+    }
+
+    private function releaseCouponUsageForDeletedOrder(OrderModel $order): void
+    {
+        if (empty($order->coupon_code)) {
+            return;
+        }
+
+        $promotion = Promotion::query()
+            ->where('is_coupon', true)
+            ->where('coupon_code', $order->coupon_code)
+            ->lockForUpdate()
+            ->first();
+
+        if ($promotion && $promotion->coupon_limit !== null) {
+            $promotion->increment('coupon_limit');
         }
     }
 

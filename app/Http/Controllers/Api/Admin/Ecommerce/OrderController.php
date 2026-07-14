@@ -13,6 +13,7 @@ use App\Http\Requests\Api\Admin\Ecommerce\OrderViewRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\OrderUpdateStatusRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\OrderUserSummaryRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\OrderCreateGuestRequest;
+use App\Http\Requests\Api\Admin\Ecommerce\OrderDeleteRequest;
 use App\Services\Admin\Ecommerce\Order\AdminOrderService;
 
 class OrderController extends Controller
@@ -74,7 +75,7 @@ class OrderController extends Controller
 
     public function createGuest(OrderCreateGuestRequest $request)
     {
-        try {
+        try { 
             $data = $request->validated();
 
             $order = $this->adminOrderService->createGuestOrder($data);
@@ -84,5 +85,20 @@ class OrderController extends Controller
             return $this->error($e->getMessage(), 500);
         }
     }
+
+    public function delete(OrderDeleteRequest $request)
+    {
+        try {
+            $this->adminOrderService->deleteOrder($request->validated());
+
+            return $this->success(null, __('main.deleted_successfully', ['model' => 'Order']));
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+
+
+    
 
 }

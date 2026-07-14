@@ -90,11 +90,35 @@ class AdminOrderRepository
     }
 
     /**
+     * Fetch an order and the records needed to safely reverse its effects
+     * before a hard delete. The order row is locked for the transaction.
+     */
+    public function findForDeletion(array $data): OrderModel
+    {
+        $query = OrderModel::with([
+            'items.batches.stockMovment.product',
+            'items.batches.stockMovment.variant',
+            'items.orderBundelItems',
+        ])->lockForUpdate();
+
+        if (!empty($data['order_number'])) {
+            return $query->where('order_number', $data['order_number'])->firstOrFail();
+        }
+
+        return $query->findOrFail($data['id']);
+    }
+
+    /**
      * Save order instance.
      */
     public function save(OrderModel $order): OrderModel
     {
         $order->save();
         return $order;
+    }
+
+    public function delete(OrderModel $order): void
+    {
+        $order->delete();
     }
 }
