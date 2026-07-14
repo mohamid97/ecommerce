@@ -184,14 +184,14 @@ class CartAction
 
         $totalPrice         = 0.0;
         $totalDiscountPrice = 0.0;
-       dd('bundle' , $bundle , $dto);
+       
         foreach ($dto->bundle_items as $item) {
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
             $bundleItemId = $item['bundle_item_id'] ?? null;
 
             $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
-
+            dd('hh' , $bundleDetail);
             if ($variantId) {
                 $variant = ProductVariant::find($variantId);
                 $price = $variant?->sale_price ?? 0;
