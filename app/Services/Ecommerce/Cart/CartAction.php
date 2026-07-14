@@ -82,19 +82,19 @@ class CartAction
         }
 
 
-        $bundleItemDetails =   BundelDetails::where('bundel_id', $this->bundel->id)
+        $bundleDetail =   BundelDetails::where('bundel_id', $this->bundel->id)
             ->where('product_id', $productId)
             ->where('id' , $bundleItemId)->first();
            
 
         // need to all ids of variant_ids and check if variantId inside it write code
-        $variantIds = $bundleItemDetails->variant_ids ?? [];
-        dd($variantId, $variantIds , in_array($variantId, $variantIds));
-        if ($variantId && !in_array($variantId, $variantIds)) {
-            return null;
+        $variantIds = $bundleDetail->variant_ids ?? [];
+        // dd($variantId, $variantIds , in_array($variantId, $variantIds));
+        if ($variantId && in_array($variantId, $variantIds)) {
+            return $bundleDetail;
         }
 
-        return $bundleItemDetails;
+   
 
 
         // return $this->bundel->bundelDetails->first(function (BundelDetails $detail) use ($productId, $variantId, $bundleItemId): bool {
