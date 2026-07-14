@@ -94,7 +94,6 @@ class CartAction
             return null;
         }
 
-        dd('not in null');
         return $bundleItemDetails;
 
 
@@ -210,7 +209,7 @@ class CartAction
             $productId = $item['product_id'];
             $variantId = $item['variant_id'] ?? null;
             $bundleItemId = $item['bundle_item_id'] ?? null;
-
+            dd($this->findBundleDetailForSelection($productId, $variantId, $bundleItemId));
             $bundleDetail = $this->findBundleDetailForSelection($productId, $variantId, $bundleItemId);
             dd('hh' , $bundleDetail,$productId, $variantId, $bundleItemId);
             if ($variantId) {
