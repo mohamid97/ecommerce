@@ -119,6 +119,8 @@ class ProductService
             ->where('id', $id)
             ->first();
 
+            // need to throw 404 not found
+            
         if (!$product) {
             throw new Exception(__('main.not_found', ['model' => 'Product']));
         }

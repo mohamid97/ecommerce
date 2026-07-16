@@ -53,7 +53,7 @@ class ProductController extends Controller
 
             return $this->success(new ProductDetailsResource($product), __('main.show_successfully', ['model' => 'Product']));
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 500);
+            return $this->error($e->getMessage(), $e->getCode() ?: 500);
         }
     }
 
@@ -72,7 +72,7 @@ class ProductController extends Controller
                 __('main.list_successfully', ['model' => 'Products'])
             );
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 500);
+            return $this->error($e->getMessage(), $e->getCode() ?: 500);
         }
     }
 
@@ -91,7 +91,7 @@ class ProductController extends Controller
                 __('main.list_successfully', ['model' => 'Products'])
             );
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 500);
+            return $this->error($e->getMessage(), $e->getCode() ?: 500);
         }
     }
 
@@ -133,7 +133,7 @@ class ProductController extends Controller
                 __('main.list_successfully', ['model' => 'Products'])
             );
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 404);
+            return $this->error($e->getMessage(), $e->getCode() ?: 500);
         }
     }
 
@@ -151,7 +151,7 @@ class ProductController extends Controller
 
             return $this->success(new VaraintDetailsResource($variant), __('main.show_successfully', ['model' => 'Variant']));
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 404);
+            return $this->error($e->getMessage(), $e->getCode() ?: 500);
         }
     }
 
