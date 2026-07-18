@@ -92,6 +92,16 @@ class AdminOrderService
                 );
             }
 
+
+            // 2.  can Refund  only When Status is finished.
+            if ($newStatus !== 'refunded' && !in_array($order->status, ['finished' , 'cancelled'], true) ) {
+                throw new \RuntimeException(
+                    __('main.cannot_update_terminal_status', ['status' => $order->status])
+                );
+            }
+
+
+
             // 3. Cannot cancel a finished order.
             if ($newStatus === 'cancelled' && $order->status === 'finished') {
                 throw new \RuntimeException(__('main.cannot_cancel_finished_order'));
