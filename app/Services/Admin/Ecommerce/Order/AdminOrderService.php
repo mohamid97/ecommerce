@@ -18,7 +18,9 @@ class AdminOrderService
 {
     public function __construct(
         protected AdminOrderRepository $repository,
-        protected EcommerceOrderService $orderService
+        protected EcommerceOrderService $orderService,
+        protected PointsService $pointsService,
+        protected UserService $userSerivce
     ) {}
 
     /**
@@ -55,40 +57,94 @@ class AdminOrderService
      */
     public function userOrderSummary(int $userId)
     {
-        return app(UserService::class)->orderSummary($userId);
+        return $this->userSerivce->orderSummary($userId);
     }
 
     /**
      * Update order status and payment status.
+     *
+     * Business rules:
+     * - 'finished' is terminal except it CAN be refunded.
+     * - Cancel can happen anytime except if already 'finished'.
+     * - Status 'finished' requires payment_status to be 'paid'.
+     * - Status 'cancelled' restores stock.
+     * - Status 'refunded' auto-sets payment_status='refunded' and restores stock.
+     * - Delivered/finished sets delivered_at timestamp.
      */
     public function updateStatus(array $data): OrderModel
     {
         return DB::transaction(function () use ($data) {
             $order = $this->repository->findByIdOrNumber($data);
+            $newStatus = $data['status'];
+            $newPaymentStatus = $data['payment_status'];
+
+            // 1. Terminal statuses that cannot be changed at all.
+            if (in_array($order->status, ['cancelled', 'refunded'], true)) {
+                throw new \RuntimeException(
+                    __('main.cannot_update_terminal_status', ['status' => $order->status])
+                );
+            }
+
+            // 2. Finished can only be changed to refunded.
+            if ($order->status === 'finished' && $newStatus !== 'refunded') {
+                throw new \RuntimeException(
+                    __('main.cannot_update_terminal_status', ['status' => $order->status])
+                );
+            }
+
+            // 3. Cannot cancel a finished order.
+            if ($newStatus === 'cancelled' && $order->status === 'finished') {
+                throw new \RuntimeException(__('main.cannot_cancel_finished_order'));
+            }
+
+            // 4. 'finished' requires payment to be 'paid'.
+            if ($newStatus === 'finished' && $newPaymentStatus !== 'paid') {
+                throw new \RuntimeException(__('main.finished_requires_paid'));
+            }
+
+            // 5. 'refunded' forces payment_status to 'refunded'.
+            if ($newStatus === 'refunded') {
+                $newPaymentStatus = 'refunded';
+            }
+
             $wasEverDelivered = !is_null($order->delivered_at);
             $wasRefunded = $order->status === 'refunded';
+            $wasCancelled = $order->status === 'cancelled';
 
-            $order->status = $data['status'];
-            $order->payment_status = $data['payment_status'];
+            $order->status = $newStatus;
+            $order->payment_status = $newPaymentStatus;
 
-            if ($order->status === 'delivered' && !$order->delivered_at) {
+            // Set delivered_at when transitioning to delivered or finished.
+            if (in_array($newStatus, ['delivered', 'finished'], true) && !$order->delivered_at) {
                 $order->delivered_at = now();
             }
 
             $this->repository->save($order);
 
             // Increase sales counters once, the first time an order reaches delivered.
-            if (!$wasEverDelivered && $order->status === 'delivered') {
+            if (!$wasEverDelivered && in_array($order->status, ['delivered', 'finished'], true)) {
                 $this->increaseSalesNumbersForDeliveredOrder($order);
             }
 
-            // Restore stock when an order is refunded.
+            // Restore stock when order is refunded (first time).
             if (!$wasRefunded && $order->status === 'refunded') {
                 $this->restoreStockForRefundedOrder($order);
             }
 
-            // award points if necessary
-            app(PointsService::class)->awardPointsForCompletedPaidOrder($order);
+            // Restore stock when order is cancelled (first time).
+            if (!$wasCancelled && $order->status === 'cancelled') {
+                $this->restoreStockForRefundedOrder($order);
+            }
+
+            // Award points when order becomes finished + paid.
+            if ($order->status === 'finished' && $order->payment_status === 'paid') {
+                $this->pointsService->awardPointsForCompletedPaidOrder($order);
+            }
+
+            // Revoke points when order is refunded or cancelled (undo both used & earned points).
+            if (in_array($order->status, ['refunded', 'cancelled'], true)) {
+                $this->pointsService->revokePointsForOrder($order);
+            }
 
             return $order->fresh('user');
         });
@@ -96,19 +152,28 @@ class AdminOrderService
 
     /**
      * Permanently delete an order while reversing every effect created by it.
-     * Refunded orders have already had their stock restored, so that step is
-     * intentionally skipped for them.
+     *
+     * Business rules:
+     * - Cannot delete if order status is 'finished'.
+     * - If status is NOT 'refunded' AND NOT 'cancelled' → restore stock first.
+     * - If status is 'refunded' or 'cancelled' → stock already restored, skip.
      */
     public function deleteOrder(array $data): void
     {
         DB::transaction(function () use ($data) {
             $order = $this->repository->findForDeletion($data);
 
-            if ($order->status !== 'refunded') {
+            // Cannot delete a finished order.
+            if ($order->status === 'finished') {
+                throw new \RuntimeException(__('main.cannot_delete_finished_order'));
+            }
+
+            // Restore stock only if it hasn't been restored yet.
+            if (!in_array($order->status, ['refunded', 'cancelled'], true)) {
                 $this->restoreStockForRefundedOrder($order);
             }
 
-            if ($order->delivered_at) {
+            if ($order->finished) {
                 $this->decreaseSalesNumbersForDeletedOrder($order);
             }
 
@@ -339,7 +404,6 @@ class AdminOrderService
             $promotion->increment('coupon_limit');
         }
     }
-
 
     /**
      * Reverse every stock batch that was consumed when the order was created.

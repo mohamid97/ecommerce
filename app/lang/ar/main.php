@@ -14,6 +14,10 @@ return [
     'updated_successfully'=>':model updated successfully.',
     'deleted_successfully'=>':model deleted successfully.',
     'restored_successfully'=>':model restored successfully.',
+    'cannot_update_terminal_status'=>'لا يمكن تحديث حالة الطلب. الطلب بالفعل :status.',
+    'cannot_cancel_finished_order'=>'لا يمكن إلغاء طلب مكتمل.',
+    'finished_requires_paid'=>'لا يمكن تعيين الطلب كمكتمل ما لم تكن حالة الدفع مدفوع.',
+    'cannot_delete_finished_order'=>'لا يمكن حذف طلب مكتمل.',
 
 
     

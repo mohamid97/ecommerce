@@ -13,6 +13,10 @@ return [
     'updated_successfully'=>':model updated successfully.',
     'deleted_successfully'=>':model deleted successfully.',
     'restored_successfully'=>':model restored successfully.',
+    'cannot_update_terminal_status'=>'Cannot update order status. The order is already :status.',
+    'cannot_cancel_finished_order'=>'Cannot cancel a finished order.',
+    'finished_requires_paid'=>'Order cannot be marked as finished unless payment status is paid.',
+    'cannot_delete_finished_order'=>'Cannot delete a finished order.',
     
 
     

@@ -85,7 +85,7 @@ class PointsService
      */
     public function awardPointsForCompletedPaidOrder(Order $order): int
     {
-        if (!$order->user_id || $order->status !== 'delivered' || $order->payment_status !== 'paid') {
+        if (!$order->user_id || $order->status !== 'finished' || $order->payment_status !== 'paid') {
             return 0;
         }
 
@@ -116,5 +116,31 @@ class PointsService
         $order->save();
 
         return $points;
+    }
+
+    /**
+     * Revoke points when an order is refunded or cancelled.
+     * - Return points_used back to the user.
+     * - Deduct points_earned from the user.
+     */
+    public function revokePointsForOrder(Order $order): void
+    {
+        if (!$order->user_id) {
+            return;
+        }
+
+        $user = $order->user ?: User::find($order->user_id);
+
+        if (!$user) {
+            return;
+        }
+
+        $user->points = max(
+            0,
+            (int) ($user->points ?? 0)
+                + (int) ($order->points_used ?? 0)
+                - (int) ($order->points_earned ?? 0)
+        );
+        $user->save();
     }
 }
