@@ -2,23 +2,23 @@
 
 namespace App\Models\Api\Admin;
 
+use App\Models\Api\Admin\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
- 
+
 class Brand extends Model implements TranslatableContract
 {
-    use HasFactory , Translatable;
-    protected $fillable = ['image' , 'breadcrumb'];
-    public $translatedAttributes = ['title','slug','des' , 'alt_image' , 'title_image' , 'meta_title' , 'meta_des'];
+    use HasFactory, Translatable;
+    protected $fillable = ['image', 'breadcrumb'];
+    public $translatedAttributes = ['title', 'slug', 'des', 'alt_image', 'title_image', 'meta_title', 'meta_des'];
     public $translationForeignKey = 'brand_id';
     public $translationModel = 'App\Models\Api\Admin\BrandTranslation';
 
-    
     protected function serializeDate(\DateTimeInterface $date)
     {
-      return $date->format('Y-m-d'); 
+        return $date->format('Y-m-d');
     }
 
     public function categories()
@@ -26,6 +26,10 @@ class Brand extends Model implements TranslatableContract
         return $this->belongsToMany(Category::class, 'brand_category');
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'brand_id');
+    }
 
     
 }

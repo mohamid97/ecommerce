@@ -9,14 +9,24 @@ use Astrotomic\Translatable\Translatable;
 
 class OptionValue extends Model implements TranslatableContract
 {
-      use HasFactory , Translatable;    
-    protected $fillable = ['option_id' , 'value'];
+    use HasFactory, Translatable;
+    protected $fillable = ['option_id', 'value'];
     public $translatedAttributes = ['title'];
     public $translationForeignKey = 'option_value_id';
     public $translationModel = 'App\Models\Api\Ecommerce\OptionValueTranslation';
 
     public function option()
     {
-        return $this->belongsTo(Option::class , 'option_id' , 'id');
+        return $this->belongsTo(Option::class, 'option_id', 'id');
+    }
+
+    public function productOptionValues()
+    {
+        return $this->hasMany(ProductOptionValue::class, 'option_value_id');
+    }
+
+    public function variantOptionValues()
+    {
+        return $this->hasMany(VariantOptionValue::class, 'option_value_id');
     }
 }

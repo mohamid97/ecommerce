@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Product Filter API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Filter Products - Full Example",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/products/filter",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "products", "filter"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"category_id\": 1,\n  \"brand_id\": 1,\n  \"from\": 100,\n  \"to\": 500,\n  \"option_values\": [1, 2],\n  \"sort\": \"asc\",\n  \"sort_by\": \"sale_price\",\n  \"paginate\": 10\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Products - Search",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/products/filter",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "products", "filter"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"search\": \"laptop\",\n  \"sort\": \"desc\"\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Products - Category Slug",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/products/filter",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "products", "filter"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"category_slug\": \"electronics\"\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Products - Brand Slug",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/products/filter",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "products", "filter"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"brand_slug\": \"apple\"\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Products - Price Range Only",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/products/filter",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "products", "filter"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": 0,\n  \"to\": 1000\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Products - Option Values",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/products/filter",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "products", "filter"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"option_values\": [1, 2, 3]\n}"
+        }
+      },
+      "response": []
+    }
+  ]
+}
