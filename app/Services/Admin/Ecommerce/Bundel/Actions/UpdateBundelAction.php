@@ -13,20 +13,29 @@ class UpdateBundelAction{
         public ValidateBundel $validateBundel
     ) {}
     public function updateBundel($data){
-    
+     
         $translation = app(TranslationService::class);
         $bundel = Bundel::where('id', $data->id)->firstOrFail();
 
-        $bundel->update([
+        $updateData = [
             'price' => null,
             'discount' => $data->discount,
             'discount_type' => $data->discount_type,
             'category_id' => $data->category_id,
             'brand_id' => $data->brand_id,
-            'bundle_image' => $this->uploadImage($data->bundle_image, 'bundel', 'public'),
             'status' => $data->status,
-        ]);
- 
+        ];
+
+        // Handle bundle_image update logic:
+        // - If bundle_image is not set (not sent in request), don't update the image
+        // - If bundle_image is set but null/empty, set image to null (remove it)
+        // - If bundle_image is a valid file, upload and update the image
+        if (isset($data->bundle_image)) {
+            $updateData['bundle_image'] = $this->uploadImage($data->bundle_image, 'bundel', 'public');
+        }
+
+        $bundel->update($updateData);
+  
         $translation->storeTranslations($bundel, $data , ['title' , 'des' , 'meta_title' , 'meta_des']);
         $this->validateBundel->validateBundelDetails($bundel->id, $data);
         $this->updateBundelDetails($bundel->id , $data);
