@@ -123,7 +123,16 @@ class DynamicService
         }
         
         foreach ($columns as $column) {
-            $formatted[$column] = $record->$column ?? null;
+           if($column == 'slug'){
+               $formatted[$column] = [
+                   'ar'=>$record->translate('ar')->slug ?? null,
+                   'en'=>$record->translate('en')->slug ?? null
+                   ];
+           }else{
+                           $formatted[$column] = $record->$column ?? null;
+
+           }
+            
         }
         
         return $formatted;
