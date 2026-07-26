@@ -15,7 +15,12 @@ class BundelResource extends JsonResource
     public function toArray(Request $request): array
     {
         $title = $this->getColumnLang('title');
-        $slug = $this->getColumnLang('slug');
+        $slug = $this->slug;
+        if(!isset($slug) || empty($slug)){
+            $slug = $this->createSlugFromTitle($title);
+        }else{
+            $slug = $this->getColumnLang('slug');
+        }
 
         return [
             'id'=>$this->id,
@@ -41,7 +46,7 @@ class BundelResource extends JsonResource
             }),
             'title' => $title,
             // Create a fallback slug when the translation does not provide one.
-            'slug' => filled($slug) ? $slug : $this->createSlugFromTitle($title),
+            'slug' => $slug,
             'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),
         ];
