@@ -14,6 +14,7 @@ class BundelDetailsResourc extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $slug = $this->getColumnLang('slug');
         return [
             'id'=>$this->id,
             'price'=>(float) $this->getBundlePrice()['total_price'],
@@ -38,7 +39,7 @@ class BundelDetailsResourc extends JsonResource
                 ];
             }),
             'title'=>$this->getColumnLang('title'),
-            'slug'=>$this->getColumnLang('slug'),
+            'slug'=>filled($slug) ? $slug : $this->createSlugFromTitle($this->getColumnLang('title')),
             'des'=>$this->getColumnLang('des'),
             'meta_title'=>$this->getColumnLang('meta_title'),
             'meta_des'=>$this->getColumnLang('meta_des'),
@@ -159,6 +160,22 @@ class BundelDetailsResourc extends JsonResource
 
     
 
+    protected function createSlugFromTitle(array|string|null $title): ?string
+    {
+        if (is_array($title)) {
+            $title = filled($title['en'] ?? null)
+                ? $title['en']
+                : ($title['ar'] ?? null);
+        }
 
+        if (! is_string($title) || trim($title) === '') {
+            return null;
+        }
+
+        return strtolower((string) preg_replace('/\s+/u', '-', trim($title)));
+    }
+
+
+    
 
 }
