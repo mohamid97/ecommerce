@@ -13,6 +13,8 @@ use App\Http\Resources\Api\Front\Ecommerce\VaraintDetailsResource;
 use App\Services\Ecommerce\Product\ProductService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
 
 class ProductController extends Controller
 {
@@ -42,18 +44,29 @@ class ProductController extends Controller
     /**
      * Get detailed information for a single product.
      */
+
     public function productDetails(Request $request)
     {
         try {
             $product = $this->service->getProductDetails($request->id);
 
             if (!$product->has_options) {
-                return $this->success(new ProductNoOptionResource($product), __('main.show_successfully', ['model' => 'Product']));
+                return $this->success(
+                    new ProductNoOptionResource($product),
+                    __('main.show_successfully', ['model' => 'Product'])
+                );
             }
 
-            return $this->success(new ProductDetailsResource($product), __('main.show_successfully', ['model' => 'Product']));
+            return $this->success(
+                new ProductDetailsResource($product),
+                __('main.show_successfully', ['model' => 'Product'])
+            );
+
+        } catch (HttpExceptionInterface $e) {
+            return $this->error($e->getMessage(), $e->getStatusCode());
+
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), $e->getCode() ?: 500);
+            return $this->error($e->getMessage(), 500);
         }
     }
 

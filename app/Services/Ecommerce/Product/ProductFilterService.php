@@ -182,17 +182,33 @@ class ProductFilterService
         $groupedOptions = $optionValues->groupBy('option_id');
 
         foreach ($groupedOptions as $optionId => $values) {
-            $option = $values->first()->option;
+            $firstValue = $values->first();
+            if (!$firstValue || !$firstValue->option) {
+                continue;
+            }
+            $option = $firstValue->option;
             
-            $filterValues = $values->map(function ($value) use ($productIds, $currentFilters) {
+            $filterValues = $values->map(function ($value) use ($productIds, $currentFilters, $option) {
                 $count = $this->getProductCountByOptionValue($value->id, $productIds, $currentFilters);
                 
-                return [
+                $optionData = [
                     'id' => $value->id,
-                    'title' => $value->title,
+                    'label' => $value->title,
                     'value' => $value->value,
                     'count' => $count,
                 ];
+
+                // Add color for value_type 'color'
+                if ($option->value_type === 'color') {
+                    $optionData['color'] = $value->value;
+                }
+
+                // Add image for value_type 'image'
+                if ($option->value_type === 'image' && !empty($value->value)) {
+                    $optionData['image'] = $value->value;
+                }
+
+                return $optionData;
             })->filter(function ($item) {
                 return $item['count'] > 0;
             })->values();
@@ -200,19 +216,224 @@ class ProductFilterService
             if ($filterValues->isNotEmpty()) {
                 $filters[] = [
                     'id' => $option->id,
-                    'title' => $option->title,
-                    'code' => $option->code,
-                    'value_type' => $option->value_type,
-                    'values' => $filterValues,
+                    'name' => $option->title,
+                    'type' => 'option',
+                    'valueType' => $option->value_type,
+                    'options' => $filterValues,
                 ];
             }
         }
 
-        // Add categories filter
-        $filters['categories'] = $this->getCategoryFilters($productIds, $currentFilters);
+        // Add categories filter with hierarchical structure
+        $filters = $this->getCategoryFilters($productIds, $currentFilters, $filters);
 
         // Add brands filter
-        $filters['brands'] = $this->getBrandFilters($productIds, $currentFilters);
+        $filters = $this->getBrandFilters($productIds, $currentFilters, $filters);
+
+        // Add price range filter
+        $filters = $this->getPriceRangeFilter($productIds, $currentFilters, $filters);
+
+        return $filters;
+    }
+
+    /**
+     * Get category filters with product counts and hierarchical structure.
+     *
+     * @param array $productIds
+     * @param array $currentFilters
+     * @param array $filters
+     * @return array
+     */
+    private function getCategoryFilters(array $productIds, array $currentFilters, array $filters): array
+    {
+        $query = Category::whereHas('products', function ($q) use ($productIds) {
+            $q->whereIn('products.id', $productIds)
+                ->where('status', 'active');
+        });
+
+        // Apply other filters
+        if (!empty($currentFilters['brand_id'])) {
+            $query->whereHas('products', function ($q) use ($productIds, $currentFilters) {
+                $q->whereIn('products.id', $productIds)
+                    ->where('products.status', 'active')
+                    ->where('products.brand_id', $currentFilters['brand_id']);
+            });
+        }
+
+        $categories = $query->get();
+
+        $categoryOptions = $categories->map(function ($category) use ($productIds, $currentFilters) {
+            $count = $this->getProductCountByCategory($category->id, $productIds, $currentFilters);
+            
+            $categoryData = [
+                'id' => 'cat-' . $category->id,
+                'label' => $category->title,
+                'value' => $category->slug,
+                'count' => $count,
+            ];
+
+            // Load children for hierarchical structure
+            $children = $this->getCategoryChildren($category->id, $productIds, $currentFilters);
+            if (!empty($children)) {
+                $categoryData['children'] = $children;
+            }
+
+            return $categoryData;
+        })->filter(function ($item) {
+            return $item['count'] > 0;
+        })->values();
+
+        if ($categoryOptions->isNotEmpty()) {
+            $filters[] = [
+                'id' => 'category',
+                'name' => 'Category',
+                'type' => 'category',
+                'options' => $categoryOptions,
+            ];
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Get child categories recursively.
+     *
+     * @param int $parentId
+     * @param array $productIds
+     * @param array $currentFilters
+     * @return array
+     */
+    private function getCategoryChildren(int $parentId, array $productIds, array $currentFilters): array
+    {
+        $query = Category::where('parent_id', $parentId)
+            ->whereHas('products', function ($q) use ($productIds) {
+                $q->whereIn('products.id', $productIds)
+                    ->where('status', 'active');
+            });
+
+        $children = $query->get();
+
+        return $children->map(function ($child) use ($productIds, $currentFilters) {
+            $count = $this->getProductCountByCategory($child->id, $productIds, $currentFilters);
+            
+            $childData = [
+                'id' => 'cat-' . $child->id,
+                'label' => $child->title,
+                'value' => $child->slug,
+                'count' => $count,
+            ];
+
+            // Recursively get grandchildren
+            $grandchildren = $this->getCategoryChildren($child->id, $productIds, $currentFilters);
+            if (!empty($grandchildren)) {
+                $childData['children'] = $grandchildren;
+            }
+
+            return $childData;
+        })->filter(function ($item) {
+            return $item['count'] > 0;
+        })->values()->toArray();
+    }
+
+    /**
+     * Get brand filters with product counts.
+     *
+     * @param array $productIds
+     * @param array $currentFilters
+     * @param array $filters
+     * @return array
+     */
+    private function getBrandFilters(array $productIds, array $currentFilters, array $filters): array
+    {
+        $query = Brand::whereHas('products', function ($q) use ($productIds) {
+            $q->whereIn('products.id', $productIds)
+                ->where('status', 'active');
+        });
+
+        // Apply other filters
+        if (!empty($currentFilters['category_id'])) {
+            $query->whereHas('products', function ($q) use ($productIds, $currentFilters) {
+                $q->whereIn('products.id', $productIds)
+                    ->where('products.status', 'active')
+                    ->where('products.category_id', $currentFilters['category_id']);
+            });
+        }
+
+        $brands = $query->get();
+
+        $brandOptions = $brands->map(function ($brand) use ($productIds, $currentFilters) {
+            $count = $this->getProductCountByBrand($brand->id, $productIds, $currentFilters);
+            
+            return [
+                'id' => 'brand-' . $brand->id,
+                'label' => $brand->title,
+                'value' => $brand->slug,
+                'count' => $count,
+            ];
+        })->filter(function ($item) {
+            return $item['count'] > 0;
+        })->values();
+
+        if ($brandOptions->isNotEmpty()) {
+            $filters[] = [
+                'id' => 'brand',
+                'name' => 'Brand',
+                'type' => 'option',
+                'valueType' => 'text',
+                'options' => $brandOptions,
+            ];
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Get price range filter.
+     *
+     * @param array $productIds
+     * @param array $currentFilters
+     * @param array $filters
+     * @return array
+     */
+    private function getPriceRangeFilter(array $productIds, array $currentFilters, array $filters): array
+    {
+        $minPrice = null;
+        $maxPrice = null;
+
+        $products = Product::whereIn('id', $productIds)
+            ->where('status', 'active')
+            ->with(['variants' => function ($q) {
+                $q->where('status', '!=', 'draft');
+            }])
+            ->get();
+
+        foreach ($products as $product) {
+            if ($product->has_options) {
+                $variants = $product->relationLoaded('variants')
+                    ? $product->variants
+                    : $product->variants()->where('status', '!=', 'draft')->get();
+
+                if ($variants->isNotEmpty()) {
+                    $variantMin = (float) $variants->min('sale_price');
+                    $variantMax = (float) $variants->max('sale_price');
+
+                    $minPrice = $minPrice === null ? $variantMin : min($minPrice, $variantMin);
+                    $maxPrice = $maxPrice === null ? $variantMax : max($maxPrice, $variantMax);
+                }
+            } else {
+                $price = (float) $product->sale_price;
+                $minPrice = $minPrice === null ? $price : min($minPrice, $price);
+                $maxPrice = $maxPrice === null ? $price : max($maxPrice, $price);
+            }
+        }
+
+        $filters[] = [
+            'id' => 'price',
+            'name' => 'Price Range',
+            'type' => 'range',
+            'min' => $minPrice ?? 0,
+            'max' => $maxPrice ?? 1000,
+        ];
 
         return $filters;
     }
@@ -276,45 +497,6 @@ class ProductFilterService
     }
 
     /**
-     * Get category filters with product counts.
-     *
-     * @param array $productIds
-     * @param array $currentFilters
-     * @return array
-     */
-    private function getCategoryFilters(array $productIds, array $currentFilters): array
-    {
-        $query = Category::whereHas('products', function ($q) use ($productIds) {
-            $q->whereIn('products.id', $productIds)
-                ->where('status', 'active');
-        });
-
-        // Apply other filters
-        if (!empty($currentFilters['brand_id'])) {
-            $query->whereHas('products', function ($q) use ($productIds, $currentFilters) {
-                $q->whereIn('products.id', $productIds)
-                    ->where('products.status', 'active')
-                    ->where('products.brand_id', $currentFilters['brand_id']);
-            });
-        }
-
-        $categories = $query->get();
-
-        return $categories->map(function ($category) use ($productIds, $currentFilters) {
-            $count = $this->getProductCountByCategory($category->id, $productIds, $currentFilters);
-            
-            return [
-                'id' => $category->id,
-                'title' => $category->title,
-                'slug' => $category->slug,
-                'count' => $count,
-            ];
-        })->filter(function ($item) {
-            return $item['count'] > 0;
-        })->values()->toArray();
-    }
-
-    /**
      * Get product count for a specific category.
      *
      * @param int $categoryId
@@ -354,45 +536,6 @@ class ProductFilterService
         }
 
         return $query->count();
-    }
-
-    /**
-     * Get brand filters with product counts.
-     *
-     * @param array $productIds
-     * @param array $currentFilters
-     * @return array
-     */
-    private function getBrandFilters(array $productIds, array $currentFilters): array
-    {
-        $query = Brand::whereHas('products', function ($q) use ($productIds) {
-            $q->whereIn('products.id', $productIds)
-                ->where('status', 'active');
-        });
-
-        // Apply other filters
-        if (!empty($currentFilters['category_id'])) {
-            $query->whereHas('products', function ($q) use ($productIds, $currentFilters) {
-                $q->whereIn('products.id', $productIds)
-                    ->where('products.status', 'active')
-                    ->where('products.category_id', $currentFilters['category_id']);
-            });
-        }
-
-        $brands = $query->get();
-
-        return $brands->map(function ($brand) use ($productIds, $currentFilters) {
-            $count = $this->getProductCountByBrand($brand->id, $productIds, $currentFilters);
-            
-            return [
-                'id' => $brand->id,
-                'title' => $brand->title,
-                'slug' => $brand->slug,
-                'count' => $count,
-            ];
-        })->filter(function ($item) {
-            return $item['count'] > 0;
-        })->values()->toArray();
     }
 
     /**
@@ -482,9 +625,26 @@ class ProductFilterService
     private function getEmptyFilters(): array
     {
         return [
-            'options' => [],
-            'categories' => [],
-            'brands' => [],
+            [
+                'id' => 'category',
+                'name' => 'Category',
+                'type' => 'category',
+                'options' => [],
+            ],
+            [
+                'id' => 'brand',
+                'name' => 'Brand',
+                'type' => 'option',
+                'valueType' => 'text',
+                'options' => [],
+            ],
+            [
+                'id' => 'price',
+                'name' => 'Price Range',
+                'type' => 'range',
+                'min' => 0,
+                'max' => 1000,
+            ],
         ];
     }
 }

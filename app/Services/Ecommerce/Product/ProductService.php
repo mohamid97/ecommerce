@@ -9,6 +9,8 @@ use App\Models\Api\Ecommerce\NewProduct;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Admin\RelatedProduct;
 use Exception;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 
 class ProductService
 {
@@ -122,7 +124,8 @@ class ProductService
             // need to throw 404 not found
             
         if (!$product) {
-            throw new Exception(__('main.not_found', ['model' => 'Product']));
+            // 404
+            throw new NotFoundHttpException(__('main.not_found', ['model' => 'Product']));
         }
 
         if ($product->has_options) {
