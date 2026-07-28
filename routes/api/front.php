@@ -105,9 +105,9 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         Route::post('related' , 'relatedProducts');
     });
 
-    // Product filter with available options
+    // Product filter with available options (GET with query params)
     Route::prefix('products')->namespace('Ecommerce')->controller('ProductFilterController')->group(function(){
-        Route::post('filter' , 'filter');
+        Route::get('filter' , 'filter');
     });
 
     Route::prefix('industries')->namespace('Ecommerce')->controller('ProductController')->group(function(){
