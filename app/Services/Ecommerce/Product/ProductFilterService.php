@@ -244,16 +244,46 @@ class ProductFilterService
             }
         }
 
-        // Add categories filter with hierarchical structure
+        // Add categories filter with hierarchical structure (first)
         $filters = $this->getCategoryFilters($productIds, $currentFilters, $filters);
 
-        // Add brands filter
+        // Add brands filter (second)
         $filters = $this->getBrandFilters($productIds, $currentFilters, $filters);
 
-        // Add price range filter
+        // Add price range filter (last)
         $filters = $this->getPriceRangeFilter($productIds, $currentFilters, $filters);
 
-        return $filters;
+        // Reorder filters: category first, brand second, options third, price last
+        $orderedFilters = [];
+        $categoryFilter = null;
+        $brandFilter = null;
+        $optionFilters = [];
+        $priceFilter = null;
+
+        foreach ($filters as $filter) {
+            if ($filter['id'] === 'category') {
+                $categoryFilter = $filter;
+            } elseif ($filter['id'] === 'brand') {
+                $brandFilter = $filter;
+            } elseif ($filter['id'] === 'price') {
+                $priceFilter = $filter;
+            } else {
+                $optionFilters[] = $filter;
+            }
+        }
+
+        if ($categoryFilter) {
+            $orderedFilters[] = $categoryFilter;
+        }
+        if ($brandFilter) {
+            $orderedFilters[] = $brandFilter;
+        }
+        $orderedFilters = array_merge($orderedFilters, $optionFilters);
+        if ($priceFilter) {
+            $orderedFilters[] = $priceFilter;
+        }
+
+        return $orderedFilters;
     }
 
     /**

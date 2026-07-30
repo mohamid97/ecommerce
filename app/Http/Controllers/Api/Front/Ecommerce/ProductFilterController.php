@@ -34,9 +34,11 @@ class ProductFilterController extends Controller
                         'current_page' => $result['products']->currentPage(),
                         'last_page' => $result['products']->lastPage(),
                     ],
+                    'filters' => $result['filters'],
+                    'price_range' => $result['price_range'],
                 ],
-                'filters' => $result['filters'],
-                'price_range' => $result['price_range'],
+                
+                
             ]);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
