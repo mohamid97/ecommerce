@@ -112,28 +112,7 @@ class ProductFilterService
 
         // Dynamic option filters from query params: ?optionCode=value
         // Any key in data that matches an option code is treated as an option filter
-        $options = Option::with('values.translations')->get();
-        foreach ($options as $option) {
-            $optionCode = $option->code ?: 'option_' . $option->id;
-            if (!empty($data[$optionCode])) {
-                $filterValues = (array) $data[$optionCode];
-                // Find matching option value IDs by translated title in current locale
-                $matchingValueIds = [];
-                foreach ($option->values as $optValue) {
-                    if (in_array($optValue->title, $filterValues)) {
-                        $matchingValueIds[] = $optValue->id;
-                    }
-                }
-                if (!empty($matchingValueIds)) {
-                    $query->whereHas('variants', function ($q) use ($matchingValueIds) {
-                        $q->where('status', '!=', 'draft');
-                        $q->whereHas('variants', function ($vq) use ($matchingValueIds) {
-                            $vq->whereIn('option_value_id', $matchingValueIds);
-                        });
-                    });
-                }
-            }
-        }
+        $this->applyCurrentFilterConstraints($query, $data);
 
         // Only active products
         $query->where('status', 'active');
@@ -149,6 +128,30 @@ class ProductFilterService
     }
 
     /**
+     * Resolve the active locale safely in both runtime and testing environments.
+     *
+     * @return string
+     */
+    private function getCurrentLocale(): string
+    {
+        if (function_exists('app')) {
+            try {
+                $container = app();
+                if (is_object($container) && method_exists($container, 'getLocale')) {
+                    $locale = $container->getLocale();
+                    if (!empty($locale)) {
+                        return $locale;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fall back to the environment locale below.
+            }
+        }
+
+        return env('APP_LOCALE', 'en');
+    }
+
+    /**
      * Get the translated value for the current locale.
      *
      * @param \Illuminate\Database\Eloquent\Model $model
@@ -157,7 +160,7 @@ class ProductFilterService
      */
     private function getLocalizedValue($model, string $attribute = 'title'): string
     {
-        $locale = app()->getLocale();
+        $locale = $this->getCurrentLocale();
         $translated = optional($model->translate($locale))->{$attribute};
         return $translated ?: $model->{$attribute};
     }
@@ -203,7 +206,7 @@ class ProductFilterService
             $optionCode = $option->code ?: 'option_' . $option->id;
 
             $filterValues = $values->map(function ($value) use ($productIds, $currentFilters, $option, $optionCode) {
-                $count = $this->getProductCountByOptionValue($value->id, $productIds, $currentFilters);
+                $count = $this->getProductCountByOptionValue($value->id, $productIds, $currentFilters, $optionCode);
 
                 // Get translated title for current locale for URL-friendly value
                 // In URL: ?size=small (English) or ?size=صغير (Arabic)
@@ -296,34 +299,32 @@ class ProductFilterService
      */
     private function getCategoryFilters(array $productIds, array $currentFilters, array $filters): array
     {
-        $query = Category::with('translations')->whereHas('products', function ($q) use ($productIds) {
-            $q->whereIn('products.id', $productIds)
-                ->where('status', 'active');
+        $allCategories = Category::with('translations')
+            ->orderBy('parent_id')
+            ->orderBy('order')
+            ->get();
+
+        $categoryMap = $allCategories->mapWithKeys(function ($category) {
+            return [$category->id => $category];
         });
 
-        $categories = $query->get();
+        $categoryOptions = [];
 
-        $categoryOptions = $categories->map(function ($category) use ($productIds, $currentFilters) {
-            $count = $this->getProductCountByCategory($category->id, $productIds, $currentFilters);
-
-            $categoryData = [
-                'id' => $this->getLocalizedValue($category, 'slug'),
-                'value' => $this->getLocalizedValue($category),
-                'count' => $count,
-            ];
-
-            // Load children for hierarchical structure
-            $children = $this->getCategoryChildren($category->id, $productIds, $currentFilters);
-            if (!empty($children)) {
-                $categoryData['children'] = $children;
+        foreach ($allCategories as $category) {
+            if ($category->parent_id !== null) {
+                continue;
             }
 
-            return $categoryData;
-        })->filter(function ($item) {
-            return $item['count'] > 0;
-        })->values();
+            $node = $this->buildCategoryNode($category, $productIds, $currentFilters);
+            if ($node === null) {
+                continue;
+            }
 
-        if ($categoryOptions->isNotEmpty()) {
+            $this->attachCategoryChildren($node, $category->id, $categoryMap, $productIds, $currentFilters);
+            $categoryOptions[] = $node;
+        }
+
+        if (!empty($categoryOptions)) {
             $filters[] = [
                 'id' => 'category',
                 'name' => $this->getCategoryTranslatedName(),
@@ -336,13 +337,61 @@ class ProductFilterService
     }
 
     /**
+     * Build a single category node and its nested children.
+     *
+     * @param \App\Models\Api\Admin\Category $category
+     * @param array $productIds
+     * @param array $currentFilters
+     * @return array|null
+     */
+    protected function buildCategoryNode($category, array $productIds, array $currentFilters): ?array
+    {
+        $count = $this->getProductCountByCategory($category->id, $productIds, $currentFilters);
+
+        return [
+            'id' => $this->getLocalizedValue($category, 'slug'),
+            'value' => $this->getLocalizedValue($category),
+            'count' => $count,
+        ];
+    }
+
+    /**
+     * Attach child categories to a parent node.
+     *
+     * @param array $parentNode
+     * @param int $parentId
+     * @param \Illuminate\Support\Collection $categoryMap
+     * @param array $productIds
+     * @param array $currentFilters
+     * @return void
+     */
+    protected function attachCategoryChildren(array &$parentNode, int $parentId, $categoryMap, array $productIds, array $currentFilters): void
+    {
+        $children = [];
+
+        foreach ($categoryMap as $category) {
+            if ($category->parent_id !== $parentId) {
+                continue;
+            }
+
+            $childNode = $this->buildCategoryNode($category, $productIds, $currentFilters);
+            $this->attachCategoryChildren($childNode, $category->id, $categoryMap, $productIds, $currentFilters);
+            $children[] = $childNode;
+        }
+
+        if (!empty($children)) {
+            $parentNode['children'] = $children;
+        }
+    }
+
+    /**
      * Get category translated name.
      *
      * @return array
      */
     private function getCategoryTranslatedName(): string
     {
-        $locale = app()->getLocale();
+        $locale = $this->getCurrentLocale();
         $names = [
             'ar' => 'الفئات',
             'en' => 'Category',
@@ -358,34 +407,17 @@ class ProductFilterService
      * @param array $currentFilters
      * @return array
      */
-    private function getCategoryChildren(int $parentId, array $productIds, array $currentFilters): array
+    protected function getCategoryChildren(int $parentId, array $productIds, array $currentFilters): array
     {
-        $query = Category::with('translations')->where('parent_id', $parentId)
-            ->whereHas('products', function ($q) use ($productIds) {
-                $q->whereIn('products.id', $productIds)
-                    ->where('status', 'active');
-            });
-
-        $children = $query->get();
+        $children = Category::with('translations')
+            ->where('parent_id', $parentId)
+            ->orderBy('order')
+            ->get();
 
         return $children->map(function ($child) use ($productIds, $currentFilters) {
-            $count = $this->getProductCountByCategory($child->id, $productIds, $currentFilters);
-
-            $childData = [
-                'id' => $this->getLocalizedValue($child, 'slug'),
-                'value' => $this->getLocalizedValue($child),
-                'count' => $count,
-            ];
-
-            // Recursively get grandchildren
-            $grandchildren = $this->getCategoryChildren($child->id, $productIds, $currentFilters);
-            if (!empty($grandchildren)) {
-                $childData['children'] = $grandchildren;
-            }
-
-            return $childData;
+            return $this->buildCategoryNode($child, $productIds, $currentFilters);
         })->filter(function ($item) {
-            return $item['count'] > 0;
+            return $item !== null;
         })->values()->toArray();
     }
 
@@ -512,18 +544,15 @@ class ProductFilterService
     }
 
     /**
-     * Get product count for a specific option value.
+     * Apply currently selected global filters to a product query.
      *
-     * @param int $optionValueId
-     * @param array $productIds
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $currentFilters
-     * @return int
+     * @param string|null $excludedOptionCode
+     * @return void
      */
-    private function getProductCountByOptionValue(int $optionValueId, array $productIds, array $currentFilters): int
+    private function applyCurrentFilterConstraints($query, array $currentFilters, ?string $excludedOptionCode = null): void
     {
-        $query = Product::whereIn('id', $productIds)
-            ->where('status', 'active');
-
         if (!empty($currentFilters['category'])) {
             $query->whereHas('category.translations', function ($q) use ($currentFilters) {
                 $q->where('slug', $currentFilters['category']);
@@ -557,6 +586,101 @@ class ProductFilterService
                 });
             });
         }
+
+        $options = Option::with('values.translations')->get();
+        foreach ($options as $option) {
+            $optionCode = $option->code ?: 'option_' . $option->id;
+            if ($excludedOptionCode !== null && $optionCode === $excludedOptionCode) {
+                continue;
+            }
+
+            $filterValues = $this->getOptionFilterValues($currentFilters, $optionCode);
+            if (empty($filterValues)) {
+                continue;
+            }
+
+            $matchingValueIds = $this->getMatchingOptionValueIds($option, $filterValues);
+            if (empty($matchingValueIds)) {
+                continue;
+            }
+
+            $query->whereHas('variants', function ($q) use ($matchingValueIds) {
+                $q->where('status', '!=', 'draft');
+                $q->whereHas('variants', function ($vq) use ($matchingValueIds) {
+                    $vq->whereIn('option_value_id', $matchingValueIds);
+                });
+            });
+        }
+    }
+
+    /**
+     * Normalize filter values from request input.
+     *
+     * @param mixed $filterValues
+     * @return array
+     */
+    private function getOptionFilterValues(array $currentFilters, string $optionCode): array
+    {
+        if (!isset($currentFilters[$optionCode])) {
+            return [];
+        }
+
+        $filterValues = $currentFilters[$optionCode];
+        if (is_string($filterValues)) {
+            $filterValues = explode(',', $filterValues);
+        }
+
+        if (!is_array($filterValues)) {
+            $filterValues = [$filterValues];
+        }
+
+        return array_values(array_filter(array_map(function ($value) {
+            return is_scalar($value) ? trim((string) $value) : null;
+        }, $filterValues), function ($value) {
+            return $value !== null && $value !== '';
+        }));
+    }
+
+    /**
+     * Find matching option value IDs for a set of selected filter values.
+     *
+     * @param \App\Models\Api\Ecommerce\Option $option
+     * @param array $filterValues
+     * @return array
+     */
+    private function getMatchingOptionValueIds($option, array $filterValues): array
+    {
+        $matchingValueIds = [];
+
+        foreach ($option->values as $optValue) {
+            $localizedTitle = $this->getLocalizedValue($optValue);
+            $fallbackValue = $option->value_type !== 'text' && !empty($optValue->value)
+                ? $optValue->value
+                : $localizedTitle;
+
+            if (in_array($localizedTitle, $filterValues, true) || in_array($fallbackValue, $filterValues, true)) {
+                $matchingValueIds[] = $optValue->id;
+            }
+        }
+
+        return $matchingValueIds;
+    }
+
+    /**
+     * Get product count for a specific option value.
+     *
+     * @param int $optionValueId
+     * @param array $productIds
+     * @param array $currentFilters
+     * @param string|null $optionCode
+     * @return int
+     */
+    private function getProductCountByOptionValue(int $optionValueId, array $productIds, array $currentFilters, ?string $optionCode = null): int
+    {
+        $query = Product::whereIn('id', $productIds)
+            ->where('status', 'active');
+
+        $this->applyCurrentFilterConstraints($query, $currentFilters, $optionCode);
 
         // Filter by this option value
         $query->where(function ($q) use ($optionValueId) {
@@ -579,38 +703,13 @@ class ProductFilterService
      * @param array $currentFilters
      * @return int
      */
-    private function getProductCountByCategory(int $categoryId, array $productIds, array $currentFilters): int
+    protected function getProductCountByCategory(int $categoryId, array $productIds, array $currentFilters): int
     {
         $query = Product::where('category_id', $categoryId)
+            ->whereIn('id', $productIds)
             ->where('status', 'active');
 
-        if (!empty($currentFilters['brand'])) {
-            $query->whereHas('brand.translations', function ($q) use ($currentFilters) {
-                $q->where('slug', $currentFilters['brand']);
-            });
-        }
-
-        if (!empty($currentFilters['from']) && is_numeric($currentFilters['from'])) {
-            $query->where(function ($q) use ($currentFilters) {
-                $q->where('has_options', false)
-                    ->where('sale_price', '>=', (float) $currentFilters['from']);
-                $q->orWhereHas('variants', function ($vq) use ($currentFilters) {
-                    $vq->where('status', '!=', 'draft')
-                        ->where('sale_price', '>=', (float) $currentFilters['from']);
-                });
-            });
-        }
-
-        if (!empty($currentFilters['to']) && is_numeric($currentFilters['to'])) {
-            $query->where(function ($q) use ($currentFilters) {
-                $q->where('has_options', false)
-                    ->where('sale_price', '<=', (float) $currentFilters['to']);
-                $q->orWhereHas('variants', function ($vq) use ($currentFilters) {
-                    $vq->where('status', '!=', 'draft')
-                        ->where('sale_price', '<=', (float) $currentFilters['to']);
-                });
-            });
-        }
+        $this->applyCurrentFilterConstraints($query, $currentFilters);
 
         return $query->count();
     }
@@ -626,35 +725,10 @@ class ProductFilterService
     private function getProductCountByBrand(int $brandId, array $productIds, array $currentFilters): int
     {
         $query = Product::where('brand_id', $brandId)
+            ->whereIn('id', $productIds)
             ->where('status', 'active');
 
-        if (!empty($currentFilters['category'])) {
-            $query->whereHas('category.translations', function ($q) use ($currentFilters) {
-                $q->where('slug', $currentFilters['category']);
-            });
-        }
-
-        if (!empty($currentFilters['from']) && is_numeric($currentFilters['from'])) {
-            $query->where(function ($q) use ($currentFilters) {
-                $q->where('has_options', false)
-                    ->where('sale_price', '>=', (float) $currentFilters['from']);
-                $q->orWhereHas('variants', function ($vq) use ($currentFilters) {
-                    $vq->where('status', '!=', 'draft')
-                        ->where('sale_price', '>=', (float) $currentFilters['from']);
-                });
-            });
-        }
-
-        if (!empty($currentFilters['to']) && is_numeric($currentFilters['to'])) {
-            $query->where(function ($q) use ($currentFilters) {
-                $q->where('has_options', false)
-                    ->where('sale_price', '<=', (float) $currentFilters['to']);
-                $q->orWhereHas('variants', function ($vq) use ($currentFilters) {
-                    $vq->where('status', '!=', 'draft')
-                        ->where('sale_price', '<=', (float) $currentFilters['to']);
-                });
-            });
-        }
+        $this->applyCurrentFilterConstraints($query, $currentFilters);
 
         return $query->count();
     }
