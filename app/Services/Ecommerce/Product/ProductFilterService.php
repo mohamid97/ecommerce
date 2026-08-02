@@ -34,8 +34,8 @@ class ProductFilterService
         $paginate = (!empty($data['paginate']) && ($data['paginate'] >= 1 && $data['paginate'] <= 100)) ? $data['paginate'] : 10;
         $products = $query->paginate($paginate);
 
-        // Get available filters with counts based on current product set
-        $filters = $this->getAvailableFilters($products->items(), $data);
+        // Facets are based on all matching products, not only this page.
+        $filters = $this->getAvailableFilters($data);
 
         // Get price range
         $priceRange = $this->getPriceRange($products->items());
@@ -54,7 +54,7 @@ class ProductFilterService
      * @param array $data
      * @return void
      */
-    private function applyBaseFilters($query, array $data): void
+    private function applyBaseFilters($query, array $data, ?string $excludedFacet = null): void
     {
         // Search filter
         if (!empty($data['search'])) {
@@ -64,14 +64,14 @@ class ProductFilterService
         }
 
         // Category filter: ?category=slug
-        if (!empty($data['category'])) {
+        if ($excludedFacet !== 'category' && !empty($data['category'])) {
             $query->whereHas('category.translations', function ($q) use ($data) {
                 $q->where('slug', $data['category']);
             });
         }
 
         // Brand filter: ?brand=slug
-        if (!empty($data['brand'])) {
+        if ($excludedFacet !== 'brand' && !empty($data['brand'])) {
             $query->whereHas('brand.translations', function ($q) use ($data) {
                 $q->where('slug', $data['brand']);
             });
@@ -87,7 +87,7 @@ class ProductFilterService
             $max = (float) $data['to'];
         }
 
-        if ($min !== null || $max !== null) {
+        if ($excludedFacet !== 'price' && ($min !== null || $max !== null)) {
             $query->where(function ($q) use ($min, $max) {
                 $q->where(function ($q2) use ($min, $max) {
                     $q2->where('has_options', false);
@@ -112,7 +112,7 @@ class ProductFilterService
 
         // Dynamic option filters from query params: ?optionCode=value
         // Any key in data that matches an option code is treated as an option filter
-        $this->applyCurrentFilterConstraints($query, $data);
+        $this->applyCurrentFilterConstraints($query, $data, $excludedFacet);
 
         // Only active products
         $query->where('status', 'active');
@@ -125,6 +125,19 @@ class ProductFilterService
                 $query->orderBy('created_at', $data['sort']);
             }
         }
+    }
+
+    /**
+     * Return the complete product universe for one facet. The facet named in
+     * $excludedFacet is intentionally not applied; every other request filter
+     * remains in force.
+     */
+    private function getFacetProductIds(array $data, ?string $excludedFacet): array
+    {
+        $query = Product::query();
+        $this->applyBaseFilters($query, $data, $excludedFacet);
+
+        return $query->pluck('id')->all();
     }
 
     /**
@@ -172,9 +185,9 @@ class ProductFilterService
      * @param array $currentFilters
      * @return array
      */
-    private function getAvailableFilters(array $products, array $currentFilters): array
+    private function getAvailableFilters(array $currentFilters): array
     {
-        $productIds = collect($products)->pluck('id')->toArray();
+        $productIds = $this->getFacetProductIds($currentFilters, null);
 
         // If no products, return empty filters
         if (empty($productIds)) {
@@ -183,14 +196,10 @@ class ProductFilterService
 
         $filters = [];
 
-        // Get all option values for these products (with translations)
+        // Enumerate values globally, then retain only values whose count is
+        // positive in that facet's own candidate set. This is what lets a
+        // selected Color still show all compatible colors.
         $optionValues = OptionValue::with(['option', 'option.translations', 'translations'])
-            ->whereHas('productOptionValues.productOption', function ($q) use ($productIds) {
-                $q->whereIn('product_id', $productIds);
-            })
-            ->orWhereHas('variantOptionValues.productVariant.product', function ($q) use ($productIds) {
-                $q->whereIn('id', $productIds);
-            })
             ->get();
 
         // Group by option
@@ -248,13 +257,13 @@ class ProductFilterService
         }
 
         // Add categories filter with hierarchical structure (first)
-        $filters = $this->getCategoryFilters($productIds, $currentFilters, $filters);
+        $filters = $this->getCategoryFilters($this->getFacetProductIds($currentFilters, 'category'), $currentFilters, $filters);
 
         // Add brands filter (second)
-        $filters = $this->getBrandFilters($productIds, $currentFilters, $filters);
+        $filters = $this->getBrandFilters($this->getFacetProductIds($currentFilters, 'brand'), $currentFilters, $filters);
 
         // Add price range filter (last)
-        $filters = $this->getPriceRangeFilter($productIds, $currentFilters, $filters);
+        $filters = $this->getPriceRangeFilter($this->getFacetProductIds($currentFilters, 'price'), $currentFilters, $filters);
 
         // Reorder filters: category first, brand second, options third, price last
         $orderedFilters = [];
@@ -553,19 +562,19 @@ class ProductFilterService
      */
     private function applyCurrentFilterConstraints($query, array $currentFilters, ?string $excludedOptionCode = null): void
     {
-        if (!empty($currentFilters['category'])) {
+        if ($excludedOptionCode !== 'category' && !empty($currentFilters['category'])) {
             $query->whereHas('category.translations', function ($q) use ($currentFilters) {
                 $q->where('slug', $currentFilters['category']);
             });
         }
 
-        if (!empty($currentFilters['brand'])) {
+        if ($excludedOptionCode !== 'brand' && !empty($currentFilters['brand'])) {
             $query->whereHas('brand.translations', function ($q) use ($currentFilters) {
                 $q->where('slug', $currentFilters['brand']);
             });
         }
 
-        if (!empty($currentFilters['from']) && is_numeric($currentFilters['from'])) {
+        if ($excludedOptionCode !== 'price' && !empty($currentFilters['from']) && is_numeric($currentFilters['from'])) {
             $query->where(function ($q) use ($currentFilters) {
                 $q->where('has_options', false)
                     ->where('sale_price', '>=', (float) $currentFilters['from']);
@@ -576,7 +585,7 @@ class ProductFilterService
             });
         }
 
-        if (!empty($currentFilters['to']) && is_numeric($currentFilters['to'])) {
+        if ($excludedOptionCode !== 'price' && !empty($currentFilters['to']) && is_numeric($currentFilters['to'])) {
             $query->where(function ($q) use ($currentFilters) {
                 $q->where('has_options', false)
                     ->where('sale_price', '<=', (float) $currentFilters['to']);
@@ -677,10 +686,8 @@ class ProductFilterService
      */
     private function getProductCountByOptionValue(int $optionValueId, array $productIds, array $currentFilters, ?string $optionCode = null): int
     {
-        $query = Product::whereIn('id', $productIds)
-            ->where('status', 'active');
-
-        $this->applyCurrentFilterConstraints($query, $currentFilters, $optionCode);
+        $query = Product::query();
+        $this->applyBaseFilters($query, $currentFilters, $optionCode);
 
         // Filter by this option value
         $query->where(function ($q) use ($optionValueId) {
@@ -705,11 +712,8 @@ class ProductFilterService
      */
     protected function getProductCountByCategory(int $categoryId, array $productIds, array $currentFilters): int
     {
-        $query = Product::where('category_id', $categoryId)
-            ->whereIn('id', $productIds)
-            ->where('status', 'active');
-
-        $this->applyCurrentFilterConstraints($query, $currentFilters);
+        $query = Product::where('category_id', $categoryId);
+        $this->applyBaseFilters($query, $currentFilters, 'category');
 
         return $query->count();
     }
@@ -724,11 +728,8 @@ class ProductFilterService
      */
     private function getProductCountByBrand(int $brandId, array $productIds, array $currentFilters): int
     {
-        $query = Product::where('brand_id', $brandId)
-            ->whereIn('id', $productIds)
-            ->where('status', 'active');
-
-        $this->applyCurrentFilterConstraints($query, $currentFilters);
+        $query = Product::where('brand_id', $brandId);
+        $this->applyBaseFilters($query, $currentFilters, 'brand');
 
         return $query->count();
     }
