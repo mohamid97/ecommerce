@@ -613,10 +613,11 @@ class ProductFilterService
                 continue;
             }
 
-            $query->whereHas('variants', function ($q) use ($matchingValueIds) {
+            $query->whereHas('variants', function ($q) use ($option, $matchingValueIds) {
                 $q->where('status', '!=', 'draft');
-                $q->whereHas('variants', function ($vq) use ($matchingValueIds) {
-                    $vq->whereIn('option_value_id', $matchingValueIds);
+                $q->whereHas('variants', function ($vq) use ($option, $matchingValueIds) {
+                    $vq->where('option_id', $option->id)
+                        ->whereIn('option_value_id', $matchingValueIds);
                 });
             });
         }
@@ -686,7 +687,8 @@ class ProductFilterService
      */
     private function getProductCountByOptionValue(int $optionValueId, array $productIds, array $currentFilters, ?string $optionCode = null): int
     {
-        $query = Product::query();
+        $query = Product::whereIn('id', $productIds)
+            ->where('status', 'active');
         $this->applyBaseFilters($query, $currentFilters, $optionCode);
 
         // Filter by this option value
@@ -712,7 +714,9 @@ class ProductFilterService
      */
     protected function getProductCountByCategory(int $categoryId, array $productIds, array $currentFilters): int
     {
-        $query = Product::where('category_id', $categoryId);
+        $query = Product::where('category_id', $categoryId)
+            ->whereIn('id', $productIds)
+            ->where('status', 'active');
         $this->applyBaseFilters($query, $currentFilters, 'category');
 
         return $query->count();
@@ -728,7 +732,9 @@ class ProductFilterService
      */
     private function getProductCountByBrand(int $brandId, array $productIds, array $currentFilters): int
     {
-        $query = Product::where('brand_id', $brandId);
+        $query = Product::where('brand_id', $brandId)
+            ->whereIn('id', $productIds)
+            ->where('status', 'active');
         $this->applyBaseFilters($query, $currentFilters, 'brand');
 
         return $query->count();
