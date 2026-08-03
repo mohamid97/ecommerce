@@ -59,6 +59,7 @@ class BundelResource extends JsonResource
      */
     protected function createSlugFromTitle(array|string|null $title): array|string|null
     {
+        $data = [];
         if (is_array($title)) {
         $data['ar'] = strtolower((string) preg_replace('/\s+/u', '-', trim($title['ar'] ?? '')));
         $data['en'] = strtolower((string) preg_replace('/\s+/u', '-', trim($title['en'] ?? '')));
