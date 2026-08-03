@@ -141,6 +141,71 @@ class ProductFilterService
     }
 
     /**
+     * Get the base product universe for option facets.
+     *
+     * Applies only category, brand, price-range, and search — deliberately
+     * ignoring all option-value filters. This determines the full set of
+     * products that are "in scope" for the sidebar, regardless of which
+     * option checkboxes the user has ticked.
+     *
+     * Example: ?category=shirts&color=red  →  base universe = ALL shirt
+     * products (red and non-red), so the Color facet can show every shirt
+     * color that exists, not just red.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function getBaseProductIds(array $data): array
+    {
+        $query = Product::query()->where('status', 'active');
+
+        if (!empty($data['search'])) {
+            $query->whereHas('translations', function ($q) use ($data) {
+                $q->where('title', 'like', '%' . $data['search'] . '%');
+            });
+        }
+
+        if (!empty($data['category'])) {
+            $query->whereHas('category.translations', function ($q) use ($data) {
+                $q->where('slug', $data['category']);
+            });
+        }
+
+        if (!empty($data['brand'])) {
+            $query->whereHas('brand.translations', function ($q) use ($data) {
+                $q->where('slug', $data['brand']);
+            });
+        }
+
+        $min = isset($data['from']) && is_numeric($data['from']) ? (float) $data['from'] : null;
+        $max = isset($data['to'])   && is_numeric($data['to'])   ? (float) $data['to']   : null;
+
+        if ($min !== null || $max !== null) {
+            $query->where(function ($q) use ($min, $max) {
+                $q->where(function ($q2) use ($min, $max) {
+                    $q2->where('has_options', false);
+                    if ($min !== null) {
+                        $q2->where('sale_price', '>=', $min);
+                    }
+                    if ($max !== null) {
+                        $q2->where('sale_price', '<=', $max);
+                    }
+                })->orWhereHas('variants', function ($vq) use ($min, $max) {
+                    $vq->where('status', '!=', 'draft');
+                    if ($min !== null) {
+                        $vq->where('sale_price', '>=', $min);
+                    }
+                    if ($max !== null) {
+                        $vq->where('sale_price', '<=', $max);
+                    }
+                });
+            });
+        }
+
+        return $query->pluck('id')->all();
+    }
+
+    /**
      * Resolve the active locale safely in both runtime and testing environments.
      *
      * @return string
@@ -187,19 +252,28 @@ class ProductFilterService
      */
     private function getAvailableFilters(array $currentFilters): array
     {
-        $productIds = $this->getFacetProductIds($currentFilters, null);
+        // ── Step 1: Determine the base product universe ────────────────────────
+        // This is the set of products matching category + brand + price + search
+        // but intentionally ignoring ALL option-value filters.
+        // It defines *which* options/values are relevant to show in the sidebar.
+        $baseProductIds = $this->getBaseProductIds($currentFilters);
 
-        // If no products, return empty filters
-        if (empty($productIds)) {
+        if (empty($baseProductIds)) {
             return $this->getEmptyFilters();
         }
 
         $filters = [];
 
-        // Enumerate values globally, then retain only values whose count is
-        // positive in that facet's own candidate set. This is what lets a
-        // selected Color still show all compatible colors.
+        // ── Step 2: Load only option values used by products in the base universe
+        // If ?category=shirts is active, this will only return options that
+        // shirt products actually use — no laptop RAM options will appear.
         $optionValues = OptionValue::with(['option', 'option.translations', 'translations'])
+            ->whereHas('variantOptionValues', function ($q) use ($baseProductIds) {
+                $q->whereHas('productVariant', function ($pvq) use ($baseProductIds) {
+                    $pvq->whereIn('product_id', $baseProductIds)
+                        ->where('status', '!=', 'draft');
+                });
+            })
             ->get();
 
         // Group by option
@@ -214,21 +288,30 @@ class ProductFilterService
 
             $optionCode = $option->code ?: 'option_' . $option->id;
 
-            $filterValues = $values->map(function ($value) use ($productIds, $currentFilters, $option, $optionCode) {
-                $count = $this->getProductCountByOptionValue($value->id, $productIds, $currentFilters, $optionCode);
+            // ── Step 3: Noon/Amazon facet logic ───────────────────────────────
+            // For each option group, compute a SEPARATE facet product set that
+            // applies every active filter EXCEPT this option.
+            //
+            // Example with ?category=shirts&color=red&size=small:
+            //   • Color facet  → facetIds = shirts matching size=small (ignores color)
+            //   • Size  facet  → facetIds = shirts matching color=red  (ignores size)
+            //
+            // This means: selecting Red still shows all available colors,
+            // and the count next to each color tells you how many red+thatColor
+            // products exist (which for non-red would be 0, greying them out).
+            $facetProductIds = $this->getFacetProductIds($currentFilters, $optionCode);
 
-                // Get translated title for current locale for URL-friendly value
-                // In URL: ?size=small (English) or ?size=صغير (Arabic)
-                $currentLocale = app()->getLocale();
-                $localizedValue = optional($value->translate($currentLocale))->title ?: $value->title;
+            $filterValues = $values->map(function ($value) use ($facetProductIds, $option) {
+                // Count = products in facet universe that have this specific option value
+                $count = $this->getProductCountByOptionValue($value->id, $facetProductIds);
 
                 $optionData = [
-                    'id' => $this->getLocalizedValue($value),
+                    'id'    => $this->getLocalizedValue($value),
                     'value' => $this->getLocalizedValue($value),
                     'count' => $count,
                 ];
 
-                // If value_type is not text, get the value from option_value table
+                // If value_type is not text, expose the raw stored value (e.g. hex colour)
                 if ($option->value_type !== 'text' && !empty($value->value)) {
                     $optionData['value'] = $value->value;
                 }
@@ -677,31 +760,35 @@ class ProductFilterService
     }
 
     /**
-     * Get product count for a specific option value.
+     * Count how many products (within the pre-computed facet universe) have
+     * at least one active variant carrying the given option value.
      *
-     * @param int $optionValueId
-     * @param array $productIds
-     * @param array $currentFilters
-     * @param string|null $optionCode
+     * The $productIds set is already correctly scoped by the caller
+     * (getFacetProductIds excludes the current option's own filter), so we
+     * must NOT re-apply base filters here — that would double-constrain the
+     * query and produce wrong counts.
+     *
+     * @param int   $optionValueId  The option_value_id to look for
+     * @param array $productIds     Pre-computed facet product universe
      * @return int
      */
-    private function getProductCountByOptionValue(int $optionValueId, array $productIds, array $currentFilters, ?string $optionCode = null): int
+    private function getProductCountByOptionValue(int $optionValueId, array $productIds): int
     {
-        $query = Product::whereIn('id', $productIds)
-            ->where('status', 'active');
-        $this->applyBaseFilters($query, $currentFilters, $optionCode);
+        if (empty($productIds)) {
+            return 0;
+        }
 
-        // Filter by this option value
-        $query->where(function ($q) use ($optionValueId) {
-            $q->whereHas('variants', function ($vq) use ($optionValueId) {
-                $vq->where('status', '!=', 'draft')
-                    ->whereHas('variants', function ($vov) use ($optionValueId) {
-                        $vov->where('option_value_id', $optionValueId);
-                    });
-            });
-        });
-
-        return $query->count();
+        return Product::whereIn('id', $productIds)
+            ->where('status', 'active')
+            ->whereHas('variants', function ($q) use ($optionValueId) {
+                // variants() on Product → ProductVariant
+                $q->where('status', '!=', 'draft')
+                  ->whereHas('variants', function ($vq) use ($optionValueId) {
+                      // variants() on ProductVariant → VariantOptionValue
+                      $vq->where('option_value_id', $optionValueId);
+                  });
+            })
+            ->count();
     }
 
     /**
