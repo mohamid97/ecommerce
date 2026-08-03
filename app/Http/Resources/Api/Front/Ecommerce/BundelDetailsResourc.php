@@ -166,19 +166,20 @@ class BundelDetailsResourc extends JsonResource
 
     
 
-    protected function createSlugFromTitle(string|array|null $title = null): ?string
+    protected function createSlugFromTitle(array|string|null $title): array|string|null
     {
         if (is_array($title)) {
-            $title = filled($title['en'] ?? null)
-                ? $title['en']
-                : ($title['ar'] ?? null);
+        $data['ar'] = strtolower((string) preg_replace('/\s+/u', '-', trim($title['ar'] ?? '')));
+        $data['en'] = strtolower((string) preg_replace('/\s+/u', '-', trim($title['en'] ?? '')));
         }
 
         if (! is_string($title) || trim($title) === '') {
             return null;
         }
 
-        return strtolower((string) preg_replace('/\s+/u', '-', trim($title)));
+
+
+        return $data;
     }
 
 
