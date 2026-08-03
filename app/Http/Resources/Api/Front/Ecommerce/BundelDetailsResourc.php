@@ -16,10 +16,11 @@ class BundelDetailsResourc extends JsonResource
     {
         $title = $this->getColumnLang('title');
         $slug = $this->slug;
-        if(!isset($slug) || empty($slug)){
-            $slug = $this->createSlugFromTitle($title);
-        }else{
+        if(isset($slug) || !empty($slug)){
             $slug = $this->getColumnLang('slug');
+        }else{
+         $slug = $this->createSlugFromTitle($title);
+
         }
         return [
             'id'=>$this->id,

@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class BundelResource extends JsonResource
 {
+    
     /**
      * Transform the resource into an array.
      *
@@ -14,12 +15,15 @@ class BundelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+
         $title = $this->getColumnLang('title');
         $slug = $this->slug;
-        if(!isset($slug) || empty($slug)){
-            $slug = $this->createSlugFromTitle($title);
-        }else{
+        if(isset($slug) || !empty($slug)){
             $slug = $this->getColumnLang('slug');
+        }else{
+         $slug = $this->createSlugFromTitle($title);
+
         }
 
         return [
