@@ -402,18 +402,44 @@ class ProductFilterService
 
         $categoryOptions = [];
 
-        foreach ($allCategories as $category) {
-            if ($category->parent_id !== null) {
-                continue;
-            }
+        // ── When a category is active, drill into it (Noon-style) ────────────
+        // Show only the selected category node + its descendants, not siblings
+        // or unrelated root categories.
+        // When no category is selected, fall back to the full root-level tree.
+        if (!empty($currentFilters['category'])) {
+            // Find the selected category by its translated slug
+            $selectedCategory = $allCategories->first(function ($cat) use ($currentFilters) {
+                // Check every translation for a matching slug
+                foreach ($cat->translations as $translation) {
+                    if ($translation->slug === $currentFilters['category']) {
+                        return true;
+                    }
+                }
+                return false;
+            });
 
-            $node = $this->buildCategoryNode($category, $productIds, $currentFilters);
-            if ($node === null) {
-                continue;
+            if ($selectedCategory) {
+                $node = $this->buildCategoryNode($selectedCategory, $productIds, $currentFilters);
+                if ($node !== null) {
+                    $this->attachCategoryChildren($node, $selectedCategory->id, $categoryMap, $productIds, $currentFilters);
+                    $categoryOptions[] = $node;
+                }
             }
+        } else {
+            // No category filter active — show the complete root-level tree
+            foreach ($allCategories as $category) {
+                if ($category->parent_id !== null) {
+                    continue;
+                }
 
-            $this->attachCategoryChildren($node, $category->id, $categoryMap, $productIds, $currentFilters);
-            $categoryOptions[] = $node;
+                $node = $this->buildCategoryNode($category, $productIds, $currentFilters);
+                if ($node === null) {
+                    continue;
+                }
+
+                $this->attachCategoryChildren($node, $category->id, $categoryMap, $productIds, $currentFilters);
+                $categoryOptions[] = $node;
+            }
         }
 
         if (!empty($categoryOptions)) {
