@@ -14,6 +14,7 @@ class BundelDetailsResourc extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $title = $this->getColumnLang('title');
         $slug = $this->slug;
         if(!isset($slug) || empty($slug)){
             $slug = $this->createSlugFromTitle($title);
