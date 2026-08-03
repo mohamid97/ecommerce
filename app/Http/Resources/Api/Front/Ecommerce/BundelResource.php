@@ -17,12 +17,10 @@ class BundelResource extends JsonResource
     {
 
 
-        $title = $this->getColumnLang('title');
-        $slug = $this->slug;
-        if(isset($slug) || !empty($slug)){
+        if(isset($this->slug) || !empty($this->slug)){
             $slug = $this->getColumnLang('slug');
         }else{
-         $slug = $this->createSlugFromTitle($title);
+         $slug = $this->createSlugFromTitle();
 
         }
 
@@ -61,20 +59,12 @@ class BundelResource extends JsonResource
      *
      * @param array<string, mixed>|string|null $title
      */
-    protected function createSlugFromTitle(array|string|null $title): array|string|null
+    protected function createSlugFromTitle(): array
     {
         $data = [];
-        if (is_array($title)) {
-        $data['ar'] = strtolower((string) preg_replace('/\s+/u', '-', trim($title['ar'] ?? '')));
-        $data['en'] = strtolower((string) preg_replace('/\s+/u', '-', trim($title['en'] ?? '')));
-        }
 
-        if (! is_string($title) || trim($title) === '') {
-            return null;
-        }
-
-
-
+        $data['ar'] = strtolower((string) preg_replace('/\s+/u', '-', trim($this->translate('ar')->title)));
+        $data['en'] = strtolower((string) preg_replace('/\s+/u', '-', trim($this->translate('en')->title)));
         return $data;
     }
 
