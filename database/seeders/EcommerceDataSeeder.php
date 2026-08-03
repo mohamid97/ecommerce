@@ -33,6 +33,8 @@ class EcommerceDataSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
+            $this->seedLargeCatalog();
+
             $categoryTech = $this->firstOrCreateCategory('electronics', 'Electronics', 'الإلكترونيات');
             $categoryFashion = $this->firstOrCreateCategory('fashion', 'Fashion', 'الأزياء');
 
@@ -236,16 +238,17 @@ class EcommerceDataSeeder extends Seeder
         });
     }
 
-    private function firstOrCreateCategory(string $slug, string $enTitle, string $arTitle): Category
+    private function firstOrCreateCategory(string $slug, string $enTitle, string $arTitle, ?int $parentId = null): Category
     {
         $category = Category::whereHas('translations', function ($q) use ($slug) {
             $q->where('locale', 'en')->where('slug', $slug);
         })->first();
 
         if (!$category) {
-            $category = Category::create();
+            $category = Category::create(['parent_id' => $parentId]);
         }
 
+        $category->parent_id = $parentId;
         $category->translateOrNew('en')->title = $enTitle;
         $category->translateOrNew('en')->slug = $slug;
         $category->translateOrNew('ar')->title = $arTitle;
@@ -953,6 +956,282 @@ class EcommerceDataSeeder extends Seeder
         $order->total = round($totalAfterDiscount + (float) $order->shipping_cost - (float) ($order->points_amount ?? 0), 2);
         $order->points_earned = $order->payment_status === 'paid' ? (int) floor($totalAfterDiscount / 50) : 0;
         $order->save();
+    }
+
+    private function seedLargeCatalog(): void
+    {
+        $categoryDefinitions = [
+            'electronics' => [
+                'en' => 'Electronics',
+                'ar' => 'الإلكترونيات',
+                'children' => [
+                    ['slug' => 'electronics-phones', 'en' => 'Phones', 'ar' => 'الهواتف'],
+                    ['slug' => 'electronics-laptops', 'en' => 'Laptops', 'ar' => 'أجهزة اللابتوب'],
+                    ['slug' => 'electronics-audio', 'en' => 'Audio', 'ar' => 'الصوت'],
+                    ['slug' => 'electronics-gaming', 'en' => 'Gaming', 'ar' => 'الألعاب'],
+                ],
+            ],
+            'fashion' => [
+                'en' => 'Fashion',
+                'ar' => 'الأزياء',
+                'children' => [
+                    ['slug' => 'fashion-men', 'en' => 'Men', 'ar' => 'الرجال'],
+                    ['slug' => 'fashion-women', 'en' => 'Women', 'ar' => 'النساء'],
+                    ['slug' => 'fashion-accessories', 'en' => 'Accessories', 'ar' => 'الإكسسوارات'],
+                    ['slug' => 'fashion-footwear', 'en' => 'Footwear', 'ar' => 'الأحذية'],
+                ],
+            ],
+            'home' => [
+                'en' => 'Home',
+                'ar' => 'المنزل',
+                'children' => [
+                    ['slug' => 'home-kitchen', 'en' => 'Kitchen', 'ar' => 'المطبخ'],
+                    ['slug' => 'home-decor', 'en' => 'Decor', 'ar' => 'الديكور'],
+                    ['slug' => 'home-furniture', 'en' => 'Furniture', 'ar' => 'الأثاث'],
+                    ['slug' => 'home-outdoor', 'en' => 'Outdoor', 'ar' => 'الخارجي'],
+                ],
+            ],
+            'beauty' => [
+                'en' => 'Beauty',
+                'ar' => 'الجمال',
+                'children' => [
+                    ['slug' => 'beauty-skincare', 'en' => 'Skincare', 'ar' => 'العناية بالبشرة'],
+                    ['slug' => 'beauty-makeup', 'en' => 'Makeup', 'ar' => 'المكياج'],
+                    ['slug' => 'beauty-fragrance', 'en' => 'Fragrance', 'ar' => 'العطور'],
+                    ['slug' => 'beauty-haircare', 'en' => 'Haircare', 'ar' => 'العناية بالشعر'],
+                ],
+            ],
+            'sports' => [
+                'en' => 'Sports',
+                'ar' => 'الرياضة',
+                'children' => [
+                    ['slug' => 'sports-fitness', 'en' => 'Fitness', 'ar' => 'اللياقة'],
+                    ['slug' => 'sports-outdoor', 'en' => 'Outdoor', 'ar' => 'الهواء الطلق'],
+                    ['slug' => 'sports-team', 'en' => 'Team Sports', 'ar' => 'الرياضات الجماعية'],
+                    ['slug' => 'sports-wellness', 'en' => 'Wellness', 'ar' => 'العافية'],
+                ],
+            ],
+        ];
+
+        $categoryMap = [];
+        foreach ($categoryDefinitions as $slug => $definition) {
+            $parentCategory = $this->firstOrCreateCategory($slug, $definition['en'], $definition['ar'], null);
+            $categoryMap[$slug] = $parentCategory->id;
+
+            foreach ($definition['children'] as $childDefinition) {
+                $childCategory = $this->firstOrCreateCategory(
+                    $childDefinition['slug'],
+                    $childDefinition['en'],
+                    $childDefinition['ar'],
+                    $parentCategory->id
+                );
+                $categoryMap[$childDefinition['slug']] = $childCategory->id;
+            }
+        }
+
+        $brandDefinitions = [
+            ['slug' => 'cangrow-brand', 'en' => 'CanGrow', 'ar' => 'كان جرو'],
+            ['slug' => 'nova-brand', 'en' => 'Nova', 'ar' => 'نوفا'],
+            ['slug' => 'apple-brand', 'en' => 'Apple', 'ar' => 'أبل'],
+            ['slug' => 'samsung-brand', 'en' => 'Samsung', 'ar' => 'سامسونج'],
+            ['slug' => 'sony-brand', 'en' => 'Sony', 'ar' => 'سوني'],
+            ['slug' => 'nike-brand', 'en' => 'Nike', 'ar' => 'نايك'],
+            ['slug' => 'adidas-brand', 'en' => 'Adidas', 'ar' => 'أديداس'],
+            ['slug' => 'canon-brand', 'en' => 'Canon', 'ar' => 'كانون'],
+            ['slug' => 'gucci-brand', 'en' => 'Gucci', 'ar' => 'غوتشي'],
+            ['slug' => 'ikea-brand', 'en' => 'IKEA', 'ar' => 'إيكيا'],
+        ];
+
+        $brandMap = [];
+        foreach ($brandDefinitions as $definition) {
+            $brand = $this->firstOrCreateBrand($definition['slug'], $definition['en'], $definition['ar']);
+            $brandMap[$definition['slug']] = $brand->id;
+        }
+
+        $optionDefinitions = [
+            [
+                'code' => 'color',
+                'en' => 'Color',
+                'ar' => 'اللون',
+                'values' => [
+                    ['en' => 'Red', 'ar' => 'أحمر'],
+                    ['en' => 'Blue', 'ar' => 'أزرق'],
+                    ['en' => 'Black', 'ar' => 'أسود'],
+                    ['en' => 'White', 'ar' => 'أبيض'],
+                    ['en' => 'Green', 'ar' => 'أخضر'],
+                    ['en' => 'Silver', 'ar' => 'فضي'],
+                ],
+            ],
+            [
+                'code' => 'size',
+                'en' => 'Size',
+                'ar' => 'المقاس',
+                'values' => [
+                    ['en' => 'XS', 'ar' => 'إكس إس'],
+                    ['en' => 'S', 'ar' => 'صغير'],
+                    ['en' => 'M', 'ar' => 'متوسط'],
+                    ['en' => 'L', 'ar' => 'كبير'],
+                    ['en' => 'XL', 'ar' => 'إكس إل'],
+                ],
+            ],
+            [
+                'code' => 'material',
+                'en' => 'Material',
+                'ar' => 'الخامة',
+                'values' => [
+                    ['en' => 'Cotton', 'ar' => 'قطن'],
+                    ['en' => 'Leather', 'ar' => 'جلد'],
+                    ['en' => 'Metal', 'ar' => 'معدن'],
+                    ['en' => 'Plastic', 'ar' => 'بلاستيك'],
+                ],
+            ],
+            [
+                'code' => 'storage',
+                'en' => 'Storage',
+                'ar' => 'السعة',
+                'values' => [
+                    ['en' => '128GB', 'ar' => '١٢٨ جيجا'],
+                    ['en' => '256GB', 'ar' => '٢٥٦ جيجا'],
+                    ['en' => '512GB', 'ar' => '٥١٢ جيجا'],
+                    ['en' => '1TB', 'ar' => '١ تيرا'],
+                ],
+            ],
+        ];
+
+        $optionValuesByCode = [];
+        foreach ($optionDefinitions as $definition) {
+            $option = $this->firstOrCreateOption($definition['code'], $definition['en'], $definition['ar']);
+            $values = [];
+            foreach ($definition['values'] as $valueDefinition) {
+                $value = $this->firstOrCreateOptionValue($option, $valueDefinition['en'], $valueDefinition['ar']);
+                $values[] = $value;
+            }
+            $optionValuesByCode[$definition['code']] = $values;
+        }
+
+        $simpleProducts = [
+            ['sku' => 'SKU-LARGE-001', 'en' => 'Wireless Noise Cancelling Headphones', 'ar' => 'سماعات لاسلكية مع إلغاء الضوضاء', 'price' => 199, 'discount' => 15, 'discountType' => 'percentage', 'category' => 'electronics-audio', 'brand' => 'sony-brand', 'stock' => 140],
+            ['sku' => 'SKU-LARGE-002', 'en' => 'Smart Fitness Band', 'ar' => 'سوار لياقة ذكي', 'price' => 79, 'discount' => 10, 'discountType' => 'percentage', 'category' => 'sports-fitness', 'brand' => 'samsung-brand', 'stock' => 180],
+            ['sku' => 'SKU-LARGE-003', 'en' => 'Portable Blender', 'ar' => 'مضرب محمول', 'price' => 89, 'discount' => 5, 'discountType' => 'fixed', 'category' => 'home-kitchen', 'brand' => 'cangrow-brand', 'stock' => 120],
+            ['sku' => 'SKU-LARGE-004', 'en' => 'Hydrating Facial Serum', 'ar' => 'سيروم مرطب للوجه', 'price' => 54, 'discount' => 8, 'discountType' => 'percentage', 'category' => 'beauty-skincare', 'brand' => 'gucci-brand', 'stock' => 90],
+            ['sku' => 'SKU-LARGE-005', 'en' => 'Travel Backpack', 'ar' => 'حقيبة سفر', 'price' => 68, 'discount' => 12, 'discountType' => 'percentage', 'category' => 'fashion-accessories', 'brand' => 'nike-brand', 'stock' => 160],
+            ['sku' => 'SKU-LARGE-006', 'en' => 'Gaming Mouse', 'ar' => 'ماوس ألعاب', 'price' => 49, 'discount' => 0, 'discountType' => 'percentage', 'category' => 'electronics-gaming', 'brand' => 'cangrow-brand', 'stock' => 220],
+            ['sku' => 'SKU-LARGE-007', 'en' => 'Ultra Slim Laptop', 'ar' => 'لابتوب رفيع للغاية', 'price' => 1299, 'discount' => 20, 'discountType' => 'percentage', 'category' => 'electronics-laptops', 'brand' => 'apple-brand', 'stock' => 60],
+            ['sku' => 'SKU-LARGE-008', 'en' => 'Classic Denim Jacket', 'ar' => 'جاكيت جينز كلاسيكي', 'price' => 110, 'discount' => 10, 'discountType' => 'fixed', 'category' => 'fashion-men', 'brand' => 'adidas-brand', 'stock' => 110],
+            ['sku' => 'SKU-LARGE-009', 'en' => 'Ceramic Vase', 'ar' => 'مزهرية سيراميك', 'price' => 45, 'discount' => 5, 'discountType' => 'fixed', 'category' => 'home-decor', 'brand' => 'ikea-brand', 'stock' => 85],
+            ['sku' => 'SKU-LARGE-010', 'en' => 'Rose Fragrance', 'ar' => 'عطر ورد', 'price' => 95, 'discount' => 15, 'discountType' => 'percentage', 'category' => 'beauty-fragrance', 'brand' => 'gucci-brand', 'stock' => 100],
+            ['sku' => 'SKU-LARGE-011', 'en' => 'Yoga Mat', 'ar' => 'بطانية يوغا', 'price' => 34, 'discount' => 6, 'discountType' => 'fixed', 'category' => 'sports-wellness', 'brand' => 'nike-brand', 'stock' => 140],
+            ['sku' => 'SKU-LARGE-012', 'en' => 'Leather Wallet', 'ar' => 'محفظة جلدية', 'price' => 60, 'discount' => 8, 'discountType' => 'percentage', 'category' => 'fashion-accessories', 'brand' => 'gucci-brand', 'stock' => 130],
+            ['sku' => 'SKU-LARGE-013', 'en' => 'Smart Indoor Lamp', 'ar' => 'مصباح ذكي داخلي', 'price' => 72, 'discount' => 10, 'discountType' => 'percentage', 'category' => 'home-decor', 'brand' => 'samsung-brand', 'stock' => 95],
+            ['sku' => 'SKU-LARGE-014', 'en' => 'Volumizing Shampoo', 'ar' => 'شامبو مكدس', 'price' => 22, 'discount' => 4, 'discountType' => 'fixed', 'category' => 'beauty-haircare', 'brand' => 'canon-brand', 'stock' => 150],
+            ['sku' => 'SKU-LARGE-015', 'en' => 'Running Shoes', 'ar' => 'أحذية رياضية', 'price' => 110, 'discount' => 12, 'discountType' => 'percentage', 'category' => 'sports-outdoor', 'brand' => 'adidas-brand', 'stock' => 170],
+            ['sku' => 'SKU-LARGE-016', 'en' => 'Studio Headset', 'ar' => 'سماعة استوديو', 'price' => 129, 'discount' => 9, 'discountType' => 'fixed', 'category' => 'electronics-audio', 'brand' => 'sony-brand', 'stock' => 130],
+            ['sku' => 'SKU-LARGE-017', 'en' => 'Modern Coffee Mug', 'ar' => 'فنجان قهوة عصري', 'price' => 19, 'discount' => 0, 'discountType' => 'percentage', 'category' => 'home-kitchen', 'brand' => 'ikea-brand', 'stock' => 200],
+            ['sku' => 'SKU-LARGE-018', 'en' => 'Silk Scarf', 'ar' => 'وشاح حريري', 'price' => 39, 'discount' => 7, 'discountType' => 'percentage', 'category' => 'fashion-women', 'brand' => 'gucci-brand', 'stock' => 110],
+        ];
+
+        $simpleProductsCreated = [];
+        foreach ($simpleProducts as $definition) {
+            $product = $this->firstOrCreateSimpleProduct(
+                sku: $definition['sku'],
+                enTitle: $definition['en'],
+                arTitle: $definition['ar'],
+                salePrice: (float) $definition['price'],
+                discount: (float) $definition['discount'],
+                discountType: $definition['discountType'],
+                categoryId: $categoryMap[$definition['category']] ?? $categoryMap['electronics'],
+                brandId: $brandMap[$definition['brand']] ?? $brandMap['cangrow-brand'],
+                stock: (int) $definition['stock']
+            );
+            $simpleProductsCreated[] = $product;
+        }
+
+        $this->seedStocksAndShipments($simpleProductsCreated, []);
+
+        $variableProducts = [
+            ['sku' => 'SKU-VAR-001', 'en' => 'Premium Cotton Hoodie', 'ar' => 'هودي قطن فاخر', 'price' => 99, 'category' => 'fashion-men', 'brand' => 'nike-brand', 'options' => ['color', 'size'], 'variantData' => [
+                ['sku' => 'SKU-VAR-001-A', 'en' => 'Premium Cotton Hoodie - Black M', 'ar' => 'هودي قطن فاخر - أسود متوسط', 'price' => 99, 'discount' => 5, 'discountType' => 'fixed', 'stock' => 35, 'values' => ['color' => 'Black', 'size' => 'M']],
+                ['sku' => 'SKU-VAR-001-B', 'en' => 'Premium Cotton Hoodie - White L', 'ar' => 'هودي قطن فاخر - أبيض كبير', 'price' => 109, 'discount' => 8, 'discountType' => 'percentage', 'stock' => 28, 'values' => ['color' => 'White', 'size' => 'L']],
+            ]],
+            ['sku' => 'SKU-VAR-002', 'en' => 'Smartphone Pro', 'ar' => 'هاتف ذكي برو', 'price' => 899, 'category' => 'electronics-phones', 'brand' => 'samsung-brand', 'options' => ['color', 'storage'], 'variantData' => [
+                ['sku' => 'SKU-VAR-002-A', 'en' => 'Smartphone Pro - Blue 256GB', 'ar' => 'هاتف ذكي برو - أزرق ٢٥٦ جيجا', 'price' => 899, 'discount' => 10, 'discountType' => 'percentage', 'stock' => 25, 'values' => ['color' => 'Blue', 'storage' => '256GB']],
+                ['sku' => 'SKU-VAR-002-B', 'en' => 'Smartphone Pro - Black 512GB', 'ar' => 'هاتف ذكي برو - أسود ٥١٢ جيجا', 'price' => 999, 'discount' => 12, 'discountType' => 'percentage', 'stock' => 18, 'values' => ['color' => 'Black', 'storage' => '512GB']],
+            ]],
+            ['sku' => 'SKU-VAR-003', 'en' => 'Leather Office Bag', 'ar' => 'حقيبة مكتب جلدية', 'price' => 149, 'category' => 'fashion-accessories', 'brand' => 'gucci-brand', 'options' => ['color', 'material'], 'variantData' => [
+                ['sku' => 'SKU-VAR-003-A', 'en' => 'Leather Office Bag - Brown Leather', 'ar' => 'حقيبة مكتب جلدية - بني جلد', 'price' => 149, 'discount' => 6, 'discountType' => 'fixed', 'stock' => 24, 'values' => ['color' => 'Black', 'material' => 'Leather']],
+                ['sku' => 'SKU-VAR-003-B', 'en' => 'Leather Office Bag - Black Leather', 'ar' => 'حقيبة مكتب جلدية - أسود جلد', 'price' => 159, 'discount' => 7, 'discountType' => 'fixed', 'stock' => 20, 'values' => ['color' => 'Black', 'material' => 'Leather']],
+            ]],
+            ['sku' => 'SKU-VAR-004', 'en' => 'Ergonomic Office Chair', 'ar' => 'كرسي مكتب مريح', 'price' => 249, 'category' => 'home-furniture', 'brand' => 'ikea-brand', 'options' => ['color', 'material'], 'variantData' => [
+                ['sku' => 'SKU-VAR-004-A', 'en' => 'Ergonomic Office Chair - Black Metal', 'ar' => 'كرسي مكتب مريح - أسود معدن', 'price' => 249, 'discount' => 10, 'discountType' => 'percentage', 'stock' => 30, 'values' => ['color' => 'Black', 'material' => 'Metal']],
+                ['sku' => 'SKU-VAR-004-B', 'en' => 'Ergonomic Office Chair - White Plastic', 'ar' => 'كرسي مكتب مريح - أبيض بلاستيك', 'price' => 229, 'discount' => 5, 'discountType' => 'fixed', 'stock' => 22, 'values' => ['color' => 'White', 'material' => 'Plastic']],
+            ]],
+            ['sku' => 'SKU-VAR-005', 'en' => 'Summer Dress', 'ar' => 'فستان صيفي', 'price' => 129, 'category' => 'fashion-women', 'brand' => 'gucci-brand', 'options' => ['color', 'size'], 'variantData' => [
+                ['sku' => 'SKU-VAR-005-A', 'en' => 'Summer Dress - Red M', 'ar' => 'فستان صيفي - أحمر متوسط', 'price' => 129, 'discount' => 8, 'discountType' => 'percentage', 'stock' => 24, 'values' => ['color' => 'Red', 'size' => 'M']],
+                ['sku' => 'SKU-VAR-005-B', 'en' => 'Summer Dress - Blue L', 'ar' => 'فستان صيفي - أزرق كبير', 'price' => 139, 'discount' => 10, 'discountType' => 'fixed', 'stock' => 18, 'values' => ['color' => 'Blue', 'size' => 'L']],
+            ]],
+        ];
+
+        foreach ($variableProducts as $definition) {
+            $product = $this->firstOrCreateVariableProduct(
+                sku: $definition['sku'],
+                enTitle: $definition['en'],
+                arTitle: $definition['ar'],
+                salePrice: (float) $definition['price'],
+                categoryId: $categoryMap[$definition['category']] ?? $categoryMap['electronics'],
+                brandId: $brandMap[$definition['brand']] ?? $brandMap['cangrow-brand']
+            );
+
+            foreach ($definition['options'] as $optionCode) {
+                $values = [];
+                foreach ($optionValuesByCode[$optionCode] as $optionValue) {
+                    $values[] = $optionValue;
+                }
+                $option = Option::where('code', $optionCode)->first();
+                if ($option) {
+                    $this->attachOptionsToProduct($product, $option, $values);
+                }
+            }
+
+            $variants = [];
+            foreach ($definition['variantData'] as $variantDefinition) {
+                $variant = $this->firstOrCreateVariant(
+                    $product->id,
+                    $variantDefinition['sku'],
+                    $variantDefinition['en'],
+                    $variantDefinition['ar'],
+                    (float) $variantDefinition['price'],
+                    (float) $variantDefinition['discount'],
+                    $variantDefinition['discountType'],
+                    (int) $variantDefinition['stock'],
+                    false
+                );
+
+                $selectedValues = [];
+                foreach ($variantDefinition['values'] as $optionCode => $valueLabel) {
+                    $option = Option::where('code', $optionCode)->first();
+                    if (!$option) {
+                        continue;
+                    }
+                    $value = OptionValue::where('option_id', $option->id)
+                        ->whereHas('translations', function ($query) use ($valueLabel) {
+                            $query->where('locale', 'en')->where('title', $valueLabel);
+                        })->first();
+                    if ($value) {
+                        $selectedValues[] = $value;
+                    }
+                }
+
+                if (!empty($selectedValues)) {
+                    $this->attachVariantValues($variant, $selectedValues);
+                }
+                $variants[] = $variant;
+            }
+
+            $this->seedStocksAndShipments([], $variants);
+        }
+
+        LastPiece::firstOrCreate(['product_id' => Product::query()->orderBy('id')->first()?->id]);
+        NewProduct::firstOrCreate(['product_id' => Product::query()->latest('id')->first()?->id]);
     }
 
     private function seedShipmentZoneAndCity(): array
