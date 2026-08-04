@@ -22,10 +22,10 @@ class CartRepository
     {
         $cart = Cart::firstOrCreate(['user_id' => $userId]);
 
-        if (isset($dto->bundel_id)) {
+        if (isset($dto->bundle_id)) {
             $matchKey = [
                 'cart_id' => $cart->id,
-                'bundel_id' => $dto->bundel_id,
+                'bundel_id' => $dto->bundle_id,
             ];
 
             $quantity = $this->resolveQuantity($matchKey, $dto->quantity);
@@ -160,7 +160,6 @@ class CartRepository
     private function resolveQuantity(array $matchKey, int $requestedQuantity): int
     {
         $existingItem = CartItem::where($matchKey)->first();
-
         return ((int) $existingItem?->quantity) + $requestedQuantity;
     }
 
@@ -168,9 +167,7 @@ class CartRepository
     {
         $totalPrice = 0.0;
         $totalDiscountPrice = 0.0;
-
         $bundle = $cartItem->bundel()->with('bundelDetails')->first();
-
         foreach ($cartItem->cartBundelItems as $item) {
             $bundleDetail = $bundle?->bundelDetails
                 ?->first(function ($detail) use ($item) {
@@ -236,4 +233,6 @@ class CartRepository
             $cart->delete();
         }
     }
+
+    
 }

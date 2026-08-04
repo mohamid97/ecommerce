@@ -55,8 +55,8 @@ class BundelDetailsResourc extends JsonResource
                     // dd($detail->getVariants());
                     return [
                         
-                            'bundle_item_id' => $detail->id,
-                            'id'=>$detail->product->id,
+                            'id' => $detail->id,
+                            'product_id'=>$detail->product->id,
                             'title'=>$detail->product->title,
                             'sale_price'=>(float) $detail->product->sale_price,
                             'status'=>$detail->product->status,

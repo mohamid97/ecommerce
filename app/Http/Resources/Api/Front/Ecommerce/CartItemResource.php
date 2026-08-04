@@ -21,21 +21,21 @@ class CartItemResource extends JsonResource
                 'id' => $this->id,
                 'cart_id' => $this->cart_id,
                 'type' => 'bundle',
-                'bundel_id' => $this->bundel_id,
-                'bundel_title' => $this->bundel?->title,
+                'bundle_id' => $this->bundel_id,
+                'title' => $this->bundel?->title,
                 'bundle_image' => $this->getImageUrl($this->bundel?->bundle_image),
                 'bundle_items' => $this->cartBundelItems->map(function($item) {
                    
                     return [
-                        'id' => $item->id,
-                        'bundle_item_id' => $item->bundle_item_id,
+                        // 'id' => $item->id,
+                        'id' => $item->bundle_item_id,
                         'product_id' => $item->product_id,
-                        'product' => $item->product?->title,
+                        'product_name' => $item->product?->title,
                         'product_image' => $this->getImageUrl($item->product?->product_image),
                         'has_options' => (bool) $item->product?->has_options,
                         'variant_id' => $item->variant_id,
                         'variant' => $item->variant?->title,
-                        'varaint_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,
+                        'variant_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,
                         'quantity' => $item->bundleDetail?->quantity
                             ?? BundelDetails::where('bundel_id', $this->bundel_id)
                                 ->where('product_id', $item->product_id)
@@ -43,6 +43,8 @@ class CartItemResource extends JsonResource
                             ?? 1,
                     ];
                 }),
+                'sale_price' => (float) $this->total_before_discount/$this->quantity,
+                'price_after_discount' => (float) $this->total_after_discount/$this->quantity,
                 'total_before_discount' => (float) $this->total_before_discount,
                 'total_after_discount' => (float) $this->total_after_discount,
                 'quantity' => (float) $this->quantity,
@@ -63,6 +65,8 @@ class CartItemResource extends JsonResource
             'variant_id' => $this->variant_id,
             'variant' => $this->variant?->title,
             'variant_moq' => $this->variant?->moq,
+            'sale_price' => (float) $this->total_before_discount/$this->quantity,
+            'price_after_discount' => (float) $this->total_after_discount/$this->quantity,
             'varaint_name' => ($this->variant_id) ? $this->buildVariantName($this->product, $this->variant) : null,
             'total_before_discount' =>(float) $this->total_before_discount,
             'total_after_discount' => (float) $this->total_after_discount,

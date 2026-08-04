@@ -23,7 +23,7 @@ class BundleStrategy implements CartStrategyInterface
     public function validate(AddToCartDTO $dto): void
     {
         // 1. Bundle must exist
-        $this->action->checkBundelExists($dto->bundel_id);
+        $this->action->checkBundelExists($dto->bundle_id);
 
         if (empty($dto->bundle_items)) {
             throw ValidationException::withMessages([

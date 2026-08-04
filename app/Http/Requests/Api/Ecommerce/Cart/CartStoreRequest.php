@@ -27,7 +27,7 @@ class CartStoreRequest extends FormRequest
         return [
             'product_id'   => 'nullable|integer|exists:products,id',
             'variant_id'   => 'nullable|integer|exists:product_variants,id',
-            'bundel_id'    => 'nullable|required_without:product_id|integer|exists:bundels,id',
+            'bundle_id'    => 'nullable|required_without:product_id|integer|exists:bundels,id',
             'quantity'     => 'required|integer|min:1|max:50000',
             'bundle_items' => 'nullable|array',
             'bundle_items.*.product_id' => 'nullable|integer|exists:products,id',
@@ -39,7 +39,7 @@ class CartStoreRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $bundleId = $this->input('bundel_id');
+            $bundleId = $this->input('bundle_id');
             $bundleItems = $this->input('bundle_items', []);
 
             if ($bundleId && !empty($bundleItems) && is_array($bundleItems)) {

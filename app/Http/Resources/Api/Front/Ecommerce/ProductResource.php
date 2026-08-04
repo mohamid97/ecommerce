@@ -80,7 +80,7 @@ class ProductResource extends JsonResource
             // 'des' => $this->des,
             'sale_price' => (float) $priceSource->sale_price,
             'moq' => $priceSource->moq ?? $this->moq ?? 1,
-            'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
+            'discount' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
             'discount_type' => $priceSource->discount_type,
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
             'price_min' => $minPrice,
@@ -92,7 +92,7 @@ class ProductResource extends JsonResource
             // 'breadcrumb' => $this->getImageUrl($this->breadcrumb),
             'status' => $this->has_options ? ($priceSource->status ?? $this->status) : $this->status,
             'stock' => $this->has_options ? ($priceSource->stock ?? $this->stock) : $this->stock,
-            'default_varaint' => $this->has_options && $displayVariant ? [
+            'variant' => $this->has_options && $displayVariant ? [
                 'id' => $displayVariant->id,
                 // 'title' => $displayVariant->title,
                 'variant_name' => $displayVariant->getVariantFullNameAttribute(),

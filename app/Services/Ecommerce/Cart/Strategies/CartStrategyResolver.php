@@ -23,7 +23,7 @@ class CartStrategyResolver
      */
     public function resolve(AddToCartDTO $dto): CartStrategyInterface
     {
-        if (isset($dto->bundel_id)) {
+        if (isset($dto->bundle_id)) {
             $this->action->resolveBundleItemVariants($dto);
             return new BundleStrategy($this->action, $this->repo);
         }

@@ -50,7 +50,7 @@ class ProductDetailsResource extends JsonResource
                     ];
                 });
             }),
-            'varaint_images'=> $defaultVaraintModel?->varaintImages?->map(function ($image) {
+            'variant_images'=> $defaultVaraintModel?->varaintImages?->map(function ($image) {
                 return [
                     'id' => $image->id,
                     'image' => $this->getImageUrl($image->image?->image)
@@ -72,7 +72,7 @@ class ProductDetailsResource extends JsonResource
                     ];
                 });
             }),
-            'varaints' => CustomProductVaraintsResource::collection($this->variants),
+            'variants' => CustomProductVaraintsResource::collection($this->variants),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];
