@@ -18,7 +18,7 @@ class MetaFeedService
                 'translations',
                 'variants' => function ($q) {
                     $q->where('status', 'active')
-                      ->where('stock', '>', 0)
+                    //   ->where('stock', '>', 0)
                       ->whereNotNull('sale_price')
                       ->where('sale_price', '>', 0)
                       ->with([
