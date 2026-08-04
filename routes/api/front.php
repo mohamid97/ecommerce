@@ -1,37 +1,33 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Front\MessageController;
+use Illuminate\Support\Facades\Route;
 
-
-
- 
 Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     // members Auth system
-    Route::prefix('auth')->controller('MemberController')->group(function(){
+    Route::prefix('auth')->controller('MemberController')->group(function () {
         Route::post('/send-verification', 'sendVerification');
         Route::post('/verfiy-otp', 'verfiyOtp');
         Route::post('/register', 'register');
         Route::post('/login', 'login');
         Route::post('/logout', 'logout')->middleware('auth:sanctum');
 
-
     });
 
-    Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function(){
+    Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function () {
         Route::post('/guest/view', 'viewGuestCart');
     });
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::prefix('auth')->controller('MemberController')->group(function(){
+        Route::prefix('auth')->controller('MemberController')->group(function () {
             Route::get('/user', 'getUserData');
             Route::post('/update-user', 'updateUserData');
             // Route::post('/complete-profile', 'completeProfile');
         });
 
-        // start carts with authanicate 
-        Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function(){
+        // start carts with authanicate
+        Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function () {
             Route::post('/add', 'addToCart');
             Route::post('/update-quantity', 'updateQuantity');
             Route::post('/delete-all', 'deleteAllFromCart');
@@ -40,7 +36,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         });
 
         // wishlists
-        Route::prefix('wishlists')->namespace('Ecommerce')->controller('WishlistController')->group(function(){
+        Route::prefix('wishlists')->namespace('Ecommerce')->controller('WishlistController')->group(function () {
             Route::post('/add', 'add');
             Route::post('/toggle', 'toggle');
             Route::post('/delete-item', 'remove');
@@ -48,7 +44,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
         });
 
         // orders
-        Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
+        Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function () {
             Route::get('/', 'index');
             Route::post('/preview', 'preview');
             Route::post('/store', 'store');
@@ -58,94 +54,74 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
     });
 
     // guest order (no auth)
-    Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function(){
+    Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function () {
         Route::post('/guest/preview', 'previewGuest');
         Route::post('/guest/store', 'storeGuest');
     });
 
-    Route::prefix('govs')->namespace('Ecommerce')->controller('GovController')->group(function(){
+    Route::prefix('govs')->namespace('Ecommerce')->controller('GovController')->group(function () {
         Route::get('get', 'get');
     });
-
 
     // contact and messages
     Route::post('send-message', [MessageController::class, 'sendMessage']);
 
     // dynamic endpoint to get profile data
-    Route::prefix('data')->controller('FrontendController')->group(function(){
-        Route::post('get' , 'get')->middleware('allowFrontendModels');
-        Route::post('dynamic/filter' , 'dynamicFilter');
-        Route::post('gallery' , 'getGallery'); 
-        Route::post('search' , 'search');     
+    Route::prefix('data')->controller('FrontendController')->group(function () {
+        Route::post('get', 'get')->middleware('allowFrontendModels');
+        Route::post('dynamic/filter', 'dynamicFilter');
+        Route::post('gallery', 'getGallery');
+        Route::post('search', 'search');
     });
-    
-    Route::prefix('applicant')->controller('ApplicantController')->group(function(){
-        Route::post('store' , 'store');
-        
+
+    Route::prefix('applicant')->controller('ApplicantController')->group(function () {
+        Route::post('store', 'store');
+
     });
 
     // consultation + training forms
-    Route::prefix('consultation')->controller('\App\Http\Controllers\Api\Front\ConsultationController')->group(function(){
+    Route::prefix('consultation')->controller('\App\Http\Controllers\Api\Front\ConsultationController')->group(function () {
         Route::post('store', 'store');
     });
 
-    Route::prefix('training')->controller('\App\Http\Controllers\Api\Front\TrainingController')->group(function(){
+    Route::prefix('training')->controller('\App\Http\Controllers\Api\Front\TrainingController')->group(function () {
         Route::post('store', 'store');
     });
 
-
-    Route::prefix('products')->namespace('Ecommerce')->controller('ProductController')->group(function(){
-        Route::get('get' , 'get');
-        Route::get('last-piece' , 'lastPiece');
-        Route::get('newest' , 'newest');
-        Route::get('industries' , 'industries');
-        Route::get('industry-products' , 'productsByIndustry');
-        Route::post('details' , 'productDetails');
-        Route::post('varaint-details' , 'varaintDetails');
-        Route::post('related' , 'relatedProducts');
+    Route::prefix('products')->namespace('Ecommerce')->controller('ProductController')->group(function () {
+        Route::get('get', 'get');
+        Route::get('last-piece', 'lastPiece');
+        Route::get('newest', 'newest');
+        Route::get('industries', 'industries');
+        Route::get('industry-products', 'productsByIndustry');
+        Route::post('details', 'productDetails');
+        Route::post('varaint-details', 'varaintDetails');
+        Route::post('related', 'relatedProducts');
     });
 
     // Product filter with available options (GET with query params)
-    Route::prefix('products')->namespace('Ecommerce')->controller('ProductFilterController')->group(function(){
-        Route::get('filter' , 'filter');
+    Route::prefix('products')->namespace('Ecommerce')->controller('ProductFilterController')->group(function () {
+        Route::get('filter', 'filter');
     });
 
-    Route::prefix('industries')->namespace('Ecommerce')->controller('ProductController')->group(function(){
-        Route::get('get' , 'industries');
-        Route::post('products' , 'productsByIndustry');
+    Route::prefix('industries')->namespace('Ecommerce')->controller('ProductController')->group(function () {
+        Route::get('get', 'industries');
+        Route::post('products', 'productsByIndustry');
     });
 
+    // bundel
 
-    // bundel 
-
-    Route::prefix('bundles')->namespace('Ecommerce')->controller('BundleController')->group(function(){
-        Route::get('get' , 'get');
-        Route::post('details' , 'bundleDetails');
+    Route::prefix('bundles')->namespace('Ecommerce')->controller('BundleController')->group(function () {
+        Route::get('get', 'get');
+        Route::post('details', 'bundleDetails');
     });
 
-
-    Route::prefix('coupons')->namespace('Ecommerce')->controller('CouponController')->group(function(){
-        Route::post('validate' , 'validateCoupon');
+    Route::prefix('coupons')->namespace('Ecommerce')->controller('CouponController')->group(function () {
+        Route::post('validate', 'validateCoupon');
     });
 
-
-    Route::prefix('points')->namespace('Ecommerce')->controller('PointController')->group(function(){
-        Route::post('calculate' , 'calculate');
+    Route::prefix('points')->namespace('Ecommerce')->controller('PointController')->group(function () {
+        Route::post('calculate', 'calculate');
     });
-
-
-
-
-
-
-
-
-    
-
-
-      
-
-
-
 
 });
