@@ -17,8 +17,8 @@ class BundelResource extends JsonResource
     {
 
 
-        if(isset($this->slug) || !empty($this->slug)){
-            $slug = $this->getColumnLang('slug');
+        if(isset($this->slug) || is_array($this->slug)){
+         $slug = $this->getColumnLang('slug');
         }else{
          $slug = $this->createSlugFromTitle();
 
@@ -46,7 +46,7 @@ class BundelResource extends JsonResource
                     'id'=>$this->brand->id,
                 ];
             }),
-            'title' => $title,
+            'title' => $this->getColumnLang('title'),
             // Create a fallback slug when the translation does not provide one.
             'slug' => $slug,
             'created_at'=>$this->created_at->format('Y-m-d'),
