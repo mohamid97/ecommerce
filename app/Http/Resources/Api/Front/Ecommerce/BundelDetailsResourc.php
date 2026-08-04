@@ -14,8 +14,7 @@ class BundelDetailsResourc extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // $title = $this->getColumnLang('title');
-        if(isset($slug) || !empty($slug)){
+        if(isset($this->slug) && is_array($this->slug)){
             $slug = $this->getColumnLang('slug');
         }else{
          $slug = $this->createSlugFromTitle();
@@ -174,6 +173,7 @@ class BundelDetailsResourc extends JsonResource
         $data['en'] = strtolower((string) preg_replace('/\s+/u', '-', trim($this->translate('en')->title)));
         return $data;
     }
+
 
 
 

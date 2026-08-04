@@ -17,8 +17,8 @@ class BundelResource extends JsonResource
     {
 
 
-        if(isset($this->slug) || is_array($this->slug)){
-         $slug = $this->getColumnLang('slug');
+        if(isset($this->slug) && is_array($this->slug)){
+            $slug = $this->getColumnLang('slug');
         }else{
          $slug = $this->createSlugFromTitle();
 
