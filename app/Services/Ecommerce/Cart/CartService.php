@@ -118,7 +118,7 @@ class CartService
 
         foreach ($data['bundles'] ?? [] as $bundleData) {
             $dto = AddToCartDTO::fromRequest([
-                'bundel_id' => $bundleData['bundel_id'] ?? $bundleData['bundle_id'],
+                'bundle_id' => $bundleData['bundel_id'] ?? $bundleData['bundle_id'],
                 'quantity' => $bundleData['quantity'],
                 'bundle_items' => $bundleData['bundle_items'] ?? [],
             ]);

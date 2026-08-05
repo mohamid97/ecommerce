@@ -12,13 +12,13 @@ class MetaFeedService
     {
         $products = Product::query()
             ->active()
-            ->whereNotNull('product_image')
+            // ->whereNotNull('product_image')
             ->with([
                 'brand.translations',
                 'translations',
                 'variants' => function ($q) {
                     $q->where('status', 'active')
-                    //   ->where('stock', '>', 0)
+                       ->where('stock', '>', 0)
                       ->whereNotNull('sale_price')
                       ->where('sale_price', '>', 0)
                       ->with([
@@ -76,7 +76,7 @@ XML;
         $description  = $this->escapeXml($this->productDescription($product));
         $link         = $this->escapeXml($this->buildProductUrl($product));
         $imageLink    = $this->escapeXml($this->buildImageUrl($product->product_image));
-        $price        = $this->escapeXml($this->formatPrice($product->sale_price));
+        $price        = $this->escapeXml($this->formatPrice($product->getDiscountPrice()));
         $currency     = $this->escapeXml($this->resolveCurrency());
         $brand        = $this->escapeXml(optional($product->brand)->title ?? '');
         $availability = $this->escapeXml('in stock');
@@ -115,7 +115,7 @@ XML;
 
         $description  = $this->escapeXml($this->productDescription($product));
         $link         = $this->escapeXml($this->buildProductUrl($product));
-        $price        = $this->escapeXml($this->formatPrice($variant->sale_price));
+        $price        = $this->escapeXml($this->formatPrice($variant->getDiscountPrice()));
         $currency     = $this->escapeXml($this->resolveCurrency());
         $brand        = $this->escapeXml(optional($product->brand)->title ?? '');
         $availability = $this->escapeXml($variant->stock > 0 ? 'in stock' : 'out of stock');
@@ -219,7 +219,7 @@ XML;
     {
         $slug = $this->resolveTranslation($product, 'slug', (string) $product->id);
 
-        return rtrim(config('app.url', url('/')), '/') . '/products/' . rawurlencode($slug);
+        return rtrim(config('app.url', url('/')), '/') . '/products/' . rawurlencode($slug) .'/'.$product->id;
     }
 
     protected function buildImageUrl(?string $path): string
