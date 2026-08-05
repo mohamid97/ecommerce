@@ -104,11 +104,11 @@ XML;
     protected function buildVariantItemXml(Product $product, ProductVariant $variant): string
     {
         // Unique ID per variant + parent item_group_id to group variants together in Meta
-         $id          = $this->escapeXml($product->id );
+         $id          = $this->escapeXml($product->id . '_' . $variant->id);
          $itemGroupId = $this->escapeXml('product_' . $product->id);
 
-        // Variant title (e.g. "Red T-Shirt - XL")
-        $variantFullName = $variant->getVariantFullNameAttribute() ?: $variant->sku;
+        // Variant title (e.g. "Red T-Shirt - XL") - use Arabic translations
+        $variantFullName = $this->buildVariantFullName($variant) ?: $variant->sku;
         $title           = $this->escapeXml(
             $this->productTitle($product) . ($variantFullName ? ' - ' . $variantFullName : '')
         );
@@ -145,6 +145,29 @@ XML;
             {$categoryTag}
         </item>
 XML;
+    }
+
+    /**
+     * Build the variant full name using Arabic translations of option and option value titles.
+     */
+    protected function buildVariantFullName(ProductVariant $variant): ?string
+    {
+        return $variant->variants
+            ->map(function ($variantOptionValue) {
+                $option      = $variantOptionValue->optionValue?->option;
+                $optionValue = $variantOptionValue->optionValue;
+
+                $optionTitle = optional($option->translate('ar'))->title ?: optional($option)->title;
+                $valueTitle  = optional($optionValue->translate('ar'))->title ?: optional($optionValue)->title;
+
+                if (!$optionTitle || !$valueTitle) {
+                    return null;
+                }
+
+                return $optionTitle . ' ' . $valueTitle;
+            })
+            ->filter()
+            ->implode(' ');
     }
 
     /**
