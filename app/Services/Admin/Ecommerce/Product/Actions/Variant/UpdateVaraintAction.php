@@ -10,24 +10,37 @@ class UpdateVaraintAction
     public function updateVariant($dto){
         $productVaraint = ProductVariant::findOrFail($dto->id);
 
-        $data = array_filter([
-            'sale_price' => $dto->sale_price,
-            'discount_value' => $dto->discount,
-            'discount_type' => $dto->discount_type,
-            'sku' => $dto->sku,
-            'barcode' => $dto->barcode,
-            'moq' => $dto->moq ?? null,
-            'length' => $dto->length,
-            'weight' => $dto->weight,
-            'width' => $dto->width,
-            'height' => $dto->height,
-            'delivery_time' => $dto->delivery_time,
-            'max_time' => $dto->max_time,
-        ], fn ($value) => $value !== null);
+        // $data = array_filter([
+        //     'sale_price' => $dto->sale_price,
+        //     'discount_value' => $dto->discount,
+        //     'discount_type' => $dto->discount_type,
+        //     'sku' => $dto->sku,
+        //     'barcode' => $dto->barcode,
+        //     'moq' => $dto->moq ?? null,
+        //     'length' => $dto->length,
+        //     'weight' => $dto->weight,
+        //     'width' => $dto->width,
+        //     'height' => $dto->height,
+        //     'delivery_time' => $dto->delivery_time,
+        //     'max_time' => $dto->max_time,
+        // ], fn ($value) => $value !== null);
 
-        if (!empty($data)) {
-            $productVaraint->update($data);
-        }
+        // if (!empty($data)) {
+            $productVaraint->update([
+                'sale_price' => $dto->sale_price,
+                'discount_value' => $dto->discount,
+                'discount_type' => $dto->discount_type,
+                'sku' => $dto->sku,
+                'barcode' => $dto->barcode,
+                'moq' => $dto->moq ?? null,
+                'length' => $dto->length,
+                'weight' => $dto->weight,
+                'width' => $dto->width,
+                'height' => $dto->height,
+                'delivery_time' => $dto->delivery_time,
+                'max_time' => $dto->max_time,
+            ]);
+        // }
 
         $this->updateVariantTranslations($dto, $productVaraint);
 

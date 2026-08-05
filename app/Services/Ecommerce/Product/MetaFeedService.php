@@ -114,7 +114,7 @@ XML;
         );
 
         $description  = $this->escapeXml($this->productDescription($product));
-        $link         = $this->escapeXml($this->buildProductUrl($product));
+        $link         = $this->escapeXml($this->buildProductUrl($product) . '?v=' . $variant->id);
         $price        = $this->escapeXml($this->formatPrice($variant->getDiscountPrice()));
         $currency     = $this->escapeXml($this->resolveCurrency());
         $brand        = $this->escapeXml(optional($product->brand)->title ?? '');
