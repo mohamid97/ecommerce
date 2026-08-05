@@ -18,7 +18,7 @@ class ProductDetailsResource extends JsonResource
     public function toArray(Request $request): array
     {
         $defaultVaraintModel = $this->variants->firstWhere('is_default', 1) ?? $this->variants->first();
-
+        $productOrOneMOQ = $this->moq ?? 1;
         return [
 
             'id' => $this->id,
@@ -33,7 +33,7 @@ class ProductDetailsResource extends JsonResource
             'discount_type' => $defaultVaraintModel?->discount_type,
             'on_demand' => $this->on_demand,
             'sku' => $defaultVaraintModel?->sku,
-            'moq' => $defaultVaraintModel?->moq ?? 1,
+            'moq' => $defaultVaraintModel?->moq ?? $productOrOneMOQ,
             'has_options' => $this->has_options,
             'product_image' => $this->getImageUrl($this->product_image),
             'breadcrumb' => $this->getImageUrl($this->breadcrumb),
