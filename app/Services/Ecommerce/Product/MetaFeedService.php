@@ -219,7 +219,7 @@ XML;
     {
         $slug = $this->resolveTranslation($product, 'slug', (string) $product->id);
 
-        return rtrim(config('app.front_url') . '/products/' . rawurlencode($slug) .'/'.$product->id);
+        return rtrim(config('app.front_url') . '/ar/product/' . rawurlencode($slug) .'/'.$product->id);
     }
 
     protected function buildImageUrl(?string $path): string
