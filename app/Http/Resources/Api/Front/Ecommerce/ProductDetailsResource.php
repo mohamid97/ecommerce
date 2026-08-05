@@ -80,10 +80,6 @@ class ProductDetailsResource extends JsonResource
 
 
 
-
-
-
-
     protected function buildVariantName($variants)
     {
         return $variants

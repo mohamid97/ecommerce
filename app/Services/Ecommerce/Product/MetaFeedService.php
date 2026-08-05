@@ -18,9 +18,9 @@ class MetaFeedService
                 'translations',
                 'variants' => function ($q) {
                     $q->where('status', 'active')
-                       ->where('stock', '>', 0)
-                      ->whereNotNull('sale_price')
-                      ->where('sale_price', '>', 0)
+                    //    ->where('stock', '>', 0)
+                    //   ->whereNotNull('sale_price')
+                    //   ->where('sale_price', '>', 0)
                       ->with([
                           'variants.option.translations',
                           'variants.optionValue.translations',
@@ -51,7 +51,7 @@ class MetaFeedService
 
         $items       = implode(PHP_EOL, array_filter($xmlParts));
         $title       = e(config('app.name', 'Store'));
-        $link        = e(rtrim(config('app.url', url('/')), '/'));
+        $link        = e(rtrim(config('app.front_url', url('/')), '/'));
         $description = e(config('app.name', 'Store').' product catalog');
 
         return <<<XML
@@ -71,7 +71,7 @@ XML;
 
     protected function buildSimpleItemXml(Product $product): string
     {
-        $id           = $this->escapeXml('product_' . $product->id);
+        $id           = $this->escapeXml($product->id);
         $title        = $this->escapeXml($this->productTitle($product));
         $description  = $this->escapeXml($this->productDescription($product));
         $link         = $this->escapeXml($this->buildProductUrl($product));
@@ -104,8 +104,8 @@ XML;
     protected function buildVariantItemXml(Product $product, ProductVariant $variant): string
     {
         // Unique ID per variant + parent item_group_id to group variants together in Meta
-        $id          = $this->escapeXml('product_' . $product->id . '_variant_' . $variant->id);
-        $itemGroupId = $this->escapeXml('product_' . $product->id);
+         $id          = $this->escapeXml($product->id );
+         $itemGroupId = $this->escapeXml('product_' . $product->id);
 
         // Variant title (e.g. "Red T-Shirt - XL")
         $variantFullName = $variant->variant_full_name ?: $variant->sku;
@@ -219,7 +219,7 @@ XML;
     {
         $slug = $this->resolveTranslation($product, 'slug', (string) $product->id);
 
-        return rtrim(config('app.url', url('/')), '/') . '/products/' . rawurlencode($slug) .'/'.$product->id;
+        return rtrim(config('app.front_url') . '/products/' . rawurlencode($slug) .'/'.$product->id);
     }
 
     protected function buildImageUrl(?string $path): string
