@@ -12,6 +12,8 @@ class MetaFeedController extends Controller
 
     public function __invoke(): Response
     {
+        app('config')->set('column_langs' , 'ar');
+        app('config')->set('app.locale' , 'ar');
         $xml = $this->service->buildFeed();
 
         return response($xml, 200, [

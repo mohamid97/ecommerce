@@ -108,7 +108,7 @@ XML;
          $itemGroupId = $this->escapeXml('product_' . $product->id);
 
         // Variant title (e.g. "Red T-Shirt - XL")
-        $variantFullName = $variant->variant_full_name ?: $variant->sku;
+        $variantFullName = $variant->getVariantFullNameAttribute() ?: $variant->sku;
         $title           = $this->escapeXml(
             $this->productTitle($product) . ($variantFullName ? ' - ' . $variantFullName : '')
         );
