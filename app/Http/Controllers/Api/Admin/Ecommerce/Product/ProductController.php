@@ -294,9 +294,9 @@ public function relatedProducts(Request $request)
                     'id' => $item?->product?->id,
                     'title' => $item?->product?->title, // translatable
                 ];
-            });
+            });  
 
-return $this->success($related, __('main.data_retrieved'));
+        return $this->success($related, __('main.data_retrieved'));
     }
 
     return $this->error(__('main.not_founded'), 404);

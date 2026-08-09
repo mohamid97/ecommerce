@@ -13,4 +13,9 @@ class ProductVaraintImages extends Model
     public function image(){
         return $this->belongsTo(GerneralVariantGalleries::class , 'image_id');
     }
+
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
+    }
 }

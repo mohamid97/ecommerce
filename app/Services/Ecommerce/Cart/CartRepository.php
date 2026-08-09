@@ -154,6 +154,7 @@ class CartRepository
             'items.bundel',
             'items.cartBundelItems.product',
             'items.cartBundelItems.variant.variants.optionValue.option',
+            'items.cartBundelItems.bundleDetail',
         ])->findOrFail($cartItem->cart_id);
     }
 

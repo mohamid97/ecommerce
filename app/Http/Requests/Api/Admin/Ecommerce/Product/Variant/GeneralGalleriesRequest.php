@@ -30,6 +30,9 @@ class GeneralGalleriesRequest extends FormRequest
         return [
            'product_id' => 'required|exists:products,id',
            'image' => 'required|image|mimes:jpeg,webp,png,jpg,gif|max:2048',
+           'alt_text' => 'nullable|array',
+           'alt_text.*' => 'nullable|string|max:255',
+           'order' => 'nullable|integer|min:0',
         ];
     }
 

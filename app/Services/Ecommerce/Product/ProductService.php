@@ -148,8 +148,7 @@ class ProductService
      */
     public function getLastPieceProducts(array $data)
     {
-        $subQuery = LastPiece::query()->select('product_id');
-        return $this->getSectionProducts($data, $subQuery, LastPiece::class);
+        return $this->getSectionProducts($data, LastPiece::class);
     }
 
     /**
@@ -160,8 +159,7 @@ class ProductService
      */
     public function getNewestProducts(array $data)
     {
-        $subQuery = NewProduct::query()->select('product_id');
-        return $this->getSectionProducts($data, $subQuery, NewProduct::class);
+        return $this->getSectionProducts($data, NewProduct::class);
     }
 
     /**
@@ -301,24 +299,28 @@ class ProductService
      * @param  mixed  $subQuery
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    private function getSectionProducts(array $data, $subQuery, string $sectionModelClass)
+    private function getSectionProducts(array $data, string $sectionModelClass)
     {
-        $products = Product::query()
-            ->with(['category', 'brand', 'industries', 'variants' => function ($query) {
-                $query->where('status', '!=', 'draft')->orderByDesc('is_default')->orderBy('id');
-            }])
-            ->where('status', '!=', 'draft')
-            ->whereIn('id', $subQuery);
-
         $paginate = (!empty($data['paginate']) && ($data['paginate'] >= 1 && $data['paginate'] <= 100)) ? $data['paginate'] : 10;
 
-        $products = $products->paginate($paginate);
-
-        $products->getCollection()->each(function ($product) use ($sectionModelClass) {
-            $sectionEntry = $sectionModelClass::query()->where('product_id', $product->id)->first();
-            $product->setAttribute('selected_variant_id', $sectionEntry?->variant_id);
-        });
-
-        return $products;
+        return $sectionModelClass::query()
+            ->with([
+                'product.variants' => function ($query) {
+                    $query->where('status', '!=', 'draft')
+                        ->orderByDesc('is_default')
+                        ->orderBy('id');
+                },
+                'product.variants.variants.optionValue.option',
+                'product.variants.varaintImages.image',
+                'variant.variants.optionValue.option',
+                'variant.varaintImages.image',
+            ])
+            ->whereHas('product', fn ($query) => $query->where('status', '!=', 'draft'))
+            ->where(function ($query) {
+                $query->whereNull('variant_id')
+                    ->orWhereHas('variant', fn ($variantQuery) => $variantQuery->where('status', '!=', 'draft'));
+            })
+            ->latest()
+            ->paginate($paginate);
     }
 }

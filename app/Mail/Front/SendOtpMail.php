@@ -29,7 +29,7 @@ class SendOtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Otp',
+            subject: 'Your verification code',
         );
     }
 
@@ -40,6 +40,7 @@ class SendOtpMail extends Mailable
     {
         return new Content(
             view: 'emails.otp',
+            text: 'emails.otp-text',
         );
     }
 

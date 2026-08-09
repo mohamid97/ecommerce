@@ -126,6 +126,7 @@ class CartController extends Controller
             'items.bundel',
             'items.cartBundelItems.product',
             'items.cartBundelItems.variant.variants.optionValue.option',
+            'items.cartBundelItems.bundleDetail',
             'items.product',
             'items.variant.variants.optionValue.option',
             'items.bundel',

@@ -19,6 +19,8 @@ class GeneralGalleriesResoure extends JsonResource
         return [
                'id' => $this->id,
               'image'=>$this->getImageUrl($this->image),
+              'alt_text' => $this->alt_text ?? (object) [],
+              'order' => $this->order,
             ];
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Resources\Api\Front\Ecommerce\ProductNoOptionResource;
 use App\Http\Resources\Api\Front\Ecommerce\ProductResource;
 use App\Http\Resources\Api\Front\Ecommerce\LastpieceResource;
 use App\Http\Resources\Api\Front\Ecommerce\NewestResource;
+use App\Http\Resources\Api\Front\Ecommerce\SectionProductResource;
 use App\Http\Resources\Api\Front\Ecommerce\VaraintDetailsResource;
 use App\Services\Ecommerce\Product\ProductService;
 use App\Traits\ResponseTrait;
@@ -80,7 +81,7 @@ class ProductController extends Controller
 
             return $this->successPaginated(
                 $products,
-                LastpieceResource::collection($products),
+                SectionProductResource::collection($products),
                 'last_piece_products',
                 __('main.list_successfully', ['model' => 'Products'])
             );
@@ -99,7 +100,7 @@ class ProductController extends Controller
 
             return $this->successPaginated(
                 $products,
-                NewestResource::collection($products),
+                SectionProductResource::collection($products),
                 'newest_products',
                 __('main.list_successfully', ['model' => 'Products'])
             );

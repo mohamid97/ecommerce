@@ -12,6 +12,12 @@ class GerneralVariantGalleries extends Model
     protected $fillable = [
         'image',
         'product_id',
+        'alt_text',
+        'order',
+    ];
+
+    protected $casts = [
+        'alt_text' => 'array',
     ];
 
     public function variantImage(){
@@ -21,5 +27,10 @@ class GerneralVariantGalleries extends Model
     public function product()
     {
         return $this->belongsTo(Product::class , 'product_id' , 'id');
+    }
+
+    public function specialImageOptions()
+    {
+        return $this->hasMany(SpecialImageOptionSelection::class, 'image_id');
     }
 }

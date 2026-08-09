@@ -3,11 +3,14 @@
 namespace App\Http\Resources\Api\Front\Ecommerce;
 
 use App\Models\Api\Ecommerce\BundelDetails;
+use App\Http\Resources\Api\Front\Ecommerce\Concerns\CalculatesCartMaximumQuantity;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GuestCartItemResource extends JsonResource
 {
+    use CalculatesCartMaximumQuantity;
+
     public function toArray(Request $request): array
     {
         if ($this->bundel_id && $this->type === 'bundel') {
@@ -36,6 +39,7 @@ class GuestCartItemResource extends JsonResource
                 'total_before_discount' => (float) $this->total_before_discount,
                 'total_after_discount' => (float) $this->total_after_discount,
                 'quantity' => (float) $this->quantity,
+                'max_quantity' => $this->maximumQuantity(),
                 'created_at' => $this->created_at->format('Y-m-d'),
                 'updated_at' => $this->updated_at->format('Y-m-d'),
             ];
@@ -56,6 +60,7 @@ class GuestCartItemResource extends JsonResource
             'total_before_discount' => (float) $this->total_before_discount,
             'total_after_discount' => (float) $this->total_after_discount,
             'quantity' => (float) $this->quantity,
+            'max_quantity' => $this->maximumQuantity(),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
         ];
