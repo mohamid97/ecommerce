@@ -101,18 +101,22 @@ class CartRepository
         $cart = Cart::where('user_id', $userId)->first();
 
         if (!$cart) {
-            return;
+            throw new \Exception(__('main.user_cart_not_found'));
         }
 
         if (isset($dto->bundelId)) {
-            CartItem::where('cart_id', $cart->id)
+            $deleted = CartItem::where('cart_id', $cart->id)
                 ->where('bundel_id', $dto->bundelId)
                 ->delete();
         } else {
-            CartItem::where('cart_id', $cart->id)
+            $deleted = CartItem::where('cart_id', $cart->id)
                 ->where('product_id', $dto->productId)
                 ->when($dto->variantId, fn ($q) => $q->where('variant_id', $dto->variantId))
                 ->delete();
+        }
+
+        if ($deleted === 0) {
+            throw new \Exception(__('main.product_not_found_in_cart', ['product' => 'Item']));
         }
 
         if ($cart->items()->count() === 0) {

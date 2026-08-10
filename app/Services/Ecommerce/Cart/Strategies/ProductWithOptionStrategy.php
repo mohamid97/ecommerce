@@ -17,7 +17,7 @@ class ProductWithOptionStrategy implements CartStrategyInterface
         protected CartRepository $repo
     ) {}
 
-    public function validate(AddToCartDTO $dto): void
+    public function validate(int $userId, AddToCartDTO $dto): void
     {
         //$this->action->validateMOQ('variant',$dto->variant_id, $dto->quantity);
         // check if product exists 
@@ -26,7 +26,10 @@ class ProductWithOptionStrategy implements CartStrategyInterface
         $this->action->checkProductHasOption();
         // then check if variant exists and stock is available
         $this->action->checkVariantExists($dto->variant_id);
-        $this->action->checkStockWithOption($dto->quantity);
+
+        // Final demand = existing demand for this variant across whole cart + new quantity
+        $existing = $this->action->getTotalCartDemand($userId, $dto->product_id, $dto->variant_id);
+        $this->action->checkStockWithOption($existing + $dto->quantity);
     }
 
     public function store(int $userId, AddToCartDTO $dto): mixed

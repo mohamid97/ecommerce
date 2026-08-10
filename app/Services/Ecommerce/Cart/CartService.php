@@ -33,7 +33,7 @@ class CartService
     {
         $strategy = $this->resolver->resolve($dto);
 
-        $strategy->validate($dto);
+        $strategy->validate($userId, $dto);
 
         return $strategy->store($userId, $dto);
     }
@@ -142,7 +142,8 @@ class CartService
     private function validateGuestItem(AddToCartDTO $dto): void
     {
         $strategy = $this->resolver->resolve($dto);
-        $strategy->validate($dto);
+        // Guest carts have no DB cart, so pass 0 → getTotalCartDemand returns 0
+        $strategy->validate(0, $dto);
     }
 
     private function makeGuestProductItem(AddToCartDTO $dto): CartItem
@@ -175,7 +176,7 @@ class CartService
 
     private function makeGuestBundleItem(AddToCartDTO $dto): CartItem
     {
-        $bundle = Bundel::with('bundelDetails')->findOrFail($dto->bundel_id);
+        $bundle = Bundel::with('bundelDetails')->findOrFail($dto->bundle_id);
         $priceData = $this->action->getBundlePriceWithData($dto);
 
         $item = new CartItem([

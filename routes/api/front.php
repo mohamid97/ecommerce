@@ -7,10 +7,10 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     // members Auth system
     Route::prefix('auth')->controller('MemberController')->group(function () {
-        Route::post('/send-verification', 'sendVerification');
-        Route::post('/verfiy-otp', 'verfiyOtp');
-        Route::post('/register', 'register');
-        Route::post('/login', 'login');
+        Route::post('/send-verification', 'sendVerification')->middleware('throttle:otp');
+        Route::post('/verfiy-otp', 'verfiyOtp')->middleware('throttle:otp');
+        Route::post('/register', 'register')->middleware('throttle:register');
+        Route::post('/login', 'login')->middleware('throttle:login');
         Route::post('/logout', 'logout')->middleware('auth:sanctum');
 
     });

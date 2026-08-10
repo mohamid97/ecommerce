@@ -10,7 +10,7 @@ interface CartStrategyInterface
      * Validate the incoming DTO (stock, existence, options …).
      * Throws an exception on failure.
      */
-    public function validate(AddToCartDTO $dto): void;
+    public function validate(int $userId, AddToCartDTO $dto): void;
 
     /**
      * Persist the cart item and return the cart model.

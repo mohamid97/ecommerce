@@ -32,6 +32,13 @@ class UpdateMemberRequest extends FormRequest
             'phone' => 'nullable|string|max:12',
             'government_id'=>'nullable|integer|exists:govs,id',
             'address'=>'nullable|string|max:5000',
+            'city'=>'nullable|string|max:255',
+            'area'=>'nullable|string|max:255',
+            'building_number'=>'nullable|string|max:255',
+            'floor'=>'nullable|string|max:255',
+            'apartment_number'=>'nullable|string|max:255',
+            'landmark'=>'nullable|string|max:255',
+            'notes'=>'nullable|string|max:5000',
         ];
     }
 

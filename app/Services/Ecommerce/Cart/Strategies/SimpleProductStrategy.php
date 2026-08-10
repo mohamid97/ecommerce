@@ -18,7 +18,7 @@ class SimpleProductStrategy implements CartStrategyInterface
         protected CartRepository $repo
     ) {}
 
-    public function validate(AddToCartDTO $dto): void
+    public function validate(int $userId, AddToCartDTO $dto): void
     {
         // $this->action->validateMOQ('product',$dto->product_id, $dto->quantity);
         $this->action->checkProductExists($dto->product_id);
@@ -29,8 +29,10 @@ class SimpleProductStrategy implements CartStrategyInterface
                 'variant_id' => __('main.variant_is_required_for_this_product')
             ]);
         }
-       
-        $this->action->checkStock($dto->quantity);
+
+        // Final demand = existing demand across whole cart + new quantity
+        $existing = $this->action->getTotalCartDemand($userId, $dto->product_id, null);
+        $this->action->checkStock($existing + $dto->quantity);
     }
 
     public function store(int $userId, AddToCartDTO $dto): mixed

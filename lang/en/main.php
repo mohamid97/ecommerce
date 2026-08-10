@@ -19,6 +19,7 @@ return [
     'error_happend'=>'An Error Happend Please Try Agin',
     'member_register'=>'User Register Successfully. Please Login Now',
     'memeber_data'=>'User Data',
+    'invalid_credentials'=>'Invalid email or password.',
     'added_to_cart'=>':product Added To Cart',
     'cart_delete'=>'Cart Of :user Deleted',
     'model_not_founded'=>":model Not Founded",

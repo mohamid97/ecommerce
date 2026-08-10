@@ -20,7 +20,7 @@ class BundleStrategy implements CartStrategyInterface
         protected CartRepository $repo
     ) {}
 
-    public function validate(AddToCartDTO $dto): void
+    public function validate(int $userId, AddToCartDTO $dto): void
     {
         // 1. Bundle must exist
         $this->action->checkBundelExists($dto->bundle_id);
@@ -65,7 +65,7 @@ class BundleStrategy implements CartStrategyInterface
 
             // get per-bundle required qty from bundle detail
             $perBundleQty = $this->action->bundelDetail->quantity ?? 1;
-            $totalRequestedQty = $dto->quantity * $perBundleQty;
+            $incomingDemand = $dto->quantity * $perBundleQty;
 
             // 4. Require variant if product has options
             if ($this->action->product->has_options && !$variantId) {
@@ -74,12 +74,14 @@ class BundleStrategy implements CartStrategyInterface
                 ]);
             }
 
-            // 5. Validation specific to whether variant_id is present
+            // 5. Final demand = existing demand for this product/variant across whole cart + this bundle's incoming demand
+            $existing = $this->action->getTotalCartDemand($userId, $productId, $variantId);
+
             if ($variantId) {
                 $this->action->checkVariantBelongsToBundle($variantId);
-                $this->action->checkStockWithOption($totalRequestedQty);
+                $this->action->checkStockWithOption($existing + $incomingDemand);
             } else {
-                $this->action->checkStock($totalRequestedQty);
+                $this->action->checkStock($existing + $incomingDemand);
             }
         }
 

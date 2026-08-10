@@ -26,7 +26,7 @@ class LoginMemeberRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'email' => 'required|email|exists:users,email',
+           'email' => 'required|email',
            'password'=>'required|string|min:6|max:12'
         ];
     }

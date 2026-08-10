@@ -93,7 +93,7 @@ class MemberController extends Controller
             
                 return $this->success( new LoginMemeberResource($user->load('profile')) , __('main.memeber_data'));
             }
-           return $this->error( __('main.error_happend') ,  500); 
+           return $this->error( __('main.invalid_credentials') ,  401); 
 
         }catch(\Exception $e){
             DB::rollBack();
@@ -118,7 +118,17 @@ class MemberController extends Controller
             $user->update($request->validated());
             $user->profile()->updateOrCreate(
                 ['user_id' => $user->id],
-                $request->only('government_id', 'address')
+                $request->only(
+                    'government_id',
+                    'address',
+                    'city',
+                    'area',
+                    'building_number',
+                    'floor',
+                    'apartment_number',
+                    'landmark',
+                    'notes'
+                )
             );
             DB::commit();
             return $this->success(

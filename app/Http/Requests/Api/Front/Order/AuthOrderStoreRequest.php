@@ -28,6 +28,7 @@ class AuthOrderStoreRequest extends FormRequest
             'payment_method' => 'nullable|string|max:255',
             'use_points' => 'nullable|boolean',
             'points_to_use' => 'nullable|integer|min:0|max:1000',
+            'coupon_code' => 'nullable|string|max:255',
             
         ];
     }

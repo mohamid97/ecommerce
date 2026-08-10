@@ -149,6 +149,52 @@ class CartAction
         }
     }
 
+    /**
+     * Sum the total requested quantity for a product/variant across the ENTIRE cart:
+     * standalone items + every bundle item that contains it.
+     */
+    public function getTotalCartDemand(int $userId, int $productId, ?int $variantId = null): int
+    {
+        $cart = \App\Models\Api\Ecommerce\Cart::where('user_id', $userId)->first();
+        if (!$cart) {
+            return 0;
+        }
+
+        $total = 0;
+
+        // 1. Standalone product/variant items
+        $query = CartItem::where('cart_id', $cart->id)
+            ->where('product_id', $productId);
+
+        if ($variantId !== null) {
+            $query->where('variant_id', $variantId);
+        } else {
+            $query->whereNull('variant_id');
+        }
+        $total += (int) $query->sum('quantity');
+
+        // 2. Bundle items containing this product/variant
+        $bundleItems = CartItem::where('cart_id', $cart->id)
+            ->whereNotNull('bundel_id')
+            ->with(['cartBundelItems.bundleDetail'])
+            ->get();
+
+        foreach ($bundleItems as $bundleItem) {
+            foreach ($bundleItem->cartBundelItems as $bundleProduct) {
+                if ((int) $bundleProduct->product_id !== $productId) {
+                    continue;
+                }
+                if ($variantId !== null && (int) $bundleProduct->variant_id !== $variantId) {
+                    continue;
+                }
+                $perBundleQty = (int) ($bundleProduct->bundleDetail->quantity ?? 1);
+                $total += (int) $bundleItem->quantity * $perBundleQty;
+            }
+        }
+
+        return $total;
+    }
+
     public function getUserCartItem(int $userId, int $cartItemId): CartItem
     {
         $cartItem = CartItem::with(['cartBundelItems'])

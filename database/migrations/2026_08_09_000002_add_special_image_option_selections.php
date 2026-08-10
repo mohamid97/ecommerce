@@ -30,5 +30,6 @@ return new class extends Migration
         Schema::table('gerneral_variant_galleries', function (Blueprint $table) {
             $table->dropColumn(['alt_text', 'order']);
         });
+        
     }
 };

@@ -28,6 +28,21 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // OTP endpoints: tight limit per IP + email to prevent email bombing & brute-force
+        RateLimiter::for('otp', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip() . '|' . $request->input('email'));
+        });
+
+        // Login: limit per IP + email to prevent password brute-force
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip() . '|' . $request->input('email'));
+        });
+
+        // Register: limit per IP to prevent mass account creation / spam
+        RateLimiter::for('register', function (Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api/admin')

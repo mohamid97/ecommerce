@@ -26,10 +26,10 @@ class DeleteFromCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'cart_item_id'      => 'nullable|integer|exists:cart_items,id',
-           'product_id'        => 'nullable|integer|exists:products,id',
+           'cart_item_id'      => 'nullable|integer|exists:cart_items,id|required_without_all:product_id,bundel_id',
+           'product_id'        => 'nullable|integer|exists:products,id|required_without_all:cart_item_id,bundel_id',
            'variant_id'        => 'nullable|integer|exists:product_variants,id',
-           'bundel_id'         => 'nullable|integer|exists:bundels,id',
+           'bundel_id'         => 'nullable|integer|exists:bundels,id|required_without_all:cart_item_id,product_id',
         ];
     }
 

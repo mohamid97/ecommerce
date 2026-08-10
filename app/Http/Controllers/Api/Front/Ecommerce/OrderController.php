@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Front\Ecommerce;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Front\Order\AuthOrderStoreRequest;
+use App\Http\Requests\Api\Front\Order\GuestOrderPreviewRequest;
 use App\Http\Requests\Api\Front\Order\GuestOrderStoreRequest;
 use App\Http\Resources\Api\Front\Ecommerce\OrderResource;
 use App\Services\Ecommerce\Order\OrderService;
@@ -108,6 +109,8 @@ class OrderController extends Controller
             $order = $this->service->createOrderFromGuestCart($cart, $data);
 
             return $this->success(new OrderResource($order), __('main.created_successfully', ['model' => 'Order']));
+        }catch(\Illuminate\Validation\ValidationException $e){
+            throw $e;
         }catch(\Exception $e){
             return $this->error($e->getMessage(), 400);
         }
@@ -116,13 +119,10 @@ class OrderController extends Controller
     /**
      * Preview totals for a guest-provided cart payload (items + optional coupon).
      */
-    public function previewGuest(Request $request)
+    public function previewGuest(GuestOrderPreviewRequest $request)
     {
         try {
-            $data = $request->validate([
-                'items' => 'required|array',
-                'coupon_code' => 'nullable|string',
-            ]);
+            $data = $request->validated();
 
             // normalize incoming items into products/bundles arrays for CartService
             $products = [];
@@ -141,6 +141,7 @@ class OrderController extends Controller
                         'variant_id' => $item['variant_id'] ?? null,
                         'quantity' => $item['quantity'],
                     ];
+                    $this->service->checkMoqForGuest($item['product_id'], $item['variant_id'] ?? null, $item['quantity']);
                 }
             }
 
@@ -152,6 +153,8 @@ class OrderController extends Controller
             $result = $this->service->calculateTotalsFromCart($cart, $data, null);
 
             return $this->success($result, __('main.retrieved_successfully'));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 400);
         }
