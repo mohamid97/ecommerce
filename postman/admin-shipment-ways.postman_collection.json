@@ -1,0 +1,214 @@
+{
+  "info": {
+    "name": "Admin - Shipment Ways & Prices",
+    "_postman_id": "admin-shipment-ways-collection",
+    "description": "Postman collection for admin shipment way CRUD and shipment way price (per zone) CRUD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Shipment Way - Store (Create)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"way\",\n  \"title\": {\n    \"en\": \"Small Car\",\n    \"ar\": \"سيارة صغيرة\"\n  },\n  \"des\": {\n    \"en\": \"Small delivery car\",\n    \"ar\": \"سيارة توصيل صغيرة\"\n  },\n  \"capacity\": 3,\n  \"status\": \"active\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/store",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "store"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way - Update",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"way\",\n  \"id\": 1,\n  \"title\": {\n    \"en\": \"Small Car Updated\",\n    \"ar\": \"سيارة صغيرة محدثة\"\n  },\n  \"des\": {\n    \"en\": \"Updated description\",\n    \"ar\": \"وصف محدث\"\n  },\n  \"capacity\": 4,\n  \"status\": \"active\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/update",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "update"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way - Delete",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"way\",\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/delete",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "delete"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way - All (List)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"way\",\n  \"search\": \"\",\n  \"paginate\": 10\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/all",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "all"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way - View (Details)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"way\",\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/view",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "view"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way Price - Store (Create)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"wayzone\",\n  \"way_id\": 1,\n  \"zone_id\": 1,\n  \"price\": 50,\n  \"status\": \"active\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/store",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "store"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way Price - Update",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"wayzone\",\n  \"id\": 1,\n  \"way_id\": 1,\n  \"zone_id\": 1,\n  \"price\": 60,\n  \"status\": \"active\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/update",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "update"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way Price - Delete",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"wayzone\",\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/delete",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "delete"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way Price - All (List by way)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"wayzone\",\n  \"way_id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/all",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "all"]
+        }
+      }
+    },
+    {
+      "name": "Shipment Way Price - View (Details)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"wayzone\",\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/view",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "view"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ]
+}

@@ -82,6 +82,8 @@ class ProductStoreRequest extends FormRequest
             'min_estimated_delivery'=>'nullable|numeric|min:0',
             'max_estimated_delivery'=>'nullable|numeric|min:0',
             'moq'=>'nullable|integer|min:1',
+            'units'=>'nullable|integer|min:1',
+            'shipment_way_id'=>'nullable|exists:shipment_ways,id',
 
 
 

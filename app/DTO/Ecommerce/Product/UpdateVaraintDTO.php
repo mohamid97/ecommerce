@@ -24,6 +24,7 @@ class UpdateVaraintDTO
         public int $delivery_time = 0,
         public int $max_time = 0,
         public ?array $image_ids = null,
+        public ?int $units = null,
 
         
 
@@ -51,7 +52,8 @@ class UpdateVaraintDTO
             $data['moq'] ?? null,
             $data['delivery_time'] ?? 0,
             $data['max_time'] ?? 0,
-            $data['image_ids'] ?? null
+            $data['image_ids'] ?? null,
+            $data['units'] ?? null
             
         );
     }

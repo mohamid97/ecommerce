@@ -85,7 +85,9 @@ class StoreProductService
             'height'=>$data['height'] ?? null,
             'weight'=>$data['weight'] ?? null,
             'min_estimated_delivery'=>$data['min_estimated_delivery'] ?? null,
-            'max_estimated_delivery'=>$data['max_estimated_delivery'] ?? null
+            'max_estimated_delivery'=>$data['max_estimated_delivery'] ?? null,
+            'units'=>$data['units'] ?? 1,
+            'shipment_way_id'=>$data['shipment_way_id'] ?? null
         ]);
     }
     

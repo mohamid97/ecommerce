@@ -17,7 +17,8 @@ class OrderService
         protected OrderAction $action,
         protected OrderStrategyResolver $resolver,
         protected CouponService $couponService,
-        protected PointsService $pointsService
+        protected PointsService $pointsService,
+        protected \App\Services\Ecommerce\Shipment\ShipmentCalculationService $shipmentCalculation
     ) {}
 
 
@@ -81,13 +82,11 @@ class OrderService
             // $order->total = $total;
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
-            $order->shipping_cost = $order->shipping_cost ?? (float) config('setting.shipping_cost', 70);
+            // calculate real shipping cost
+            $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['shipment_zone_id'] ?? null)['shipping_cost'];
+            $order->shipping_cost = $shippingCost;
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
-            //  dd($order);
-
-            // mark cart closed via repository
-            // $this->repo->markCartConverted($cart);
 
             $this->action->deleteCart($user->id);
            return $order;  
@@ -123,7 +122,9 @@ class OrderService
 
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
-            $order->shipping_cost = $order->shipping_cost ?? (float) config('frontend.shipping_cost', 70);
+            // calculate real shipping cost
+            $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['shipment_zone_id'] ?? null)['shipping_cost'];
+            $order->shipping_cost = $shippingCost;
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
 
@@ -166,8 +167,8 @@ class OrderService
         // apply coupon to produce post-discount total (matching createOrder flow)
         $totalAfterPreview= max(0, $baseAmount - $discountAmount - $pointsAmount);
 
-        // shipping cost from config (reads env via config/frontend.php)
-        $shippingCost = (float) config('setting.shipping_cost', 70);
+        // calculate real shipping cost based on cart items and selected zone
+        $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['shipment_zone_id'] ?? null)['shipping_cost'];
 
         $finalTotal = ( $totalAfterPreview + $shippingCost );
 

@@ -106,6 +106,8 @@ class ProductDetailsResource extends JsonResource
                         'weight'=>(float) $this->shipmentDetails->weight,
                         'min_estimated_delivery'=> (float) $this->shipmentDetails->min_estimated_delivery,
                         'max_estimated_delivery'=>(float) $this->shipmentDetails->max_estimated_delivery,
+                        'units'=> (int) ($this->shipmentDetails->units ?? 1),
+                        'shipment_way_id'=> $this->shipmentDetails->shipment_way_id,
                     ];
             }),
             'is_featured'=> (bool) $this->is_featured,

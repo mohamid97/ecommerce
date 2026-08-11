@@ -64,7 +64,7 @@ class OrderController extends Controller
         
         try {
             $user = $request->user();
-            $data = $request->only(['coupon_code', 'use_points', 'points_to_use']);
+            $data = $request->only(['coupon_code', 'use_points', 'points_to_use', 'shipment_zone_id']);
 
             $result = $this->service->previewForUser($user, $data);
             return $this->success($result, __('main.retrieved_successfully' , ['model' => 'Order Preview']));

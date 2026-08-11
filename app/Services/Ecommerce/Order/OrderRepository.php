@@ -27,8 +27,8 @@ class OrderRepository
         $order->government_id = $data['government_id'] ?? null;
         $order->shipment_address = $data['shipment_address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
-        // shipping cost is static (front sends government_id + full address)
-        $order->shipping_cost = 70;
+        // shipping cost will be calculated by OrderService after items are processed
+        $order->shipping_cost = 0;
         $order->total= 0;
         $order->tax = 0;
         $order->total_after_discount = 0;
@@ -57,8 +57,8 @@ class OrderRepository
         $order->government_id = $data['government_id'] ?? null;
         $order->shipment_address = $data['shipment_address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
-        // shipping cost is static
-        $order->shipping_cost = 70;
+        // shipping cost will be calculated by OrderService after items are processed
+        $order->shipping_cost = 0;
         $order->total = 0;
         $order->tax = 0;
         $order->total_after_discount = 0;

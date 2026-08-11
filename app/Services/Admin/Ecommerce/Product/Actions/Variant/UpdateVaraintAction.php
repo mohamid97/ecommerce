@@ -39,6 +39,7 @@ class UpdateVaraintAction
                 'height' => $dto->height,
                 'delivery_time' => $dto->delivery_time,
                 'max_time' => $dto->max_time,
+                'units' => $dto->units ?? null,
             ]);
         // }
 

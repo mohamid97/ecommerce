@@ -11,7 +11,7 @@ use Astrotomic\Translatable\Translatable;
 class Category extends Model implements TranslatableContract
 {
     use HasFactory, Translatable;
-    protected $fillable = ['category_image', 'thumbnail', 'type', 'order', 'breadcrumb', 'parent_id'];
+    protected $fillable = ['category_image', 'thumbnail', 'type', 'order', 'breadcrumb', 'parent_id', 'shipment_way_id'];
     public $translatedAttributes = ['title', 'alt_image', 'title_image', 'small_des', 'des', 'meta_title', 'meta_des', 'slug'];
     public $translationForeignKey = 'category_id';
     public $translationModel = 'App\Models\Api\Admin\CategoryTranslation';
@@ -49,5 +49,10 @@ class Category extends Model implements TranslatableContract
     public function products()
     {
         return $this->hasMany(Product::class, 'category_id');
+    }
+
+    public function shipmentWay()
+    {
+        return $this->belongsTo(\App\Models\Api\Ecommerce\ShipmentWay::class, 'shipment_way_id');
     }
 }

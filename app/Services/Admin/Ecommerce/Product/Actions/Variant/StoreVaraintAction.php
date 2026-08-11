@@ -30,6 +30,7 @@ class StoreVaraintAction
             // 'stock' => $dto->stock,
             'delivery_time' => $dto->deliveryTime,
             'max_time' => $dto->maxTime,
+            'units' => $dto->units ?? null,
         ]);
         $this->storeVariantTranslations($dto, $productVaraint);
 

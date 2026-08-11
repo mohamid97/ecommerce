@@ -49,6 +49,7 @@ class UpdateVaraintRequest extends FormRequest
             'delivery_time'=>'nullable|integer|min:0',
             'max_time'=>'nullable|integer|min:0',
             'moq'=>'nullable|integer|min:1',
+            'units'=>'nullable|integer|min:1',
             'status'=>'nullable|in:active,draft,unavailable'
 
         ];

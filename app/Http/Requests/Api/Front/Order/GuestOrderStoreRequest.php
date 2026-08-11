@@ -18,6 +18,7 @@ class GuestOrderStoreRequest extends FormRequest
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'government_id' => 'required|integer|exists:govs,id',
+            'shipment_zone_id' => 'nullable|integer|exists:shipment_zones,id',
             'shipment_address' => 'required|string|max:1000',
             'payment_method' => 'required|string|max:255',
             'items' => 'required|array|min:1',

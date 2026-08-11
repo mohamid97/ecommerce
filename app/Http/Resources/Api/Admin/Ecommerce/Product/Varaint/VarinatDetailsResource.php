@@ -40,6 +40,7 @@ class VarinatDetailsResource extends JsonResource
                 'weight' => (float)$this->weight,
                 'min_estimated_delivery' => $this->delivery_time,  
                 'max_estimated_delivery' => $this->max_time,
+                'units' => (int) ($this->units ?? 1),
             ],
             'title'=>$this->getColumnLang('title'),
             'slug'=>$this->getColumnLang('slug'),

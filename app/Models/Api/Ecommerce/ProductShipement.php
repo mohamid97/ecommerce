@@ -10,14 +10,20 @@ class ProductShipement extends Model
 {
     use HasFactory;
     protected $fillable = ['product_id' , 'shipement_id' , 'weight' , 'length' , 
-    'width' , 'height' , 'min_estimated_delivery' , 'max_estimated_delivery'];
+    'width' , 'height' , 'min_estimated_delivery' , 'max_estimated_delivery' , 'units' , 'shipment_way_id'];
 
     protected $casts = [
         'width'=>'float',
         'length'=>'float',
         'height'=>'float',
         'weight'=>'float',
+        'units'=>'integer',
     ];
+
+    public function shipmentWay()
+    {
+        return $this->belongsTo(ShipmentWay::class, 'shipment_way_id');
+    }
 
     public function product()
     {

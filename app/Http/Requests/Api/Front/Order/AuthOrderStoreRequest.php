@@ -24,6 +24,7 @@ class AuthOrderStoreRequest extends FormRequest
         return [
             'phone' => 'nullable|string|max:20',
             'government_id' => 'required|integer|exists:govs,id',
+            'shipment_zone_id' => 'nullable|integer|exists:shipment_zones,id',
             'shipment_address' => 'required|string|max:500',
             'payment_method' => 'nullable|string|max:255',
             'use_points' => 'nullable|boolean',

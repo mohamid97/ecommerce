@@ -198,6 +198,14 @@ class ModelRequestFactory
                 'store'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\CityStoreRequest::class,
                 'update'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\CityUpdateRequest::class,
             ],
+            'way'=>[
+                'store'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\ShipmentWayStoreRequest::class,
+                'update'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\ShipmentWayUpdateRequest::class,
+            ],
+            'wayzone'=>[
+                'store'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\ShipmentWayZoneStoreRequest::class,
+                'update'=>\App\Http\Requests\Api\Admin\Ecommerce\Shipment\ShipmentWayZoneUpdateRequest::class,
+            ],
             'dynamicfeature'=>[
                 'store'=>\App\Http\Requests\Api\Admin\Dynamicfeature\DynamicfeatureStoreRequest::class,
                 'update'=>\App\Http\Requests\Api\Admin\Dynamicfeature\DynamicfeatureUpdateRequest::class,

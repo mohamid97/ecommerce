@@ -41,6 +41,7 @@ class CategoryUpdateRequest extends FormRequest
             'order'=>'nullable|integer|unique:categories,order,except,id',
             'brands' => 'nullable|array',
             'brands.*' => 'exists:brands,id',
+            'shipment_way_id'=>'nullable|exists:shipment_ways,id',
         ];
     }
 

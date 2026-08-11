@@ -23,6 +23,7 @@ class GuestOrderPreviewRequest extends FormRequest
             'items.*.bundle_items.*.product_id' => 'required_with:items.*.bundel_id|integer|exists:products,id',
             'items.*.bundle_items.*.variant_id' => 'nullable|integer|exists:product_variants,id',
             'coupon_code' => 'nullable|string',
+            'shipment_zone_id' => 'nullable|integer|exists:shipment_zones,id',
         ];
     }
 }
