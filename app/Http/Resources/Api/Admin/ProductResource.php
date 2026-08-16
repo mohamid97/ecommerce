@@ -68,6 +68,7 @@ class ProductResource extends JsonResource
         'on_demand'=>$this->on_demand ? true :false,
         'is_featured'=> (bool) $this->is_featured,
         'moq' => $this->moq ?? 1,
+        'units' => $this->units,
         'created_at' => $this->created_at?->format('Y-m-d'),
         'updated_at' => $this->updated_at?->format('Y-m-d'),
     

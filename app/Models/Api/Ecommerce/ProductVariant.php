@@ -132,6 +132,21 @@ class ProductVariant extends Model implements TranslatableContract
     {
         return $this->belongsTo(Product::class);
     }
+
+    /**
+     * Get shipment units using the variant fallback chain:
+     * variant → product → category.
+     */
+    public function resolveUnits(): ?int
+    {
+        if (is_numeric($this->units) && (int) $this->units > 0) {
+            return (int) $this->units;
+        }
+
+        $this->loadMissing('product.category');
+
+        return $this->product?->resolveUnits();
+    }
    
     public function variants()
     {

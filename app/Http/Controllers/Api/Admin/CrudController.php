@@ -50,7 +50,7 @@ class CrudController extends Controller
         $resourceClass =  "App\\Http\\Resources\\Api\\Admin\\{$studlyName}Resource";
         //dd($resourceClass);
         //   dd(class_exists($resourceClass) );
-
+         //dd($this->data ,  $resourceClass);
         if (class_exists($resourceClass)) {
             if(!$this->data){
                 return $this->success( [], __($msg, ['model' => $modelName]));

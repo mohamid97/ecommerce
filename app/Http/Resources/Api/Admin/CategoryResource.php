@@ -53,13 +53,7 @@ class CategoryResource extends JsonResource
             'services' => $this->whenLoaded('services', function () {
                return $this->getColumnsLangWithArrayRelation(['title' , 'slug'] , 'services' , ['service_image']);
             }),
-            'shipment_way' => $this->whenLoaded('shipmentWay', function () {
-                return $this->shipmentWay ? [
-                    'id' => $this->shipmentWay->id,
-                    'title' => $this->getColumnLang('title', 'shipmentWay'),
-                    'capacity' => (int) $this->shipmentWay->capacity,
-                ] : null;
-            })
+            'units' => $this->units,
         ];
 
     }

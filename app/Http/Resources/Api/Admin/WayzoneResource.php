@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ShipmentWayZoneResource extends JsonResource
+class WayzoneResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

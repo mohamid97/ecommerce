@@ -14,7 +14,7 @@ use Astrotomic\Translatable\Translatable;
 class Product extends Model implements TranslatableContract
 {
     use HasFactory,Translatable;
-    protected $fillable = ['product_image','sku','is_featured' , 'barcode','stock','sales_number','sale_price','discount','discount_type','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id', 'moq'];
+    protected $fillable = ['product_image','sku','is_featured' , 'barcode','stock','sales_number','sale_price','discount','discount_type','has_options','on_demand' , 'status','breadcrumb' , 'order' , 'brand_id','category_id', 'moq', 'units'];
     public $translatedAttributes = ['title' , 'slug' , 'small_des' ,'des' , 'meta_title' , 'meta_des' , 'alt_image', 'title_image'];
     public $translationForeignKey = 'product_id';
     public $translationModel = 'App\Models\Api\Admin\ProductTranslation';
@@ -95,6 +95,7 @@ class Product extends Model implements TranslatableContract
         'is_featured' => 'boolean',
         'sales_number' => 'integer',
         'moq' => 'integer',
+        'units' => 'integer',
 
 
     ];
@@ -143,6 +144,23 @@ class Product extends Model implements TranslatableContract
     public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
+    }
+
+    /**
+     * Get shipment units using the product fallback chain: product → category.
+     * Null means this product cannot be shipped until units are configured.
+     */
+    public function resolveUnits(): ?int
+    {
+        $this->loadMissing('category');
+
+        foreach ([$this->units, $this->category?->units] as $units) {
+            if (is_numeric($units) && (int) $units > 0) {
+                return (int) $units;
+            }
+        }
+
+        return null;
     }
 
 

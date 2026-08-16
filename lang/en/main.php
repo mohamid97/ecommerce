@@ -52,6 +52,7 @@ return [
     'user_cart_not_found'=>'User cart not found.',
     'empty_cart'=>'Your cart is empty.',
     'product_has_no_variants' => 'Product has variants but none are available.',
+    'units_are_required_for_product' => 'This product cannot be used because its shipping units are not configured. (Product ID: :product)',
 
     
 

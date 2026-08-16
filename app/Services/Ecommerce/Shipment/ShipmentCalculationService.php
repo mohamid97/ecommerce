@@ -2,68 +2,44 @@
 
 namespace App\Services\Ecommerce\Shipment;
 
-use App\Models\Api\Admin\Category;
 use App\Models\Api\Admin\Product;
-use App\Models\Api\Ecommerce\Bundel;
 use App\Models\Api\Ecommerce\BundelDetails;
 use App\Models\Api\Ecommerce\CartItem;
-use App\Models\Api\Ecommerce\ProductShipement;
 use App\Models\Api\Ecommerce\ProductVariant;
 use App\Models\Api\Ecommerce\ShipmentWay;
 use App\Models\Api\Ecommerce\ShipmentWayZone;
-use Illuminate\Support\Facades\DB;
 
 class ShipmentCalculationService
 {
-    /**
-     * Calculate shipping cost for a list of cart items at a given zone.
-     *
-     * @param iterable<CartItem> $cartItems
-     * @param int|null $shipmentZoneId
-     * @return array{shipping_cost: float, used_cars: array}
-     */
     public function calculate(iterable $cartItems, ?int $shipmentZoneId): array
     {
-        if (empty($cartItems) || empty($shipmentZoneId)) {
-            return ['shipping_cost' => 0.0, 'used_cars' => []];
-        }
-
-        // Step 1: build packing list of units
         $packingList = [];
+
         foreach ($cartItems as $cartItem) {
-            $units = $this->resolveUnitsForCartItem($cartItem);
-            $qty = (int) ($cartItem->quantity ?? 1);
-            for ($i = 0; $i < $qty; $i++) {
-                $packingList[] = $units;
+            $unitsList = $this->resolveUnitsForCartItem($cartItem);
+            for ($i = 0; $i < (int) ($cartItem->quantity ?? 1); $i++) {
+                foreach ($unitsList as $units) {
+                    $packingList[] = $units;
+                }
             }
         }
 
-        if (empty($packingList)) {
+        if (empty($packingList) || empty($shipmentZoneId)) {
             return ['shipping_cost' => 0.0, 'used_cars' => []];
         }
 
-        // Step 2: validate no single item exceeds largest car capacity
-        $largestCapacity = ShipmentWay::where('status', 'active')->max('capacity');
-        if ($largestCapacity === null) {
-            $largestCapacity = 0;
-        }
-
+        $largestCapacity = (int) (ShipmentWay::where('status', 'active')->max('capacity') ?? 0);
         foreach ($packingList as $units) {
             if ($units > $largestCapacity) {
                 throw new \Exception("Item requires {$units} units but the largest available car capacity is {$largestCapacity}.");
             }
         }
 
-        // Step 3: get active ways sorted by capacity DESC
-        $ways = ShipmentWay::where('status', 'active')
-            ->orderByDesc('capacity')
-            ->get();
-
+        $ways = ShipmentWay::where('status', 'active')->orderByDesc('capacity')->get();
         if ($ways->isEmpty()) {
             return ['shipping_cost' => 0.0, 'used_cars' => []];
         }
 
-        // Step 4: greedy packing (largest car first)
         $usedWayIds = [];
         $remaining = $packingList;
 
@@ -74,7 +50,6 @@ class ShipmentCalculationService
 
             $capacity = (int) $way->capacity;
             $currentLoad = 0;
-
             foreach ($remaining as $index => $units) {
                 if ($currentLoad + $units <= $capacity) {
                     $currentLoad += $units;
@@ -91,7 +66,6 @@ class ShipmentCalculationService
             throw new \Exception('Unable to pack all items into available shipment ways.');
         }
 
-        // Step 5: sum prices for used ways at the given zone
         $prices = ShipmentWayZone::whereIn('way_id', $usedWayIds)
             ->where('zone_id', $shipmentZoneId)
             ->where('status', 'active')
@@ -100,89 +74,73 @@ class ShipmentCalculationService
 
         $totalShipping = 0.0;
         $usedCars = [];
-
         foreach ($usedWayIds as $wayId) {
-            $price = $prices->get($wayId)?->price ?? 0;
             $way = $ways->firstWhere('id', $wayId);
-            $totalShipping += (float) $price;
+            $price = (float) ($prices->get($wayId)?->price ?? 0);
+            $totalShipping += $price;
             $usedCars[] = [
                 'way_id' => $wayId,
-                'title' => $way?->title ?? null,
+                'title' => $way?->title,
                 'capacity' => $way?->capacity ?? 0,
-                'price' => (float) $price,
+                'price' => $price,
             ];
         }
 
-        return [
-            'shipping_cost' => round($totalShipping, 2),
-            'used_cars' => $usedCars,
-        ];
+        return ['shipping_cost' => round($totalShipping, 2), 'used_cars' => $usedCars];
     }
 
-    /**
-     * Resolve units for a single cart item (variant → product → category default = 1).
-     * For bundles, sum units of all contained products/variants.
-     */
-    private function resolveUnitsForCartItem(CartItem $cartItem): int
+    private function resolveUnitsForCartItem(CartItem $cartItem): array
     {
-        // If this cart item is a bundle, sum units of all bundle contents
         if ($cartItem->bundel_id) {
             return $this->resolveBundleUnits($cartItem);
         }
 
-        // 1. Variant units
-        if ($cartItem->variant_id) {
-            $variant = ProductVariant::find($cartItem->variant_id);
-            if ($variant && !is_null($variant->units)) {
-                return (int) $variant->units;
-            }
-        }
+        $variant = $cartItem->variant_id
+            ? ($cartItem->variant ?: ProductVariant::find($cartItem->variant_id))
+            : null;
+        $product = $cartItem->product_id
+            ? ($cartItem->product ?: Product::find($cartItem->product_id))
+            : null;
 
-        // 2. Product shipment units
-        if ($cartItem->product_id) {
-            $productShipment = ProductShipement::where('product_id', $cartItem->product_id)
-                ->whereNull('variant_id')
-                ->first();
-
-            if ($productShipement && !is_null($productShipement->units)) {
-                return (int) $productShipement->units;
-            }
-        }
-
-        // 3. Default is 1 unit if nothing is set
-        return 1;
+        return [$this->requireUnits(
+            $variant?->resolveUnits() ?? $product?->resolveUnits(),
+            $product?->id ?? $variant?->product_id,
+        )];
     }
 
-    /**
-     * Sum units for all products/variants inside a bundle.
-     */
-    private function resolveBundleUnits(CartItem $cartItem): int
+    private function resolveBundleUnits(CartItem $cartItem): array
     {
-        $bundleDetails = BundelDetails::where('bundel_id', $cartItem->bundel_id)->get();
-        $totalUnits = 0;
+        $unitsList = [];
 
-        foreach ($bundleDetails as $detail) {
-            $variantIds = $detail->selectedVariantIds();
-            $units = 1;
+        foreach ($cartItem->cartBundelItems as $bundleItem) {
+            $variant = $bundleItem->variant_id
+                ? ($bundleItem->variant ?: ProductVariant::find($bundleItem->variant_id))
+                : null;
+            $product = $bundleItem->product_id
+                ? ($bundleItem->product ?: Product::find($bundleItem->product_id))
+                : null;
+            $units = $this->requireUnits(
+                $variant?->resolveUnits() ?? $product?->resolveUnits(),
+                $product?->id ?? $variant?->product_id,
+            );
+            $detail = $bundleItem->bundleDetail ?: BundelDetails::find($bundleItem->bundle_item_id);
 
-            if (!empty($variantIds)) {
-                $variant = ProductVariant::find($variantIds[0]);
-                if ($variant && !is_null($variant->units)) {
-                    $units = (int) $variant->units;
-                }
-            } else {
-                $productShipment = ProductShipement::where('product_id', $detail->product_id)
-                    ->whereNull('variant_id')
-                    ->first();
-
-                if ($productShipement && !is_null($productShipement->units)) {
-                    $units = (int) $productShipement->units;
-                }
+            for ($i = 0; $i < (int) ($detail?->quantity ?? 1); $i++) {
+                $unitsList[] = $units;
             }
-
-            $totalUnits += $units * ($detail->quantity ?? 1);
         }
 
-        return max($totalUnits, 1);
+        return $unitsList;
+    }
+
+    private function requireUnits(?int $units, ?int $productId): int
+    {
+        if ($units === null) {
+            throw new \Exception(__('main.units_are_required_for_product', [
+                'product' => $productId ?? 'unknown',
+            ]));
+        }
+
+        return $units;
     }
 }

@@ -86,8 +86,10 @@ class CartService
 
                 if (!empty($bundleItem->variant_id)) {
                     $this->action->checkVariantBelongsToBundle($bundleItem->variant_id);
+                    $this->action->ensureUnitsAreConfigured();
                     $this->action->checkStockWithOption($totalRequestedQty);
                 } else {
+                    $this->action->ensureUnitsAreConfigured();
                     $this->action->checkStock($totalRequestedQty);
                 }
             }
@@ -97,8 +99,10 @@ class CartService
             if (!empty($cartItem->variant_id)) {
                 $this->action->checkProductHasOption();
                 $this->action->checkVariantExists($cartItem->variant_id);
+                $this->action->ensureUnitsAreConfigured();
                 $this->action->checkStockWithOption($dto->quantity);
             } else {
+                $this->action->ensureUnitsAreConfigured();
                 $this->action->checkStock($dto->quantity);
             }
         }

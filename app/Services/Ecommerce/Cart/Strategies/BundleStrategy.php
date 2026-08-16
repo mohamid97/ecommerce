@@ -79,8 +79,10 @@ class BundleStrategy implements CartStrategyInterface
 
             if ($variantId) {
                 $this->action->checkVariantBelongsToBundle($variantId);
+                $this->action->ensureUnitsAreConfigured();
                 $this->action->checkStockWithOption($existing + $incomingDemand);
             } else {
+                $this->action->ensureUnitsAreConfigured();
                 $this->action->checkStock($existing + $incomingDemand);
             }
         }

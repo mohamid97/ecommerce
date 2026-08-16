@@ -10,7 +10,7 @@ class CategoryService extends BaseModelService
 {
     use StoreMultiLang;
     protected string $modelClass = Category::class;
-    protected array $relations = ['brands' , 'parent' , 'services' , 'shipmentWay'];
+    protected array $relations = ['brands' , 'parent' , 'services'];
 
 
 
@@ -27,7 +27,7 @@ class CategoryService extends BaseModelService
     public function store()
     {
         $this->uploadSingleImage(['category_image' , 'thumbnail' , 'breadcrumb'], 'uploads/categories'); 
-        $category = parent::store($this->getBasicColumn(['category_image', 'thumbnail', 'breadcrumb' , 'order' , 'parent_id' , 'shipment_way_id']));
+        $category = parent::store($this->getBasicColumn(['category_image', 'thumbnail', 'breadcrumb' , 'order' , 'parent_id' , 'units']));
         $this->data['slug']  = $this->createSlug($this->data);
         $this->processTranslations($category, $this->data, ['title', 'slug', 'des' , 'alt_image' , 'title_image' , 'small_des' , 'meta_title' , 'meta_des']);  
         if (!empty($this->data['brands'])) {
@@ -40,7 +40,7 @@ class CategoryService extends BaseModelService
 
     public function update($id){
         $this->uploadSingleImage(['category_image' , 'thumbnail' , 'breadcrumb'], 'uploads/categories'); 
-        $category = parent::update($id , $this->getBasicColumn( ['category_image', 'thumbnail', 'breadcrumb' , 'order' , 'parent_id' , 'shipment_way_id']));
+        $category = parent::update($id , $this->getBasicColumn( ['category_image', 'thumbnail', 'breadcrumb' , 'order' , 'parent_id' , 'units']));
         $this->processTranslations($category, $this->data, ['title' , 'slug', 'des' , 'alt_image' , 'title_image' , 'small_des' , 'meta_title' , 'meta_des']);
         $this->attachBrands($category);
         return $category;        

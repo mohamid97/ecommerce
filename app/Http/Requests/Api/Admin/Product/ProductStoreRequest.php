@@ -84,6 +84,7 @@ class ProductStoreRequest extends FormRequest
             'moq'=>'nullable|integer|min:1',
             'units'=>'nullable|integer|min:1',
             'shipment_way_id'=>'nullable|exists:shipment_ways,id',
+            'category_id' => 'required|exists:categories,id',
 
 
 
@@ -103,6 +104,26 @@ class ProductStoreRequest extends FormRequest
             )
         );
         
+    }
+
+    protected function withValidator(Validator $validator): void
+    {
+        $validator->after(function ($validator) {
+            $hasOptions = filter_var($this->input('has_options'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $units = $this->input('units');
+            $categoryId = $this->input('category_id');
+
+            // Simple products (no options) must have units either directly or from category
+            if (!$hasOptions && empty($units) && $categoryId) {
+                $category = \App\Models\Api\Admin\Category::find($categoryId);
+                if (!$category || empty($category->units)) {
+                    $validator->errors()->add(
+                        'units',
+                        'Simple products must have units. Either set units on the product or set units on its category.'
+                    );
+                }
+            }
+        });
     }
 
     

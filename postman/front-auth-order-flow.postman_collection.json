@@ -1,0 +1,178 @@
+{
+  "info": {
+    "name": "Front - Auth User Order Flow",
+    "_postman_id": "front-auth-order-flow",
+    "description": "Complete order flow for authenticated user: login → add to cart → preview shipment → create order",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login (get token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    var json = pm.response.json();",
+              "    if (json.data && json.data.token) {",
+              "        pm.collectionVariables.set('token', json.data.token);",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"shopper.one@example.com\",\n  \"password\": \"password\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. View Cart",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/carts/view",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "carts", "view"]
+        }
+      }
+    },
+    {
+      "name": "3. Add Simple Product to Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/carts/add",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "carts", "add"]
+        }
+      }
+    },
+    {
+      "name": "4. Add Variant Product to Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": 2,\n  \"variant_id\": 1,\n  \"quantity\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/carts/add",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "carts", "add"]
+        }
+      }
+    },
+    {
+      "name": "5. Add Bundle to Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bundle_id\": 1,\n  \"quantity\": 1,\n  \"bundle_items\": [\n    {\n      \"bundle_item_id\": 1,\n      \"product_id\": 1,\n      \"variant_id\": null\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/carts/add",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "carts", "add"]
+        }
+      }
+    },
+    {
+      "name": "6. Preview Order with Shipment (AUTH)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shipment_zone_id\": 1,\n  \"coupon_code\": \"\",\n  \"use_points\": false,\n  \"points_to_use\": 0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/orders/preview",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "orders", "preview"]
+        }
+      }
+    },
+    {
+      "name": "7. Create Order (AUTH)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"01000000001\",\n  \"government_id\": 1,\n  \"shipment_zone_id\": 1,\n  \"shipment_address\": \"123 Test Street, Cairo\",\n  \"payment_method\": \"cash\",\n  \"use_points\": false,\n  \"points_to_use\": 0,\n  \"coupon_code\": \"\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/orders/store",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "orders", "store"]
+        }
+      }
+    },
+    {
+      "name": "8. View My Orders",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/front/v1/orders?per_page=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "front", "v1", "orders"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ]
+}

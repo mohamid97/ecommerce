@@ -26,6 +26,7 @@ class ProductWithOptionStrategy implements CartStrategyInterface
         $this->action->checkProductHasOption();
         // then check if variant exists and stock is available
         $this->action->checkVariantExists($dto->variant_id);
+        $this->action->ensureUnitsAreConfigured();
 
         // Final demand = existing demand for this variant across whole cart + new quantity
         $existing = $this->action->getTotalCartDemand($userId, $dto->product_id, $dto->variant_id);

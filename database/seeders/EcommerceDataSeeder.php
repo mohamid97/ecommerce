@@ -238,7 +238,7 @@ class EcommerceDataSeeder extends Seeder
         });
     }
 
-    private function firstOrCreateCategory(string $slug, string $enTitle, string $arTitle, ?int $parentId = null): Category
+    private function firstOrCreateCategory(string $slug, string $enTitle, string $arTitle, ?int $parentId = null, ?int $units = null): Category
     {
         $category = Category::whereHas('translations', function ($q) use ($slug) {
             $q->where('locale', 'en')->where('slug', $slug);
@@ -249,6 +249,9 @@ class EcommerceDataSeeder extends Seeder
         }
 
         $category->parent_id = $parentId;
+        if (!is_null($units)) {
+            $category->units = $units;
+        }
         $category->translateOrNew('en')->title = $enTitle;
         $category->translateOrNew('en')->slug = $slug;
         $category->translateOrNew('ar')->title = $arTitle;
@@ -317,7 +320,8 @@ class EcommerceDataSeeder extends Seeder
         string $discountType,
         int $categoryId,
         int $brandId,
-        int $stock
+        int $stock,
+        ?int $units = null
     ): Product {
         $product = Product::firstOrCreate(
             ['sku' => $sku],
@@ -345,6 +349,11 @@ class EcommerceDataSeeder extends Seeder
             'brand_id' => $brandId,
         ]);
 
+        if (!is_null($units)) {
+            $product->units = $units;
+            $product->save();
+        }
+
         $baseSlug = Str::slug($enTitle);
         $product->translateOrNew('en')->title = $enTitle;
         $product->translateOrNew('en')->slug = $baseSlug;
@@ -361,7 +370,8 @@ class EcommerceDataSeeder extends Seeder
         string $arTitle,
         float $salePrice,
         int $categoryId,
-        int $brandId
+        int $brandId,
+        ?int $units = null
     ): Product {
         $product = Product::firstOrCreate(
             ['sku' => $sku],
@@ -385,6 +395,11 @@ class EcommerceDataSeeder extends Seeder
             'category_id' => $categoryId,
             'brand_id' => $brandId,
         ]);
+
+        if (!is_null($units)) {
+            $product->units = $units;
+            $product->save();
+        }
 
         $baseSlug = Str::slug($enTitle);
         $product->translateOrNew('en')->title = $enTitle;
@@ -420,7 +435,8 @@ class EcommerceDataSeeder extends Seeder
         float $discountValue,
         string $discountType,
         int $stock,
-        bool $isDefault
+        bool $isDefault,
+        ?int $units = null
     ): ProductVariant {
         $variant = ProductVariant::firstOrCreate(
             ['sku' => $sku],
@@ -444,6 +460,11 @@ class EcommerceDataSeeder extends Seeder
             'discount_value' => $discountValue,
             'discount_type' => $discountType,
         ]);
+
+        if (!is_null($units)) {
+            $variant->units = $units;
+            $variant->save();
+        }
 
         $slug = Str::slug($enTitle);
         $variant->translateOrNew('en')->title = $enTitle;
@@ -962,60 +983,65 @@ class EcommerceDataSeeder extends Seeder
     {
         $categoryDefinitions = [
             'electronics' => [
+                'units' => 1,
                 'en' => 'Electronics',
                 'ar' => 'الإلكترونيات',
                 'children' => [
-                    ['slug' => 'electronics-phones', 'en' => 'Phones', 'ar' => 'الهواتف'],
-                    ['slug' => 'electronics-laptops', 'en' => 'Laptops', 'ar' => 'أجهزة اللابتوب'],
-                    ['slug' => 'electronics-audio', 'en' => 'Audio', 'ar' => 'الصوت'],
-                    ['slug' => 'electronics-gaming', 'en' => 'Gaming', 'ar' => 'الألعاب'],
+                    ['slug' => 'electronics-phones', 'en' => 'Phones', 'ar' => 'الهواتف', 'units' => 1],
+                    ['slug' => 'electronics-laptops', 'en' => 'Laptops', 'ar' => 'أجهزة اللابتوب', 'units' => 2],
+                    ['slug' => 'electronics-audio', 'en' => 'Audio', 'ar' => 'الصوت', 'units' => 1],
+                    ['slug' => 'electronics-gaming', 'en' => 'Gaming', 'ar' => 'الألعاب', 'units' => 1],
                 ],
             ],
             'fashion' => [
+                'units' => 1,
                 'en' => 'Fashion',
                 'ar' => 'الأزياء',
                 'children' => [
-                    ['slug' => 'fashion-men', 'en' => 'Men', 'ar' => 'الرجال'],
-                    ['slug' => 'fashion-women', 'en' => 'Women', 'ar' => 'النساء'],
-                    ['slug' => 'fashion-accessories', 'en' => 'Accessories', 'ar' => 'الإكسسوارات'],
-                    ['slug' => 'fashion-footwear', 'en' => 'Footwear', 'ar' => 'الأحذية'],
+                    ['slug' => 'fashion-men', 'en' => 'Men', 'ar' => 'الرجال', 'units' => 1],
+                    ['slug' => 'fashion-women', 'en' => 'Women', 'ar' => 'النساء', 'units' => 1],
+                    ['slug' => 'fashion-accessories', 'en' => 'Accessories', 'ar' => 'الإكسسوارات', 'units' => 1],
+                    ['slug' => 'fashion-footwear', 'en' => 'Footwear', 'ar' => 'الأحذية', 'units' => 1],
                 ],
             ],
             'home' => [
+                'units' => 1,
                 'en' => 'Home',
                 'ar' => 'المنزل',
                 'children' => [
-                    ['slug' => 'home-kitchen', 'en' => 'Kitchen', 'ar' => 'المطبخ'],
-                    ['slug' => 'home-decor', 'en' => 'Decor', 'ar' => 'الديكور'],
-                    ['slug' => 'home-furniture', 'en' => 'Furniture', 'ar' => 'الأثاث'],
-                    ['slug' => 'home-outdoor', 'en' => 'Outdoor', 'ar' => 'الخارجي'],
+                    ['slug' => 'home-kitchen', 'en' => 'Kitchen', 'ar' => 'المطبخ', 'units' => 1],
+                    ['slug' => 'home-decor', 'en' => 'Decor', 'ar' => 'الديكور', 'units' => 1],
+                    ['slug' => 'home-furniture', 'en' => 'Furniture', 'ar' => 'الأثاث', 'units' => 3],
+                    ['slug' => 'home-outdoor', 'en' => 'Outdoor', 'ar' => 'الخارجي', 'units' => 2],
                 ],
             ],
             'beauty' => [
+                'units' => 1,
                 'en' => 'Beauty',
                 'ar' => 'الجمال',
                 'children' => [
-                    ['slug' => 'beauty-skincare', 'en' => 'Skincare', 'ar' => 'العناية بالبشرة'],
-                    ['slug' => 'beauty-makeup', 'en' => 'Makeup', 'ar' => 'المكياج'],
-                    ['slug' => 'beauty-fragrance', 'en' => 'Fragrance', 'ar' => 'العطور'],
-                    ['slug' => 'beauty-haircare', 'en' => 'Haircare', 'ar' => 'العناية بالشعر'],
+                    ['slug' => 'beauty-skincare', 'en' => 'Skincare', 'ar' => 'العناية بالبشرة', 'units' => 1],
+                    ['slug' => 'beauty-makeup', 'en' => 'Makeup', 'ar' => 'المكياج', 'units' => 1],
+                    ['slug' => 'beauty-fragrance', 'en' => 'Fragrance', 'ar' => 'العطور', 'units' => 1],
+                    ['slug' => 'beauty-haircare', 'en' => 'Haircare', 'ar' => 'العناية بالشعر', 'units' => 1],
                 ],
             ],
             'sports' => [
+                'units' => 1,
                 'en' => 'Sports',
                 'ar' => 'الرياضة',
                 'children' => [
-                    ['slug' => 'sports-fitness', 'en' => 'Fitness', 'ar' => 'اللياقة'],
-                    ['slug' => 'sports-outdoor', 'en' => 'Outdoor', 'ar' => 'الهواء الطلق'],
-                    ['slug' => 'sports-team', 'en' => 'Team Sports', 'ar' => 'الرياضات الجماعية'],
-                    ['slug' => 'sports-wellness', 'en' => 'Wellness', 'ar' => 'العافية'],
+                    ['slug' => 'sports-fitness', 'en' => 'Fitness', 'ar' => 'اللياقة', 'units' => 1],
+                    ['slug' => 'sports-outdoor', 'en' => 'Outdoor', 'ar' => 'الهواء الطلق', 'units' => 1],
+                    ['slug' => 'sports-team', 'en' => 'Team Sports', 'ar' => 'الرياضات الجماعية', 'units' => 1],
+                    ['slug' => 'sports-wellness', 'en' => 'Wellness', 'ar' => 'العافية', 'units' => 1],
                 ],
             ],
         ];
 
         $categoryMap = [];
         foreach ($categoryDefinitions as $slug => $definition) {
-            $parentCategory = $this->firstOrCreateCategory($slug, $definition['en'], $definition['ar'], null);
+            $parentCategory = $this->firstOrCreateCategory($slug, $definition['en'], $definition['ar'], null, $definition['units'] ?? null);
             $categoryMap[$slug] = $parentCategory->id;
 
             foreach ($definition['children'] as $childDefinition) {
@@ -1023,7 +1049,8 @@ class EcommerceDataSeeder extends Seeder
                     $childDefinition['slug'],
                     $childDefinition['en'],
                     $childDefinition['ar'],
-                    $parentCategory->id
+                    $parentCategory->id,
+                    $childDefinition['units'] ?? null
                 );
                 $categoryMap[$childDefinition['slug']] = $childCategory->id;
             }
@@ -1110,24 +1137,24 @@ class EcommerceDataSeeder extends Seeder
         }
 
         $simpleProducts = [
-            ['sku' => 'SKU-LARGE-001', 'en' => 'Wireless Noise Cancelling Headphones', 'ar' => 'سماعات لاسلكية مع إلغاء الضوضاء', 'price' => 199, 'discount' => 15, 'discountType' => 'percentage', 'category' => 'electronics-audio', 'brand' => 'sony-brand', 'stock' => 140],
-            ['sku' => 'SKU-LARGE-002', 'en' => 'Smart Fitness Band', 'ar' => 'سوار لياقة ذكي', 'price' => 79, 'discount' => 10, 'discountType' => 'percentage', 'category' => 'sports-fitness', 'brand' => 'samsung-brand', 'stock' => 180],
-            ['sku' => 'SKU-LARGE-003', 'en' => 'Portable Blender', 'ar' => 'مضرب محمول', 'price' => 89, 'discount' => 5, 'discountType' => 'fixed', 'category' => 'home-kitchen', 'brand' => 'cangrow-brand', 'stock' => 120],
-            ['sku' => 'SKU-LARGE-004', 'en' => 'Hydrating Facial Serum', 'ar' => 'سيروم مرطب للوجه', 'price' => 54, 'discount' => 8, 'discountType' => 'percentage', 'category' => 'beauty-skincare', 'brand' => 'gucci-brand', 'stock' => 90],
-            ['sku' => 'SKU-LARGE-005', 'en' => 'Travel Backpack', 'ar' => 'حقيبة سفر', 'price' => 68, 'discount' => 12, 'discountType' => 'percentage', 'category' => 'fashion-accessories', 'brand' => 'nike-brand', 'stock' => 160],
-            ['sku' => 'SKU-LARGE-006', 'en' => 'Gaming Mouse', 'ar' => 'ماوس ألعاب', 'price' => 49, 'discount' => 0, 'discountType' => 'percentage', 'category' => 'electronics-gaming', 'brand' => 'cangrow-brand', 'stock' => 220],
-            ['sku' => 'SKU-LARGE-007', 'en' => 'Ultra Slim Laptop', 'ar' => 'لابتوب رفيع للغاية', 'price' => 1299, 'discount' => 20, 'discountType' => 'percentage', 'category' => 'electronics-laptops', 'brand' => 'apple-brand', 'stock' => 60],
-            ['sku' => 'SKU-LARGE-008', 'en' => 'Classic Denim Jacket', 'ar' => 'جاكيت جينز كلاسيكي', 'price' => 110, 'discount' => 10, 'discountType' => 'fixed', 'category' => 'fashion-men', 'brand' => 'adidas-brand', 'stock' => 110],
-            ['sku' => 'SKU-LARGE-009', 'en' => 'Ceramic Vase', 'ar' => 'مزهرية سيراميك', 'price' => 45, 'discount' => 5, 'discountType' => 'fixed', 'category' => 'home-decor', 'brand' => 'ikea-brand', 'stock' => 85],
-            ['sku' => 'SKU-LARGE-010', 'en' => 'Rose Fragrance', 'ar' => 'عطر ورد', 'price' => 95, 'discount' => 15, 'discountType' => 'percentage', 'category' => 'beauty-fragrance', 'brand' => 'gucci-brand', 'stock' => 100],
-            ['sku' => 'SKU-LARGE-011', 'en' => 'Yoga Mat', 'ar' => 'بطانية يوغا', 'price' => 34, 'discount' => 6, 'discountType' => 'fixed', 'category' => 'sports-wellness', 'brand' => 'nike-brand', 'stock' => 140],
-            ['sku' => 'SKU-LARGE-012', 'en' => 'Leather Wallet', 'ar' => 'محفظة جلدية', 'price' => 60, 'discount' => 8, 'discountType' => 'percentage', 'category' => 'fashion-accessories', 'brand' => 'gucci-brand', 'stock' => 130],
-            ['sku' => 'SKU-LARGE-013', 'en' => 'Smart Indoor Lamp', 'ar' => 'مصباح ذكي داخلي', 'price' => 72, 'discount' => 10, 'discountType' => 'percentage', 'category' => 'home-decor', 'brand' => 'samsung-brand', 'stock' => 95],
-            ['sku' => 'SKU-LARGE-014', 'en' => 'Volumizing Shampoo', 'ar' => 'شامبو مكدس', 'price' => 22, 'discount' => 4, 'discountType' => 'fixed', 'category' => 'beauty-haircare', 'brand' => 'canon-brand', 'stock' => 150],
-            ['sku' => 'SKU-LARGE-015', 'en' => 'Running Shoes', 'ar' => 'أحذية رياضية', 'price' => 110, 'discount' => 12, 'discountType' => 'percentage', 'category' => 'sports-outdoor', 'brand' => 'adidas-brand', 'stock' => 170],
-            ['sku' => 'SKU-LARGE-016', 'en' => 'Studio Headset', 'ar' => 'سماعة استوديو', 'price' => 129, 'discount' => 9, 'discountType' => 'fixed', 'category' => 'electronics-audio', 'brand' => 'sony-brand', 'stock' => 130],
-            ['sku' => 'SKU-LARGE-017', 'en' => 'Modern Coffee Mug', 'ar' => 'فنجان قهوة عصري', 'price' => 19, 'discount' => 0, 'discountType' => 'percentage', 'category' => 'home-kitchen', 'brand' => 'ikea-brand', 'stock' => 200],
-            ['sku' => 'SKU-LARGE-018', 'en' => 'Silk Scarf', 'ar' => 'وشاح حريري', 'price' => 39, 'discount' => 7, 'discountType' => 'percentage', 'category' => 'fashion-women', 'brand' => 'gucci-brand', 'stock' => 110],
+            ['sku' => 'SKU-LARGE-001', 'en' => 'Wireless Noise Cancelling Headphones', 'ar' => 'سماعات لاسلكية مع إلغاء الضوضاء', 'price' => 199, 'discount' => 15, 'discountType' => 'percentage', 'category' => 'electronics-audio', 'brand' => 'sony-brand', 'stock' => 140, 'units' => 1],
+            ['sku' => 'SKU-LARGE-002', 'en' => 'Smart Fitness Band', 'ar' => 'سوار لياقة ذكي', 'price' => 79, 'discount' => 10, 'discountType' => 'percentage', 'category' => 'sports-fitness', 'brand' => 'samsung-brand', 'stock' => 180, 'units' => 1],
+            ['sku' => 'SKU-LARGE-003', 'en' => 'Portable Blender', 'ar' => 'مضرب محمول', 'price' => 89, 'discount' => 5, 'discountType' => 'fixed', 'category' => 'home-kitchen', 'brand' => 'cangrow-brand', 'stock' => 120, 'units' => 1],
+            ['sku' => 'SKU-LARGE-004', 'en' => 'Hydrating Facial Serum', 'ar' => 'سيروم مرطب للوجه', 'price' => 54, 'discount' => 8, 'discountType' => 'percentage', 'category' => 'beauty-skincare', 'brand' => 'gucci-brand', 'stock' => 90, 'units' => 1],
+            ['sku' => 'SKU-LARGE-005', 'en' => 'Travel Backpack', 'ar' => 'حقيبة سفر', 'price' => 68, 'discount' => 12, 'discountType' => 'percentage', 'category' => 'fashion-accessories', 'brand' => 'nike-brand', 'stock' => 160, 'units' => 1],
+            ['sku' => 'SKU-LARGE-006', 'en' => 'Gaming Mouse', 'ar' => 'ماوس ألعاب', 'price' => 49, 'discount' => 0, 'discountType' => 'percentage', 'category' => 'electronics-gaming', 'brand' => 'cangrow-brand', 'stock' => 220, 'units' => 1],
+            ['sku' => 'SKU-LARGE-007', 'en' => 'Ultra Slim Laptop', 'ar' => 'لابتوب رفيع للغاية', 'price' => 1299, 'discount' => 20, 'discountType' => 'percentage', 'category' => 'electronics-laptops', 'brand' => 'apple-brand', 'stock' => 60, 'units' => 2],
+            ['sku' => 'SKU-LARGE-008', 'en' => 'Classic Denim Jacket', 'ar' => 'جاكيت جينز كلاسيكي', 'price' => 110, 'discount' => 10, 'discountType' => 'fixed', 'category' => 'fashion-men', 'brand' => 'adidas-brand', 'stock' => 110, 'units' => 1],
+            ['sku' => 'SKU-LARGE-009', 'en' => 'Ceramic Vase', 'ar' => 'مزهرية سيراميك', 'price' => 45, 'discount' => 5, 'discountType' => 'fixed', 'category' => 'home-decor', 'brand' => 'ikea-brand', 'stock' => 85, 'units' => 1],
+            ['sku' => 'SKU-LARGE-010', 'en' => 'Rose Fragrance', 'ar' => 'عطر ورد', 'price' => 95, 'discount' => 15, 'discountType' => 'percentage', 'category' => 'beauty-fragrance', 'brand' => 'gucci-brand', 'stock' => 100, 'units' => 1],
+            ['sku' => 'SKU-LARGE-011', 'en' => 'Yoga Mat', 'ar' => 'بطانية يوغا', 'price' => 34, 'discount' => 6, 'discountType' => 'fixed', 'category' => 'sports-wellness', 'brand' => 'nike-brand', 'stock' => 140, 'units' => 1],
+            ['sku' => 'SKU-LARGE-012', 'en' => 'Leather Wallet', 'ar' => 'محفظة جلدية', 'price' => 60, 'discount' => 8, 'discountType' => 'percentage', 'category' => 'fashion-accessories', 'brand' => 'gucci-brand', 'stock' => 130, 'units' => 1],
+            ['sku' => 'SKU-LARGE-013', 'en' => 'Smart Indoor Lamp', 'ar' => 'مصباح ذكي داخلي', 'price' => 72, 'discount' => 10, 'discountType' => 'percentage', 'category' => 'home-decor', 'brand' => 'samsung-brand', 'stock' => 95, 'units' => 1],
+            ['sku' => 'SKU-LARGE-014', 'en' => 'Volumizing Shampoo', 'ar' => 'شامبو مكدس', 'price' => 22, 'discount' => 4, 'discountType' => 'fixed', 'category' => 'beauty-haircare', 'brand' => 'canon-brand', 'stock' => 150, 'units' => 1],
+            ['sku' => 'SKU-LARGE-015', 'en' => 'Running Shoes', 'ar' => 'أحذية رياضية', 'price' => 110, 'discount' => 12, 'discountType' => 'percentage', 'category' => 'sports-outdoor', 'brand' => 'adidas-brand', 'stock' => 170, 'units' => 1],
+            ['sku' => 'SKU-LARGE-016', 'en' => 'Studio Headset', 'ar' => 'سماعة استوديو', 'price' => 129, 'discount' => 9, 'discountType' => 'fixed', 'category' => 'electronics-audio', 'brand' => 'sony-brand', 'stock' => 130, 'units' => 1],
+            ['sku' => 'SKU-LARGE-017', 'en' => 'Modern Coffee Mug', 'ar' => 'فنجان قهوة عصري', 'price' => 19, 'discount' => 0, 'discountType' => 'percentage', 'category' => 'home-kitchen', 'brand' => 'ikea-brand', 'stock' => 200, 'units' => 1],
+            ['sku' => 'SKU-LARGE-018', 'en' => 'Silk Scarf', 'ar' => 'وشاح حريري', 'price' => 39, 'discount' => 7, 'discountType' => 'percentage', 'category' => 'fashion-women', 'brand' => 'gucci-brand', 'stock' => 110, 'units' => 1],
         ];
 
         $simpleProductsCreated = [];
@@ -1141,7 +1168,8 @@ class EcommerceDataSeeder extends Seeder
                 discountType: $definition['discountType'],
                 categoryId: $categoryMap[$definition['category']] ?? $categoryMap['electronics'],
                 brandId: $brandMap[$definition['brand']] ?? $brandMap['cangrow-brand'],
-                stock: (int) $definition['stock']
+                stock: (int) $definition['stock'],
+                units: $definition['units'] ?? null
             );
             $simpleProductsCreated[] = $product;
         }
@@ -1203,7 +1231,8 @@ class EcommerceDataSeeder extends Seeder
                     (float) $variantDefinition['discount'],
                     $variantDefinition['discountType'],
                     (int) $variantDefinition['stock'],
-                    false
+                    false,
+                    $variantDefinition['units'] ?? null
                 );
 
                 $selectedValues = [];

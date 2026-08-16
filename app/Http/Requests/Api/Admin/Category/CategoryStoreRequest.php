@@ -44,7 +44,7 @@ class CategoryStoreRequest extends FormRequest
             'order'=>'nullable|integer|unique:categories,order',
             'brands' => 'nullable|array',
             'brands.*' => 'exists:brands,id',
-            'shipment_way_id'=>'nullable|exists:shipment_ways,id',
+            'units'=>'nullable|integer|min:1',
             
         ];
         

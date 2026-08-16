@@ -22,6 +22,7 @@ class CartAction
     public function checkProductExists(int $productId): Product
     {
         $this->product = Product::active()->find($productId);
+        $this->variant = null;
 
         if (!$this->product) {
             throw new ModelNotFoundException(
@@ -49,7 +50,9 @@ class CartAction
 
     public function checkVariantExists(int $variantId): void
     {
-        $this->variant = ProductVariant::where('status', 'active')->find($variantId);
+        $this->variant = ProductVariant::where('status', 'active')
+            ->when($this->product, fn ($query) => $query->where('product_id', $this->product->id))
+            ->find($variantId);
 
         if (!$this->variant) {
             throw new ModelNotFoundException(
@@ -126,6 +129,23 @@ class CartAction
     {
         if (!$this->product->has_options) {
             throw new \Exception(__('main.product_has_no_options'));
+        }
+    }
+
+    /**
+     * Products without a positive units value anywhere in their fallback chain
+     * cannot be added to the cart because shipping cannot be calculated.
+     */
+    public function ensureUnitsAreConfigured(): void
+    {
+        $units = $this->variant
+            ? $this->variant->resolveUnits()
+            : $this->product?->resolveUnits();
+
+        if ($units === null) {
+            throw new \Exception(__('main.units_are_required_for_product', [
+                'product' => $this->product?->id ?? $this->variant?->product_id,
+            ]));
         }
     }
 
