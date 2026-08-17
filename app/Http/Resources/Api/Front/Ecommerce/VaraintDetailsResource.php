@@ -14,16 +14,19 @@ class VaraintDetailsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+        $discountInfo = $resolver->resolveDiscountInfo($this->resource);
+
         return [
             'id' => $this->id,
             'sku' => $this->sku,
             'sale_price' =>  (float)$this->sale_price,
             'price_after_discount' => (float)$this->getDiscountPrice(),
-            'promotion' => $this->resolvePromotionInfo(),
+            'promotion' => $discountInfo['promotion'],
             'stock' => $this->stock,
             'moq' => (int) $this->moq,
-            'discount' => (float) $this->discount_value,
-            'discount_type' => $this->discount_type,
+            'discount' => $discountInfo['discount'],
+            'discount_type' => $discountInfo['discount_type'],
             'status' => $this->status,
             'shipmentDetails'=>[
                 'length' => (float)$this->length,
@@ -58,24 +61,6 @@ class VaraintDetailsResource extends JsonResource
 
 
     }
-
-    private function resolvePromotionInfo(): ?array
-    {
-        $promo = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class)
-            ->findBestPromotionForVariant($this->resource);
-
-        if (! $promo) {
-            return null;
-        }
-
-        return [
-            'id'       => $promo->id,
-            'title'    => $promo->title,
-            'discount' => (float) $promo->discount,
-            'type'     => $promo->type,
-        ];
-    }
-
 
     protected function buildVariantName()
     {

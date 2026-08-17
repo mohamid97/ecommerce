@@ -218,4 +218,50 @@ class PromotionResolver
 
         return $bestPromo;
     }
+
+    /**
+     * Get the applied discount info array for a product or variant.
+     * Compares the own discount with the best promotion discount, and returns
+     * the details of whichever gives the lowest price.
+     * Returns an array with 'discount', 'discount_type', and 'promotion' keys.
+     */
+    public function resolveDiscountInfo($priceSource): array
+    {
+        if (! $priceSource) {
+            return [
+                'discount'      => 0,
+                'discount_type' => null,
+                'promotion'     => null,
+            ];
+        }
+
+        $ownPrice = $priceSource->calculateOwnDiscountPrice();
+        
+        $promoPrice = ($priceSource instanceof \App\Models\Api\Ecommerce\ProductVariant)
+            ? $this->resolveForVariant($priceSource)
+            : $this->resolveForProduct($priceSource);
+            
+        if ($promoPrice !== null && $promoPrice < $ownPrice) {
+            $promo = ($priceSource instanceof \App\Models\Api\Ecommerce\ProductVariant)
+                ? $this->findBestPromotionForVariant($priceSource)
+                : $this->findBestPromotionForProduct($priceSource);
+                
+            return [
+                'discount'      => (float) $promo->discount,
+                'discount_type' => $promo->type,
+                'promotion'     => [
+                    'id'       => $promo->id,
+                    'title'    => $promo->title,
+                    'discount' => (float) $promo->discount,
+                    'type'     => $promo->type,
+                ]
+            ];
+        }
+
+        return [
+            'discount'      => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
+            'discount_type' => $priceSource->discount_type,
+            'promotion'     => null,
+        ];
+    }
 }

@@ -73,6 +73,9 @@ class ProductResource extends JsonResource
 
         $displayVariant = $selectedVariant ?? $defaultVaraint;
 
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+        $discountInfo = $resolver->resolveDiscountInfo($priceSource);
+
         return[
             'id' => $this->id,
             'title' => $this->title,
@@ -80,10 +83,10 @@ class ProductResource extends JsonResource
             // 'des' => $this->des,
             'sale_price' => (float) $priceSource->sale_price,
             'moq' => $priceSource->moq ?? $this->moq ?? 1,
-            'discount' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
-            'discount_type' => $priceSource->discount_type,
+            'discount' => $discountInfo['discount'],
+            'discount_type' => $discountInfo['discount_type'],
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
-            'promotion' => $this->resolvePromotionInfo($priceSource),
+            'promotion' => $discountInfo['promotion'],
             'price_min' => $minPrice,
             'price_max' => $maxPrice,
             'on_demand' => $this->on_demand,
@@ -136,29 +139,7 @@ class ProductResource extends JsonResource
         ];
     }
 
-    /**
-     * Resolve promotion info for the given price source (product or variant).
-     * Returns a compact array with promotion details, or null if none applies.
-     */
-    private function resolvePromotionInfo($priceSource): ?array
-    {
-        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
 
-        $promo = ($priceSource instanceof \App\Models\Api\Ecommerce\ProductVariant)
-            ? $resolver->findBestPromotionForVariant($priceSource)
-            : $resolver->findBestPromotionForProduct($this->resource);
-
-        if (! $promo) {
-            return null;
-        }
-
-        return [
-            'id'       => $promo->id,
-            'title'    => $promo->title,
-            'discount' => (float) $promo->discount,
-            'type'     => $promo->type,
-        ];
-    }
 
     private function getDefaultVaraint()
     {

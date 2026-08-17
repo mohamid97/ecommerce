@@ -14,13 +14,18 @@ class ProductVaraintsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+        $discountInfo = $resolver->resolveDiscountInfo($this->resource);
+
         return [
 
             'id'=>$this->id,
             'sku'=>$this->sku,
             'sale_price'=>$this->sale_price,
             'price_after_discount' => $this->getDiscountPrice(),
-            'promotion' => $this->resolvePromotionInfo(),
+            'promotion' => $discountInfo['promotion'],
+            'discount' => $discountInfo['discount'],
+            'discount_type' => $discountInfo['discount_type'],
             'stock'=>$this->stock,
             'moq' => (int) $this->moq,
             'status'=>$this->status,
@@ -36,20 +41,5 @@ class ProductVaraintsResource extends JsonResource
         ];
     }
 
-    private function resolvePromotionInfo(): ?array
-    {
-        $promo = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class)
-            ->findBestPromotionForVariant($this->resource);
 
-        if (! $promo) {
-            return null;
-        }
-
-        return [
-            'id'       => $promo->id,
-            'title'    => $promo->title,
-            'discount' => (float) $promo->discount,
-            'type'     => $promo->type,
-        ];
-    }
 }

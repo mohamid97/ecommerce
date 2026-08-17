@@ -18,6 +18,9 @@ class SectionProductResource extends JsonResource
         $priceSource = $variant ?? $product;
         $variantImage = $variant?->varaintImages?->first()?->image?->image;
 
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+        $discountInfo = $resolver->resolveDiscountInfo($priceSource);
+
         return [
             // This ID makes repeated product rows unique in newest/last-piece.
             'section_item_id' => $this->id,
@@ -26,10 +29,10 @@ class SectionProductResource extends JsonResource
             'slug' => $product->getColumnLang('slug'),
             'sale_price' => (float) $priceSource->sale_price,
             'moq' => $priceSource->moq ?? $product->moq ?? 1,
-            'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
-            'discount_type' => $priceSource->discount_type,
+            'discount_price' => $discountInfo['discount'],
+            'discount_type' => $discountInfo['discount_type'],
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
-            'promotion' => $this->resolvePromotionInfo($product, $variant),
+            'promotion' => $discountInfo['promotion'],
             'on_demand' => $product->on_demand,
             'sku' => $priceSource->sku,
             'has_options' => (bool) $product->has_options,
@@ -44,25 +47,7 @@ class SectionProductResource extends JsonResource
         ];
     }
 
-    private function resolvePromotionInfo($product, $variant): ?array
-    {
-        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
 
-        $promo = $variant
-            ? $resolver->findBestPromotionForVariant($variant)
-            : $resolver->findBestPromotionForProduct($product);
-
-        if (! $promo) {
-            return null;
-        }
-
-        return [
-            'id'       => $promo->id,
-            'title'    => $promo->title,
-            'discount' => (float) $promo->discount,
-            'type'     => $promo->type,
-        ];
-    }
 
     private function resolveVariant($product): ?ProductVariant
     {
