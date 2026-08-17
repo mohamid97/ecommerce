@@ -19,6 +19,7 @@ class VaraintDetailsResource extends JsonResource
             'sku' => $this->sku,
             'sale_price' =>  (float)$this->sale_price,
             'price_after_discount' => (float)$this->getDiscountPrice(),
+            'promotion' => $this->resolvePromotionInfo(),
             'stock' => $this->stock,
             'moq' => (int) $this->moq,
             'discount' => (float) $this->discount_value,
@@ -57,6 +58,24 @@ class VaraintDetailsResource extends JsonResource
 
 
     }
+
+    private function resolvePromotionInfo(): ?array
+    {
+        $promo = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class)
+            ->findBestPromotionForVariant($this->resource);
+
+        if (! $promo) {
+            return null;
+        }
+
+        return [
+            'id'       => $promo->id,
+            'title'    => $promo->title,
+            'discount' => (float) $promo->discount,
+            'type'     => $promo->type,
+        ];
+    }
+
 
     protected function buildVariantName()
     {

@@ -25,6 +25,7 @@ class ProductResource extends JsonResource
         // 'cost_price' => (float) $this->cost_price,
         'sale_price' => (float) $this->sale_price,
         'price_after_discount' => $this->getDiscountPrice(),
+        'promotion' => $this->resolvePromotionInfo(),
         'discount' =>  (float) $this->discount,
         'discount_type' => $this->discount_type,
         'sku' => $this->sku,
@@ -75,10 +76,28 @@ class ProductResource extends JsonResource
 
     
 
+
         
 
     
 }
+
+    private function resolvePromotionInfo(): ?array
+    {
+        $promo = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class)
+            ->findBestPromotionForProduct($this->resource);
+
+        if (! $promo) {
+            return null;
+        }
+
+        return [
+            'id'       => $promo->id,
+            'title'    => $promo->title,
+            'discount' => (float) $promo->discount,
+            'type'     => $promo->type,
+        ];
+    }
 
     private function resolvedSalesNumber(): int
     {

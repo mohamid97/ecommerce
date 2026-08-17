@@ -29,6 +29,7 @@ class SectionProductResource extends JsonResource
             'discount_price' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
             'discount_type' => $priceSource->discount_type,
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
+            'promotion' => $this->resolvePromotionInfo($product, $variant),
             'on_demand' => $product->on_demand,
             'sku' => $priceSource->sku,
             'has_options' => (bool) $product->has_options,
@@ -40,6 +41,26 @@ class SectionProductResource extends JsonResource
             'variant_name' => $variant?->getVariantFullNameAttribute(),
             'created_at' => $product->created_at?->format('Y-m-d'),
             'updated_at' => $product->updated_at?->format('Y-m-d'),
+        ];
+    }
+
+    private function resolvePromotionInfo($product, $variant): ?array
+    {
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+
+        $promo = $variant
+            ? $resolver->findBestPromotionForVariant($variant)
+            : $resolver->findBestPromotionForProduct($product);
+
+        if (! $promo) {
+            return null;
+        }
+
+        return [
+            'id'       => $promo->id,
+            'title'    => $promo->title,
+            'discount' => (float) $promo->discount,
+            'type'     => $promo->type,
         ];
     }
 

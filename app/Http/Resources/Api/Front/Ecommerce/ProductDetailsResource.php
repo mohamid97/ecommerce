@@ -29,6 +29,7 @@ class ProductDetailsResource extends JsonResource
             'des' =>$this->getColumnLang('des'),
             'sale_price' => (float) $defaultVaraintModel?->sale_price,
             'price_after_discount' => (float) $defaultVaraintModel?->getDiscountPrice(),
+            'promotion' => $this->resolvePromotionInfo($defaultVaraintModel),
             'discount' =>  (float) $defaultVaraintModel?->discount_value,
             'discount_type' => $defaultVaraintModel?->discount_type,
             'on_demand' => $this->on_demand,
@@ -75,6 +76,31 @@ class ProductDetailsResource extends JsonResource
             'variants' => CustomProductVaraintsResource::collection($this->variants),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * Resolve promotion info for the default variant or the product itself.
+     */
+    private function resolvePromotionInfo($defaultVariant): ?array
+    {
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+
+        if ($defaultVariant) {
+            $promo = $resolver->findBestPromotionForVariant($defaultVariant);
+        } else {
+            $promo = $resolver->findBestPromotionForProduct($this->resource);
+        }
+
+        if (! $promo) {
+            return null;
+        }
+
+        return [
+            'id'       => $promo->id,
+            'title'    => $promo->title,
+            'discount' => (float) $promo->discount,
+            'type'     => $promo->type,
         ];
     }
 

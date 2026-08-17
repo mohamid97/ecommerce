@@ -167,13 +167,38 @@ class Product extends Model implements TranslatableContract
     }
 
 
-    public function getDiscountPrice(){
-        // return discount and calculate percenatge or value
-        if($this->discount_type == 'percentage'){
-            return $this->sale_price - ($this->sale_price * ($this->discount_value / 100));
-        }
-        return $this->sale_price - $this->discount;
+    /**
+     * Calculate the product's own (manually set) discounted price.
+     */
+    public function calculateOwnDiscountPrice(): float
+    {
+        $salePrice = (float) ($this->sale_price ?? 0);
 
+        if ($this->discount_type === 'percentage') {
+            return $salePrice - ($salePrice * ((float) ($this->discount ?? 0) / 100));
+        }
+
+        return max(0, $salePrice - (float) ($this->discount ?? 0));
+    }
+
+    /**
+     * Return the best price after discount — whichever is lower between the
+     * product's own discount and the best active promotion discount.
+     */
+    public function getDiscountPrice(): float
+    {
+        $ownPrice = $this->calculateOwnDiscountPrice();
+
+        // Ask PromotionResolver for the best active promotion price
+        $promoPrice = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class)
+            ->resolveForProduct($this);
+
+        // Use the promotion price only if it is strictly better (lower)
+        if ($promoPrice !== null && $promoPrice < $ownPrice) {
+            return $promoPrice;
+        }
+
+        return $ownPrice;
     }
 
 

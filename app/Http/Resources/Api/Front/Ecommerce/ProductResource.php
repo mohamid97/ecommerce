@@ -83,6 +83,7 @@ class ProductResource extends JsonResource
             'discount' => (float) ($priceSource->discount_value ?? $priceSource->discount ?? 0),
             'discount_type' => $priceSource->discount_type,
             'price_after_discount' => (float) $priceSource->getDiscountPrice(),
+            'promotion' => $this->resolvePromotionInfo($priceSource),
             'price_min' => $minPrice,
             'price_max' => $maxPrice,
             'on_demand' => $this->on_demand,
@@ -132,6 +133,30 @@ class ProductResource extends JsonResource
             // }),
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * Resolve promotion info for the given price source (product or variant).
+     * Returns a compact array with promotion details, or null if none applies.
+     */
+    private function resolvePromotionInfo($priceSource): ?array
+    {
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+
+        $promo = ($priceSource instanceof \App\Models\Api\Ecommerce\ProductVariant)
+            ? $resolver->findBestPromotionForVariant($priceSource)
+            : $resolver->findBestPromotionForProduct($this->resource);
+
+        if (! $promo) {
+            return null;
+        }
+
+        return [
+            'id'       => $promo->id,
+            'title'    => $promo->title,
+            'discount' => (float) $promo->discount,
+            'type'     => $promo->type,
         ];
     }
 
