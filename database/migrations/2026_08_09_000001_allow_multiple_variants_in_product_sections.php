@@ -12,10 +12,7 @@ return new class extends Migration
             Schema::table($tableName, function (Blueprint $table) use ($tableName) {
                 // MySQL cannot drop a unique index that backs a foreign key.
                 // Drop the FK first, swap the unique index, then restore the FK.
-                $table->dropForeign([$tableName === 'new_products'
-                    ? 'new_products_product_id_foreign'
-                    : 'last_pieces_product_id_foreign'
-                ]);
+                $table->dropForeign(['product_id']);
                 $table->dropUnique(['product_id']);
                 $table->unique(['product_id', 'variant_id']);
                 $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
