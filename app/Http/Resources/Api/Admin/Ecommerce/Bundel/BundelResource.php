@@ -16,12 +16,15 @@ class BundelResource extends JsonResource
     {
    
     
+        $bundlePrice = $this->getBundlePrice();
+        
         return [
             'id'=>$this->id,
-            'price'=>(float) $this->getBundlePrice()['total_price'],
-            'price_after_discount'=>(float) $this->getBundlePrice()['price_after_discount'],
-            'discount' => (float) ($this->discount ?? 0),
-            'discount_type' => $this->discount_type,
+            'price'=>(float) $bundlePrice['total_price'],
+            'price_after_discount'=>(float) $bundlePrice['price_after_discount'],
+            'discount' => (float) $bundlePrice['discount'],
+            'discount_type' => $bundlePrice['discount_type'],
+            'promotion' => $bundlePrice['promotion'],
             'sales_number' => (int) ($this->sales_number ?? 0),
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),

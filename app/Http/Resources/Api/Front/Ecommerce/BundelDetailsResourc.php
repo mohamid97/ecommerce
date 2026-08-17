@@ -20,12 +20,15 @@ class BundelDetailsResourc extends JsonResource
          $slug = $this->createSlugFromTitle();
 
         }
+        $bundlePrice = $this->getBundlePrice();
+
         return [
             'id'=>$this->id,
-            'price'=>(float) $this->getBundlePrice()['total_price'],
-            'price_after_discount'=>(float) $this->getBundlePrice()['price_after_discount'],
-            'discount' => (float) ($this->discount ?? 0),
-            'discount_type' => $this->discount_type,
+            'price'=>(float) $bundlePrice['total_price'],
+            'price_after_discount'=>(float) $bundlePrice['price_after_discount'],
+            'discount' => (float) $bundlePrice['discount'],
+            'discount_type' => $bundlePrice['discount_type'],
+            'promotion' => $bundlePrice['promotion'],
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {

@@ -110,11 +110,41 @@ class Bundel extends Model implements TranslatableContract
             $totalPrice += $price * $detail->quantity;
         }
 
-        $priceAfterDiscount = $this->hasBundleDiscount()
+        $ownPrice = $this->hasBundleDiscount()
             ? $this->applyBundleDiscount($totalPrice)
             : $totalDiscountPrice;
 
-        return ['total_price' => $totalPrice, 'price_after_discount' => $priceAfterDiscount];
+        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
+        $promoPrice = $resolver->resolveForBundle($this, $totalPrice);
+
+        $isPromoBetter = $promoPrice !== null && $promoPrice < $ownPrice;
+        $priceAfterDiscount = $isPromoBetter ? $promoPrice : $ownPrice;
+
+        $discountValue = $this->discount ?? 0;
+        $discountType = $this->discount_type;
+        $promotion = null;
+
+        if ($isPromoBetter) {
+            $promo = $resolver->findBestPromotionForBundle($this, $totalPrice);
+            if ($promo) {
+                $discountValue = (float) $promo->discount;
+                $discountType = $promo->type;
+                $promotion = [
+                    'id'       => $promo->id,
+                    'title'    => $promo->title,
+                    'discount' => (float) $promo->discount,
+                    'type'     => $promo->type,
+                ];
+            }
+        }
+
+        return [
+            'total_price' => $totalPrice, 
+            'price_after_discount' => $priceAfterDiscount,
+            'discount' => (float) $discountValue,
+            'discount_type' => $discountType,
+            'promotion' => $promotion
+        ];
     }
 
     public function hasBundleDiscount(): bool

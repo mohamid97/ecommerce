@@ -5,6 +5,7 @@ namespace App\Services\Ecommerce\Promotion;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Ecommerce\Promotion;
 use App\Models\Api\Ecommerce\ProductVariant;
+use App\Models\Api\Ecommerce\Bundel;
 use Illuminate\Support\Collection;
 
 class PromotionResolver
@@ -57,7 +58,22 @@ class PromotionResolver
         $categoryId = $product?->category_id;
         $brandId    = $product?->brand_id;
 
-        $best = $this->bestPromoPrice($salePrice, $productId, $categoryId, $brandId);
+        $best = $this->bestPromoPrice($salePrice, $productId, $categoryId, $brandId, null);
+
+        return $best;
+    }
+
+    /**
+     * Resolve the best promotion discounted price for a bundle.
+     * Returns the discounted price (float) or null if no promotion applies.
+     */
+    public function resolveForBundle(Bundel $bundle, float $salePrice): ?float
+    {
+        if ($salePrice <= 0) {
+            return null;
+        }
+
+        $best = $this->bestPromoPrice($salePrice, null, null, null, $bundle->id);
 
         return $best;
     }
@@ -68,7 +84,7 @@ class PromotionResolver
      * Find the promotion that gives the lowest price for the given context.
      * Returns the computed price after discount, or null if no promotion matches.
      */
-    private function bestPromoPrice(float $salePrice, ?int $productId, ?int $categoryId, ?int $brandId): ?float
+    private function bestPromoPrice(float $salePrice, ?int $productId, ?int $categoryId, ?int $brandId, ?int $bundleId = null): ?float
     {
         $promotions = $this->getActivePromotions();
 
@@ -96,7 +112,7 @@ class PromotionResolver
     /**
      * Determine whether a promotion targets the given product context.
      */
-    private function matches(Promotion $promo, ?int $productId, ?int $categoryId, ?int $brandId): bool
+    private function matches(Promotion $promo, ?int $productId, ?int $categoryId, ?int $brandId, ?int $bundleId = null): bool
     {
         switch ($promo->target) {
             case 'global':
@@ -104,6 +120,9 @@ class PromotionResolver
 
             case 'product':
                 return $productId !== null && (int) $promo->product_id === $productId;
+
+            case 'bundle':
+                return $bundleId !== null && (int) $promo->bundel_id === $bundleId;
 
             case 'category':
                 if ($categoryId === null) {
@@ -189,10 +208,18 @@ class PromotionResolver
         $salePrice = (float) ($variant->sale_price ?? 0);
         $product   = $variant->relationLoaded('product') ? $variant->product : $variant->product()->first();
 
-        return $this->findBestPromotion($salePrice, $product?->id, $product?->category_id, $product?->brand_id);
+        return $this->findBestPromotion($salePrice, $product?->id, $product?->category_id, $product?->brand_id, null);
     }
 
-    private function findBestPromotion(float $salePrice, ?int $productId, ?int $categoryId, ?int $brandId): ?Promotion
+    /**
+     * Find the best matching promotion *object* for a bundle (for resource metadata).
+     */
+    public function findBestPromotionForBundle(Bundel $bundle, float $salePrice): ?Promotion
+    {
+        return $this->findBestPromotion($salePrice, null, null, null, $bundle->id);
+    }
+
+    private function findBestPromotion(float $salePrice, ?int $productId, ?int $categoryId, ?int $brandId, ?int $bundleId = null): ?Promotion
     {
         $promotions = $this->getActivePromotions();
 
@@ -200,7 +227,7 @@ class PromotionResolver
         $bestPrice = null;
 
         foreach ($promotions as $promo) {
-            if (! $this->matches($promo, $productId, $categoryId, $brandId)) {
+            if (! $this->matches($promo, $productId, $categoryId, $brandId, $bundleId)) {
                 continue;
             }
 
@@ -233,6 +260,13 @@ class PromotionResolver
                 'discount_type' => null,
                 'promotion'     => null,
             ];
+        }
+
+        if ($priceSource instanceof Bundel) {
+            // We expect an array with [0] => Bundel, [1] => totalPrice
+            // But if it's just a Bundel, we can't reliably get the total price unless we calculate it.
+            // Wait, we need totalPrice. We should refactor getDiscountInfo to accept $salePrice optionally.
+            // To keep it simple, we won't use resolveDiscountInfo for Bundel since its calculation is custom.
         }
 
         $ownPrice = $priceSource->calculateOwnDiscountPrice();

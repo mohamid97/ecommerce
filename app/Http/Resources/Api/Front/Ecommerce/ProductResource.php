@@ -50,7 +50,7 @@ class ProductResource extends JsonResource
             }
         }
 
-        $priceSource = $selectedVariant ?? ($this->has_options && $defaultVaraint ? $defaultVaraint : $this);
+        $priceSource = $selectedVariant ?? ($this->has_options && $defaultVaraint ? $defaultVaraint : $this->resource);
 
         
         //compute overall min/max prices (variants or product)
