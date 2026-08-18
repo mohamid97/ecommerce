@@ -110,9 +110,8 @@ class Bundel extends Model implements TranslatableContract
             $totalPrice += $price * $detail->quantity;
         }
 
-        $priceAfterDiscount = $this->hasBundleDiscount()
-            ? $this->applyBundleDiscount($totalPrice)
-            : $totalDiscountPrice;
+        $priceAfterDiscount = app(\App\Services\Ecommerce\Product\PromotionPriceService::class)
+            ->getBundleDiscountPrice($this, $totalPrice, $totalDiscountPrice);
 
         return ['total_price' => $totalPrice, 'price_after_discount' => $priceAfterDiscount];
     }

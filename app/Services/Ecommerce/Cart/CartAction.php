@@ -282,9 +282,8 @@ class CartAction
             $totalDiscountPrice += $discountPrice * $qty;
         }
 
-        if ($bundle->hasBundleDiscount()) {
-            $totalDiscountPrice = $bundle->applyBundleDiscount($totalPrice);
-        }
+        $totalDiscountPrice = app(\App\Services\Ecommerce\Product\PromotionPriceService::class)
+            ->getBundleDiscountPrice($bundle, $totalPrice, $totalDiscountPrice);
 
         return [
             'total_price'          => $totalPrice,

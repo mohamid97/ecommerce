@@ -18,9 +18,9 @@ return new class extends Migration
             $table->enum('status', ['active', 'draft', 'unavailable'])->default('active');
             $table->boolean('is_coupon')->default(false);
             $table->string('coupon_code')->nullable();
-            $table->enum('type',['percent','fixed' , 'bundle' , 'bulk' ,'buy-x-get-y'])->default('percent');
+            $table->enum('type', ['percent', 'fixed'])->default('percent');
             $table->enum('location',['hero','offers_section','pop_up','header_alert'])->default('hero');
-            $table->enum('target',['global','category','product','brand','order'])->default('global');
+            $table->enum('target', ['global', 'category', 'product', 'brand', 'bundle', 'order'])->default('global');
             $table->string('image')->nullable();
             $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('bundel_id')->nullable();

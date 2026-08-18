@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class BundelResource extends JsonResource
 {
+    
     /**
      * Transform the resource into an array.
      *
@@ -14,23 +15,26 @@ class BundelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-   
-    
+        $effectiveDiscount = $this->bundle->getEffectiveDiscount(
+            (float) $this->getBundlePrice()['total_price'],
+            (float) $this->getBundlePrice()['price_after_discount']
+        );
+
         return [
             'id'=>$this->id,
             'price'=>(float) $this->getBundlePrice()['total_price'],
             'price_after_discount'=>(float) $this->getBundlePrice()['price_after_discount'],
-            'discount' => (float) ($this->discount ?? 0),
-            'discount_type' => $this->discount_type,
+            'discount' => $effectiveDiscount['discount'],
+            'discount_type' => $effectiveDiscount['discount_type'],
             'sales_number' => (int) ($this->sales_number ?? 0),
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),
             'category'=>$this->whenLoaded('category', function () {
-               return [
-                'title'=>$this->category->title,
-                'slug'=>$this->category->slug,
-                'id'=>$this->category->id,
-               ];
+                return [
+                    'title'=>$this->category->title,
+                    'slug'=>$this->category->slug,
+                    'id'=>$this->category->id,
+                ];
 
             }),
             'brand'=>$this->whenLoaded('brand', function () {
@@ -45,7 +49,9 @@ class BundelResource extends JsonResource
             'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),
 
-
         ];
     }
+
+
+    
 }

@@ -20,6 +20,11 @@ class CartItemResource extends JsonResource
     public function toArray(Request $request): array
     {
         if ($this->bundel_id && $this->type === 'bundel') {
+            $effectiveDiscount = $this->bundel->getEffectiveDiscount(
+                (float) $this->total_before_discount,
+                (float) $this->total_after_discount
+            );
+
             return [
                 'id' => $this->id,
                 'cart_id' => $this->cart_id,
@@ -50,6 +55,8 @@ class CartItemResource extends JsonResource
                 'price_after_discount' => (float) $this->total_after_discount/$this->quantity,
                 'total_before_discount' => (float) $this->total_before_discount,
                 'total_after_discount' => (float) $this->total_after_discount,
+                'discount' => $effectiveDiscount['discount'],
+                'discount_type' => $effectiveDiscount['discount_type'],
                 'quantity' => (float) $this->quantity,
                 'max_quantity' => $this->maximumQuantity(),
                 'created_at' => $this->created_at->format('Y-m-d'),

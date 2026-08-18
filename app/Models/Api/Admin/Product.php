@@ -39,7 +39,7 @@ class Product extends Model implements TranslatableContract
                 return;
             }
 
-            if ($product->wasChanged(['sale_price', 'discount', 'discount_type'])) {
+            if ($product->wasChanged(['sale_price', 'discount', 'discount_type', 'category_id', 'brand_id'])) {
                 $cartItems = \App\Models\Api\Ecommerce\CartItem::where('product_id', $product->id)
                     ->whereNull('variant_id')
                     ->get();
@@ -186,12 +186,8 @@ class Product extends Model implements TranslatableContract
 
 
     public function getDiscountPrice(){
-        // return discount and calculate percenatge or value
-        if($this->discount_type == 'percentage'){
-            return $this->sale_price - ($this->sale_price * ($this->discount_value / 100));
-        }
-        return $this->sale_price - $this->discount;
-
+        return app(\App\Services\Ecommerce\Product\PromotionPriceService::class)
+            ->getDiscountPrice($this);
     }
 
 

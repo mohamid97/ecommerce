@@ -11,79 +11,41 @@ class GuestCartItemResource extends JsonResource
 {
     use CalculatesCartMaximumQuantity;
 
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
+        $effectiveDiscount = [];
+        $discountType = 'fixed';
+
         if ($this->bundel_id && $this->type === 'bundel') {
-            return [
-                // 'id' => $this->id,
-                // 'cart_id' => $this->cart_id,
-                'type' => 'bundle',
-                'bundel_id' => $this->bundel_id,
-                'bundel_title' => $this->bundel?->title,
-                'bundle_items' => $this->cartBundelItems->map(function ($item) {
-                    return [
-                        // 'id' => $item->id,
-                        'bundle_item_id' => $item->bundle_item_id,
-                        'product_id' => $item->product_id,
-                        'product' => $item->product?->title,
-                        'variant_id' => $item->variant_id,
-                        'variant' => $item->variant?->title,
-                        'varaint_name' => $item->variant_id ? $this->buildVariantName($item->product, $item->variant) : null,
-                        'quantity' => $item->bundleDetail?->quantity
-                            ?? BundelDetails::where('bundel_id', $this->bundel_id)
-                                ->where('product_id', $item->product_id)
-                                ->value('quantity')
-                            ?? 1,
-                    ];
-                }),
-                'total_before_discount' => (float) $this->total_before_discount,
-                'total_after_discount' => (float) $this->total_after_discount,
-                'quantity' => (float) $this->quantity,
-                'max_quantity' => $this->maximumQuantity(),
-                'created_at' => $this->created_at->format('Y-m-d'),
-                'updated_at' => $this->updated_at->format('Y-m-d'),
-            ];
+            $effectiveDiscount = $this->bundel->getEffectiveDiscount(
+                (float) $this->total_before_discount,
+                (float) $this->total_after_discount
+            );
+            $discountType = $effectiveDiscount['discount_type'] ?? 'fixed';
         }
 
         return [
-            // 'id' => $this->id,
-            // 'cart_id' => $this->cart_id,
-            'product_id' => $this->product_id,
-            'type' => $this->type,
-            'product' => $this->product?->title,
-            'moq' => $this->product?->moq,
-            'has_options' => (bool) $this->product?->has_options,
-            'variant_id' => $this->variant_id,
-            'variant' => $this->variant?->title,
-            'variant_moq' => $this->variant?->moq,
-            'varaint_name' => $this->variant_id ? $this->buildVariantName($this->product, $this->variant) : null,
+            'bundel_title' => $this->bundel?->title,
+            'bundle_items' => $this->cartBundelItems->map(function ($item) {
+                return [
+                    'quantity' => $item->bundleDetail?->quantity
+                        ?? BundelDetails::where('bundel_id', $this->bundel_id)
+                            ->where('product_id', $item->product_id)
+                            ->value('quantity')
+                        ?? 1,
+                ];
+            }),
+            'sale_price' => (float) $this->total_before_discount,
+            'price_after_discount' => (float) $this->total_after_discount,
             'total_before_discount' => (float) $this->total_before_discount,
             'total_after_discount' => (float) $this->total_after_discount,
-            'quantity' => (float) $this->quantity,
-            'max_quantity' => $this->maximumQuantity(),
-            'created_at' => $this->created_at->format('Y-m-d'),
-            'updated_at' => $this->updated_at->format('Y-m-d'),
+            'discount' => $effectiveDiscount['discount'] ?? 0,
+            'discount_type' => $discountType,
         ];
-    }
-
-    protected function buildVariantName($product, $variant)
-    {
-        if ($product?->has_options && $variant) {
-            return $variant->variants
-                ->map(function ($variantOptionValue) {
-                    $optionTitle = optional($variantOptionValue->optionValue?->option)->title;
-                    $valueTitle = $variantOptionValue->optionValue?->title;
-
-                    if (!$optionTitle || !$valueTitle) {
-                        return null;
-                    }
-
-                    return $optionTitle . ' ' . $valueTitle;
-                })
-                ->filter()
-                ->implode(' ');
-        }
-
-        return null;
     }
 }

@@ -4,12 +4,14 @@ namespace App\Services\Admin\Ecommerce\Promotion;
 use App\Models\Api\Ecommerce\Promotion;
 use App\Services\Admin\Ecommerce\Promotion\Actions\StorePromotionAction;
 use App\Services\Admin\Ecommerce\Promotion\Actions\UpdatePromotionAction;
+use App\Services\Ecommerce\Cart\CartPriceRefreshService;
 
 class PromotionService
 {
     public function __construct(
             private readonly StorePromotionAction  $storePromotionAction,
             private readonly UpdatePromotionAction  $updatePromotionAction,
+            private readonly CartPriceRefreshService $cartPriceRefresh,
 
     ) {}
 
@@ -31,7 +33,12 @@ class PromotionService
         }
         $id = $request['id'];
         $promotion = Promotion::findOrFail($id);
+        $wasAutomaticPromotion = ! $promotion->is_coupon;
         $promotion->delete();
+
+        if ($wasAutomaticPromotion) {
+            $this->cartPriceRefresh->refreshAll();
+        }
 
         return true;
     }

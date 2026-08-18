@@ -15,8 +15,6 @@ class BundelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-
         if(isset($this->slug) && is_array($this->slug)){
             $slug = $this->getColumnLang('slug');
         }else{
@@ -24,14 +22,19 @@ class BundelResource extends JsonResource
 
         }
 
+        $effectiveDiscount = $this->bundle->getEffectiveDiscount(
+            (float) $this->getBundlePrice()['total_price'],
+            (float) $this->getBundlePrice()['price_after_discount']
+        );
+
         return [
             'id'=>$this->id,
             'status'=>$this->status,
             'bundle_image'=>$this->getImageUrl($this->bundle_image),
             'price'=>(float) $this->getBundlePrice()['total_price'],
             'price_after_discount'=>(float) $this->getBundlePrice()['price_after_discount'],
-            'discount' => (float) ($this->discount ?? 0),
-            'discount_type' => $this->discount_type,
+            'discount' => $effectiveDiscount['discount'],
+            'discount_type' => $effectiveDiscount['discount_type'],
             'category'=>$this->whenLoaded('category', function () {
                 return [
                     'title'=>$this->category->title,
@@ -47,7 +50,6 @@ class BundelResource extends JsonResource
                 ];
             }),
             'title' => $this->getColumnLang('title'),
-            // Create a fallback slug when the translation does not provide one.
             'slug' => $slug,
             'created_at'=>$this->created_at->format('Y-m-d'),
             'updated_at'=>$this->updated_at->format('Y-m-d'),

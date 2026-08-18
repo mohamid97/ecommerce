@@ -228,9 +228,8 @@ class BundleItemStrategy implements CartItemStrategyInterface
 
         }
 
-        if ($bundle->hasBundleDiscount()) {
-            $price_after_discount = $bundle->applyBundleDiscount($sale_price);
-        }
+        $price_after_discount = app(\App\Services\Ecommerce\Product\PromotionPriceService::class)
+            ->getBundleDiscountPrice($bundle, $sale_price, $price_after_discount);
 
         return [$sale_price, $price_after_discount];
 

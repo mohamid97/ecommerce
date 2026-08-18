@@ -4,11 +4,13 @@ namespace App\Services\Admin\Ecommerce\Promotion\Actions;
 
 use App\Models\Api\Ecommerce\Promotion;
 use App\Services\Admin\Common\TranslationService;
+use App\Services\Ecommerce\Cart\CartPriceRefreshService;
 
 class UpdatePromotionAction
 {
     public function __construct(
         private readonly TranslationService $translation,
+        private readonly CartPriceRefreshService $cartPriceRefresh,
     ) {}
 
     public function execute($data)
@@ -49,6 +51,10 @@ class UpdatePromotionAction
         }
 
         $this->translation->updateTranslations($promotion, $data, ['title', 'des', 'meta_title', 'meta_des']);
+
+        // Refresh even when changed into a coupon: its previous automatic
+        // promotion price may need to be removed from carts.
+        $this->cartPriceRefresh->refreshAll();
 
         return $promotion->load('brands', 'categories');
     }

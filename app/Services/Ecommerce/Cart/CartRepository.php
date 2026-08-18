@@ -211,8 +211,9 @@ class CartRepository
             $totalDiscountPrice += $discountPrice * $bundleDetail->quantity;
         }
 
-        if ($bundle && $bundle->hasBundleDiscount()) {
-            $totalDiscountPrice = $bundle->applyBundleDiscount($totalPrice);
+        if ($bundle) {
+            $totalDiscountPrice = app(\App\Services\Ecommerce\Product\PromotionPriceService::class)
+                ->getBundleDiscountPrice($bundle, $totalPrice, $totalDiscountPrice);
         }
 
         return [

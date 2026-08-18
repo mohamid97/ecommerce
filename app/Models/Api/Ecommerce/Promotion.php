@@ -28,7 +28,7 @@ class Promotion extends Model implements TranslatableContract
         'max_amount_discount',
         'product_id',
         'image',
-        'bundle_id',
+        'bundel_id',
         'customer_group',
     ];
 
@@ -48,6 +48,11 @@ class Promotion extends Model implements TranslatableContract
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function bundel()
+    {
+        return $this->belongsTo(Bundel::class, 'bundel_id');
     }
 
     public function brands()
