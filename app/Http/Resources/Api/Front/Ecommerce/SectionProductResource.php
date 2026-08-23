@@ -23,10 +23,10 @@ class SectionProductResource extends JsonResource
 
         return [
             // This ID makes repeated product rows unique in newest/last-piece.
-            'section_item_id' => $this->id,
+            //'section_item_id' => $this->id,
             'id' => $product->id,
-            'title' => $product->title,
-            'slug' => $product->getColumnLang('slug'),
+            'title' => $this->getColumnLang('title'),
+            'slug' => $this->getColumnLang('slug'),
             'sale_price' => (float) $priceSource->sale_price,
             'moq' => $priceSource->moq ?? $product->moq ?? 1,
             'discount_price' => $discountInfo['discount'],
