@@ -66,10 +66,9 @@ class OrderService
             }
 
             // points handling (optional) for authenticated users
-            if (!empty($data['use_points']) && !empty($data['points_to_use'])) {
-                $pointsToUse = (int) $data['points_to_use'];
+            if (!empty($data['points'])) {
+                $pointsToUse = (int) $data['points'];
                 $pointsAmount = $this->pointsService->applyPointsToOrder($user, $order, $pointsToUse, $totalAfterDiscount);
-                // pointsService already sets order->points_used and order->points_amount and deducts user points
             }
            
 
@@ -83,7 +82,7 @@ class OrderService
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
             // calculate real shipping cost
-            $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['shipment_zone_id'] ?? null)['shipping_cost'];
+            $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['zone_id'] ?? null)['shipping_cost'];
             $order->shipping_cost = $shippingCost;
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
@@ -123,7 +122,7 @@ class OrderService
             $order->total_after_discount = $totalAfterDiscount;
             $order->total_before_discount = $total;
             // calculate real shipping cost
-            $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['shipment_zone_id'] ?? null)['shipping_cost'];
+            $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['zone_id'] ?? null)['shipping_cost'];
             $order->shipping_cost = $shippingCost;
             $order->total = $order->total_after_discount + $order->shipping_cost - ($order->points_amount ?? 0);
             $order->save();
@@ -159,8 +158,8 @@ class OrderService
         }
 
         $pointsAmount = 0.0;
-        if (!empty($data['use_points']) && !empty($data['points_to_use']) && $user) {
-            $pointsToUse = (int) $data['points_to_use'];
+        if (!empty($data['points']) && $user) {
+            $pointsToUse = (int) $data['points'];
             $pointsAmount = $this->pointsService->calculatePointsAmount($user, $pointsToUse, $baseAmount);
         }
 
@@ -168,7 +167,7 @@ class OrderService
         $totalAfterPreview= max(0, $baseAmount - $discountAmount - $pointsAmount);
 
         // calculate real shipping cost based on cart items and selected zone
-        $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['shipment_zone_id'] ?? null)['shipping_cost'];
+        $shippingCost = $this->shipmentCalculation->calculate($cart->items, $data['zone_id'] ?? null)['shipping_cost'];
 
         $finalTotal = ( $totalAfterPreview + $shippingCost );
 

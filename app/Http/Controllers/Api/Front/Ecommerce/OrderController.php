@@ -25,7 +25,8 @@ class OrderController extends Controller
             $paginator = \App\Models\Api\Ecommerce\Order::query()
                 ->where('user_id', $user->id)
                 ->with([
-                    'government',
+                    'city',
+                    'zone',
                     'items.product',
                     'items.variant.variants.optionValue.option',
                     'items.bundel.bundelDetails.product',
@@ -61,13 +62,33 @@ class OrderController extends Controller
      */
     public function preview(Request $request)
     {
-        
         try {
             $user = $request->user();
-            $data = $request->only(['coupon_code', 'use_points', 'points_to_use', 'shipment_zone_id']);
+            $data = $request->only(['coupon_code', 'points', 'zone_id']);
 
             $result = $this->service->previewForUser($user, $data);
-            return $this->success($result, __('main.retrieved_successfully' , ['model' => 'Order Preview']));
+
+            $preview = [
+                'subtotal' => (float) ($result['total_before_discount'] ?? 0),
+                'coupon' => !empty($data['coupon_code']) ? [
+                    'code' => (string) $data['coupon_code'],
+                    'discount_amount' => (float) ($result['discount_amount'] ?? 0),
+                ] : null,
+                'points' => !empty($data['points']) ? [
+                    'used' => (int) $data['points'],
+                    'discount_amount' => (float) ($result['points_amount'] ?? 0),
+                ] : null,
+                'shipping' => [
+                    'price' => (float) ($result['shipping_cost'] ?? 0),
+                ],
+                'total' => (float) ($result['total'] ?? 0),
+                'errors' => [
+                    'coupon' => null,
+                    'points' => null,
+                ],
+            ];
+
+            return $this->success($preview, __('main.retrieved_successfully' , ['model' => 'Order Preview']));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 400);
         }
@@ -83,9 +104,9 @@ class OrderController extends Controller
             $bundles = [];
 
             foreach ($data['items'] as $item) {
-                if (!empty($item['bundel_id'])) {
+                if (!empty($item['bundle_id'])) {
                     $bundles[] = [
-                        'bundle_id' => $item['bundel_id'],
+                        'bundle_id' => $item['bundle_id'],
                         'quantity' => $item['quantity'],
                         'bundle_items' => $item['bundle_items'] ?? [],
                     ];
@@ -124,14 +145,13 @@ class OrderController extends Controller
         try {
             $data = $request->validated();
 
-            // normalize incoming items into products/bundles arrays for CartService
             $products = [];
             $bundles = [];
 
             foreach ($data['items'] as $item) {
-                if (!empty($item['bundel_id'])) {
+                if (!empty($item['bundle_id'])) {
                     $bundles[] = [
-                        'bundle_id' => $item['bundel_id'],
+                        'bundle_id' => $item['bundle_id'],
                         'quantity' => $item['quantity'],
                         'bundle_items' => $item['bundle_items'] ?? [],
                     ];
@@ -152,7 +172,24 @@ class OrderController extends Controller
 
             $result = $this->service->calculateTotalsFromCart($cart, $data, null);
 
-            return $this->success($result, __('main.retrieved_successfully'));
+            $preview = [
+                'subtotal' => (float) ($result['total_before_discount'] ?? 0),
+                'coupon' => !empty($data['coupon_code']) ? [
+                    'code' => (string) $data['coupon_code'],
+                    'discount_amount' => (float) ($result['discount_amount'] ?? 0),
+                ] : null,
+                'points' => null,
+                'shipping' => [
+                    'price' => (float) ($result['shipping_cost'] ?? 0),
+                ],
+                'total' => (float) ($result['total'] ?? 0),
+                'errors' => [
+                    'coupon' => null,
+                    'points' => null,
+                ],
+            ];
+
+            return $this->success($preview, __('main.retrieved_successfully'));
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -173,7 +210,7 @@ class OrderController extends Controller
                 return $this->error(__('main.not_found', ['model' => 'Order']), 404);
             }
 
-            $order->load(['government', 'items.product', 'items.variant', 'items.bundel.bundelDetails.product']);
+            $order->load(['city', 'zone', 'items.product', 'items.variant', 'items.bundel.bundelDetails.product']);
 
             return $this->success(new OrderResource($order), __('main.retrieved_successfully', ['model' => 'Order']));
         } catch (\Exception $e) {

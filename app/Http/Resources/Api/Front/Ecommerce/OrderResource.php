@@ -15,11 +15,6 @@ class OrderResource extends JsonResource
             'guest_email' => $this->guest_email ?? null,
             'phone' => $this->phone ?? $this->user?->phone ?? null,
             'status' => $this->status,
-            'government_id' => $this->government_id,
-            'government' => $this->government ? [
-                'id' => $this->government->id,
-                'name' => ['ar' => $this->government->name_ar, 'en' => $this->government->name_en],
-            ] : null,
             'subtotal' => (float) $this->total_before_discount,
             'shipping_cost' => (float) $this->shipping_cost,
             'tax' => (float) $this->tax,
@@ -30,6 +25,17 @@ class OrderResource extends JsonResource
             'total_after_discount' => (float) $this->total_after_discount,
             'total' => (float) ($this->total ?? $this->total_after_discount + $this->shipping_cost + $this->tax),
             'payment_status' => $this->payment_status ?? 'unpaid',
+            'address' => $this->shipment_address,
+            // 'shipment_zone_id' => $this->shipment_zone_id,
+            // 'shipment_city_id' => $this->shipment_city_id,
+            'zone' => $this->zone ? [
+                'id' => $this->zone->id,
+                'title' => $this->zone->translate(app()->getLocale())->title ?? $this->zone->title,
+            ] : null,
+            'city' => $this->city ? [
+                'id' => $this->city->id,
+                'title' => $this->city->translate(app()->getLocale())->title ?? $this->city->title,
+            ] : null,
             'items' => $this->items->map(function ($item) {
                 $payload = [
                     'id' => $item->id,

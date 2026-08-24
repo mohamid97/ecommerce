@@ -11,8 +11,13 @@ class ShipmentZone extends Model implements TranslatableContract
 {
     use HasFactory , Translatable;
 
-    protected $fillable = ['status' , 'price'];
+    protected $fillable = ['status' , 'price', 'city_id'];
     public $translatedAttributes = ['title' , 'des'];
     public $translationForeignKey = 'zone_id';
     public $translationModel = 'App\Models\Api\Ecommerce\ShipmentZoneTranslation';
+
+    public function city()
+    {
+        return $this->belongsTo(ShipmentCity::class, 'city_id');
+    }
 }

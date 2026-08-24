@@ -32,14 +32,17 @@ class OrderResource extends JsonResource
             'phone' => $this->phone ?? $this->user?->phone ?? null,
             'status' => $this->status,
             'payment_status' => $this->payment_status ?? 'unpaid',
-            'shipment_address' => $this->shipment_address,
-            'government_id' => $this->government_id,
-            'government' => $this->government ? [
-                'id' => $this->government->id,
-                'name' => ['ar' => $this->government->name_ar, 'en' => $this->government->name_en],
-            ] : null,
+            'address' => $this->shipment_address,
             'shipment_zone_id' => $this->shipment_zone_id,
             'shipment_city_id' => $this->shipment_city_id,
+            'zone' => $this->zone ? [
+                'id' => $this->zone->id,
+                'title' => $this->zone->translate(app()->getLocale())->title ?? $this->zone->title,
+            ] : null,
+            'city' => $this->city ? [
+                'id' => $this->city->id,
+                'title' => $this->city->translate(app()->getLocale())->title ?? $this->city->title,
+            ] : null,
             'payment_method' => $this->payment_method,
             'points_used' => (int) $this->points_used,
             'points_amount' => (float) $this->points_amount,

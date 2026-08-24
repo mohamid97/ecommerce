@@ -26,12 +26,13 @@ class ZoneStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'city_id'=>'required|exists:shipment_cities,id',
             'title' => 'required|array|min:1',
             'title.*'=>'required|max:255',
             'status'=> 'nullable|in:active,draft,unavailable',
             'des' => 'nullable|array|min:1',
             'des.*'=>'nullable|max:5000',
-            'price'=>'required|numeric|min:0',
+            'price'=>'nullable|numeric|min:0',
             
         ];
     }

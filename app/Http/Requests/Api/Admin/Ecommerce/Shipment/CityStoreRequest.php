@@ -25,9 +25,8 @@ class CityStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-       
+        
         return [
-            'zone_id'=>'required|exists:shipment_zones,id',
             'title' => 'required|array|min:1',
             'title.*'=>'required|max:255',
             'status'=> 'nullable|in:active,draft,unavailable',
@@ -35,7 +34,6 @@ class CityStoreRequest extends FormRequest
             'des.*'=>'nullable|max:5000',
 
         ];
-         dd('request end');
     }
 
 

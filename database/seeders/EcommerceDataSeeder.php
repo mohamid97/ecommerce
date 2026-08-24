@@ -24,7 +24,6 @@ use App\Models\Api\Ecommerce\Order;
 use App\Models\Api\Ecommerce\OrderItem;
 use App\Models\Api\Ecommerce\OrderItemBatch;
 use App\Models\Api\Ecommerce\OrderItemBundelItem;
-use App\Models\Api\Ecommerce\Gov;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -626,7 +625,6 @@ class EcommerceDataSeeder extends Seeder
 
         $zoneId = $catalog['zone']->id;
         $cityId = $catalog['city']->id;
-        $governmentId = Gov::query()->value('id');
 
         $definitions = [
             [
@@ -781,7 +779,6 @@ class EcommerceDataSeeder extends Seeder
                     'payment_status' => $definition['payment_status'],
                     'shipment_zone_id' => $zoneId,
                     'shipment_city_id' => $cityId,
-                    'government_id' => $governmentId,
                     'shipment_address' => $definition['shipment_address'],
                     'payment_method' => $definition['payment_method'],
                     'shipping_cost' => $definition['shipping_cost'],
@@ -1265,25 +1262,25 @@ class EcommerceDataSeeder extends Seeder
 
     private function seedShipmentZoneAndCity(): array
     {
-        $zone = ShipmentZone::firstOrCreate(
-            ['price' => 25],
-            ['status' => 'active']
-        );
-        $zone->translateOrNew('en')->title = 'Cairo Zone';
-        $zone->translateOrNew('en')->des = 'Main Cairo shipping zone';
-        $zone->translateOrNew('ar')->title = 'منطقة القاهرة';
-        $zone->translateOrNew('ar')->des = 'منطقة شحن القاهرة';
-        $zone->save();
-
         $city = ShipmentCity::firstOrCreate(
-            ['zone_id' => $zone->id],
+            ['status' => 'active'],
             ['status' => 'active']
         );
-        $city->translateOrNew('en')->title = 'Nasr City';
-        $city->translateOrNew('en')->des = 'Fast shipping city';
-        $city->translateOrNew('ar')->title = 'مدينة نصر';
-        $city->translateOrNew('ar')->des = 'مدينة شحن سريع';
+        $city->translateOrNew('en')->title = 'Cairo';
+        $city->translateOrNew('en')->des = 'Main city';
+        $city->translateOrNew('ar')->title = 'القاهرة';
+        $city->translateOrNew('ar')->des = 'مدينة رئيسية';
         $city->save();
+
+        $zone = ShipmentZone::firstOrCreate(
+            ['city_id' => $city->id, 'price' => 25],
+            ['city_id' => $city->id, 'price' => 25, 'status' => 'active']
+        );
+        $zone->translateOrNew('en')->title = 'Nasr City';
+        $zone->translateOrNew('en')->des = 'Fast shipping zone';
+        $zone->translateOrNew('ar')->title = 'مدينة نصر';
+        $zone->translateOrNew('ar')->des = 'منطقة شحن سريعة';
+        $zone->save();
 
         return [
             'zone' => $zone,

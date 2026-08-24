@@ -6,7 +6,6 @@ use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
 
 class UpdateMemberRequest extends FormRequest
 {
@@ -22,18 +21,10 @@ class UpdateMemberRequest extends FormRequest
         return [
             'first_name' => 'sometimes|required|string|max:255',
             'last_name' => 'sometimes|required|string|max:255',
-            'email' => [
-                'sometimes',
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($this->user()?->id),
-            ],
             'phone' => 'nullable|string|max:12',
-            'government_id'=>'nullable|integer|exists:govs,id',
+            'city_id'=>'nullable|integer|exists:shipment_cities,id',
+            'zone_id'=>'nullable|integer|exists:shipment_zones,id',
             'address'=>'nullable|string|max:5000',
-            'city'=>'nullable|string|max:255',
-            'area'=>'nullable|string|max:255',
             'building_number'=>'nullable|string|max:255',
             'floor'=>'nullable|string|max:255',
             'apartment_number'=>'nullable|string|max:255',

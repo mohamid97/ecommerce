@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Api\Ecommerce\Gov;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +11,6 @@ class UserProfile extends Model
 
     protected $fillable = [
         'user_id',
-        'government_id',
         'address',
         'city',
         'area',
@@ -21,14 +19,22 @@ class UserProfile extends Model
         'apartment_number',
         'landmark',
         'notes',
+        'city_id',
+        'zone_id',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    public function government()
+
+    public function city()
     {
-        return $this->belongsTo(Gov::class, 'government_id');
+        return $this->belongsTo(\App\Models\Api\Ecommerce\ShipmentCity::class, 'city_id');
+    }
+
+    public function zone()
+    {
+        return $this->belongsTo(\App\Models\Api\Ecommerce\ShipmentZone::class, 'zone_id');
     }
 }

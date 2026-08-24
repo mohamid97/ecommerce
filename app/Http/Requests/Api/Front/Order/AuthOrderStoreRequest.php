@@ -23,12 +23,11 @@ class AuthOrderStoreRequest extends FormRequest
     {
         return [
             'phone' => 'nullable|string|max:20',
-            'government_id' => 'required|integer|exists:govs,id',
-            'shipment_zone_id' => 'nullable|integer|exists:shipment_zones,id',
-            'shipment_address' => 'required|string|max:500',
+            'city_id' => 'required|integer|exists:shipment_cities,id',
+            'zone_id' => 'required|integer|exists:shipment_zones,id',
+            'address' => 'required|string|max:500',
             'payment_method' => 'nullable|string|max:255',
-            'use_points' => 'nullable|boolean',
-            'points_to_use' => 'nullable|integer|min:0|max:1000',
+            'points' => 'nullable|integer|min:0',
             'coupon_code' => 'nullable|string|max:255',
             
         ];

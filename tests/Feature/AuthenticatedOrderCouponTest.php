@@ -72,21 +72,20 @@ class AuthenticatedOrderCouponTest extends TestCase
             ->once()
             ->withArgs(function (User $actualUser, array $data) use ($user, $governmentId): bool {
                 return $actualUser->id === $user->id
-                    && $data['government_id'] === $governmentId
+                    && $data['city_id'] === 1
+                    && $data['address'] === '10 Example Street, Cairo'
                     && $data['coupon_code'] === 'SAVE10'
-                    && $data['use_points'] === true
-                    && $data['points_to_use'] === 100;
+                    && $data['points'] === 100;
             })
             ->andReturn($order);
         $this->app->instance(OrderService::class, $service);
 
         $response = $this->postJson('/api/front/v1/orders/store', [
-            'government_id' => $governmentId,
-            'shipment_address' => '10 Example Street, Cairo',
+            'city_id' => 1,
+            'address' => '10 Example Street, Cairo',
             'payment_method' => 'cash',
             'coupon_code' => 'SAVE10',
-            'use_points' => true,
-            'points_to_use' => 100,
+            'points' => 100,
         ], ['lang' => 'en']);
 
         $response->assertOk()

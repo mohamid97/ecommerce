@@ -21,18 +21,18 @@ class ZoneService extends BaseModelService{
 
     public function store()
     {
-  
-        $zone = parent::store($this->getBasicColumn(['status' , 'price']));
+   
+        $zone = parent::store($this->getBasicColumn(['status' , 'price', 'city_id']));
         $this->processTranslations($zone, $this->data, ['title', 'des']);  
         return $zone;
         
     }
     
 
-
+auth/update-user
     public function update($id ){
 
-        $zone = parent::update($id , $this->getBasicColumn(['status' , 'price']));
+        $zone = parent::update($id , $this->getBasicColumn(['status' , 'price', 'city_id']));
         $this->processTranslations($zone, $this->data, ['title', 'des']);
         return $zone;
         

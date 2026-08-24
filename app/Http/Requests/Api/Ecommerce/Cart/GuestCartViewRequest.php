@@ -70,7 +70,7 @@ class GuestCartViewRequest extends FormRequest
             'products.*.variant_id' => 'nullable|integer|exists:product_variants,id',
             'products.*.quantity' => 'required|integer|min:1|max:50',
             'bundles' => 'nullable|array',
-            'bundles.*.bundel_id' => 'required|integer|exists:bundels,id',
+            'bundles.*.bundle_id' => 'required|integer|exists:bundels,id',
             'bundles.*.quantity' => 'required|integer|min:1|max:50000',
             'bundles.*.bundle_items' => 'required|array|min:1',
             'bundles.*.bundle_items.*.bundle_item_id'=>'required|integer|exists:bundel_details,id',
@@ -90,7 +90,7 @@ class GuestCartViewRequest extends FormRequest
             $bundles = $this->input('bundles', []);
             if (is_array($bundles)) {
                 foreach ($bundles as $bIndex => $bundle) {
-                    $bundleId = $bundle['bundel_id'] ?? null;
+                    $bundleId = $bundle['bundle_id'] ?? null;
                     if (!$bundleId) {
                         continue;
                     }

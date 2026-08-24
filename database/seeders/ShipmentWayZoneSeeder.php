@@ -17,8 +17,17 @@ class ShipmentWayZoneSeeder extends Seeder
         }
 
         if (!$zone) {
-            // Create a default zone if none exists
-            $zone = ShipmentZone::create(['price' => 25, 'status' => 'active']);
+            $city = ShipmentCity::first();
+            if (!$city) {
+                $city = ShipmentCity::create(['status' => 'active']);
+                $city->translateOrNew('en')->title = 'Default City';
+                $city->translateOrNew('en')->des = 'Default shipping city';
+                $city->translateOrNew('ar')->title = 'مدينة افتراضية';
+                $city->translateOrNew('ar')->des = 'مدينة شحن افتراضية';
+                $city->save();
+            }
+
+            $zone = ShipmentZone::create(['city_id' => $city->id, 'price' => 25, 'status' => 'active']);
             $zone->translateOrNew('en')->title = 'Default Zone';
             $zone->translateOrNew('en')->des = 'Default shipping zone';
             $zone->translateOrNew('ar')->title = 'منطقة افتراضية';

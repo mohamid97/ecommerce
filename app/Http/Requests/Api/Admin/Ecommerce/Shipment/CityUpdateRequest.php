@@ -27,7 +27,6 @@ class CityUpdateRequest extends FormRequest
     {
         return [
             'id'=>'required|exists:shipment_cities,id',
-            'zone_id'=>'required|exists:shipment_zones,id',
             'title' => 'required|array|min:1',
             'title.*'=>'required|max:255',
             'status'=> 'nullable|in:active,draft,unavailable',

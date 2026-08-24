@@ -22,10 +22,9 @@ class OrderRepository
         $order->user_id = $user->id;
         $order->status = 'pending';
         $order->phone = $data['phone'] ?? $user->phone ?? null;
-        $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
-        $order->shipment_city_id = $data['shipment_city_id'] ?? null;
-        $order->government_id = $data['government_id'] ?? null;
-        $order->shipment_address = $data['shipment_address'] ?? null;
+        $order->shipment_zone_id = $data['zone_id'] ?? null;
+        $order->shipment_city_id = $data['city_id'] ?? null;
+        $order->shipment_address = $data['address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
         // shipping cost will be calculated by OrderService after items are processed
         $order->shipping_cost = 0;
@@ -52,10 +51,9 @@ class OrderRepository
         $order->guest_name = $data['name'] ?? null;
         $order->guest_email = $data['email'] ?? null;
         $order->phone = $data['phone'] ?? null;
-        $order->shipment_zone_id = $data['shipment_zone_id'] ?? null;
-        $order->shipment_city_id = $data['shipment_city_id'] ?? null;
-        $order->government_id = $data['government_id'] ?? null;
-        $order->shipment_address = $data['shipment_address'] ?? null;
+        $order->shipment_zone_id = $data['zone_id'] ?? null;
+        $order->shipment_city_id = $data['city_id'] ?? null;
+        $order->shipment_address = $data['address'] ?? null;
         $order->payment_method = $data['payment_method'] ?? null;
         // shipping cost will be calculated by OrderService after items are processed
         $order->shipping_cost = 0;

@@ -10,7 +10,7 @@ class CityService extends BaseModelService{
     protected string $modelClass = ShipmentCity::class;
 
     public function all($request){
-        $city = isset($this->data['zone_id']) ? ShipmentCity::where('zone_id' , $this->data['zone_id'])->get():  parent::all($request);
+        $city = parent::all($request);
         return $city;
     }
 
@@ -21,8 +21,8 @@ class CityService extends BaseModelService{
 
     public function store()
     {
-  
-        $city = parent::store($this->getBasicColumn(['status' , 'zone_id']));
+   
+        $city = parent::store($this->getBasicColumn(['status']));
         $this->processTranslations($city, $this->data, ['title', 'des']);  
         return $city;
         
@@ -32,7 +32,7 @@ class CityService extends BaseModelService{
 
     public function update($id ){
 
-        $city = parent::update($id , $this->getBasicColumn(['status' , 'zone_id']));
+        $city = parent::update($id , $this->getBasicColumn(['status']));
         $this->processTranslations($city, $this->data, ['title', 'des']);
         return $city;
         

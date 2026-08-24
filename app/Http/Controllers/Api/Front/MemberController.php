@@ -91,7 +91,7 @@ class MemberController extends Controller
         try{
             if($user = $login->login($request->only('email' , 'password'))){
             
-                return $this->success( new LoginMemeberResource($user->load('profile')) , __('main.memeber_data'));
+                return $this->success( new LoginMemeberResource($user->load(['profile', 'profile.city', 'profile.zone'])) , __('main.memeber_data'));
             }
            return $this->error( __('main.invalid_credentials') ,  401); 
 
@@ -105,7 +105,7 @@ class MemberController extends Controller
     public function getUserData(Request $request)
     {
         return $this->success(
-            new MemeberResource($request->user()->load('profile')),
+            new MemeberResource($request->user()->load(['profile', 'profile.city', 'profile.zone'])),
             __('main.retrieved_successfully', ['model' => 'User'])
         );
     }
@@ -115,24 +115,24 @@ class MemberController extends Controller
         try {
             DB::beginTransaction();
             $user = $request->user();
-            $user->update($request->validated());
+            $user->update($request->only('first_name', 'last_name', 'phone'));
             $user->profile()->updateOrCreate(
                 ['user_id' => $user->id],
                 $request->only(
-                    'government_id',
                     'address',
-                    'city',
                     'area',
                     'building_number',
                     'floor',
                     'apartment_number',
                     'landmark',
-                    'notes'
+                    'notes',
+                    'city_id',
+                    'zone_id'
                 )
             );
             DB::commit();
             return $this->success(
-                new MemeberResource($user->fresh('profile')),
+                new MemeberResource($user->refresh()->load(['profile', 'profile.city', 'profile.zone'])),
                 __('main.updated_successfully', ['model' => 'User'])
             );
         } catch (Exception $e) {
