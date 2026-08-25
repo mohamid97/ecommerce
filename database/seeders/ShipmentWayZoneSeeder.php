@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Api\Ecommerce\ShipmentWay;
 use App\Models\Api\Ecommerce\ShipmentZone;
 use App\Models\Api\Ecommerce\ShipmentWayZone;
+use App\Models\Api\Ecommerce\ShipmentCity;
 
 class ShipmentWayZoneSeeder extends Seeder
 {
