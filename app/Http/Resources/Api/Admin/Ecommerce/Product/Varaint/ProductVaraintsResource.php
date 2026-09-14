@@ -21,11 +21,6 @@ class ProductVaraintsResource extends JsonResource
 
             'id'=>$this->id,
             'sku'=>$this->sku,
-            'sale_price'=>$this->sale_price,
-            'price_after_discount' => $this->getDiscountPrice(),
-            'promotion' => $discountInfo['promotion'],
-            'discount' => $discountInfo['discount'],
-            'discount_type' => $discountInfo['discount_type'],
             'stock'=>$this->stock,
             'moq' => (int) $this->moq,
             'status'=>$this->status,

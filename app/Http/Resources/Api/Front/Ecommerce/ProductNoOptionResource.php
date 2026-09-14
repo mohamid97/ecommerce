@@ -24,10 +24,7 @@ class ProductNoOptionResource extends JsonResource
             'meta_title' => $this->getColumnLang('meta_title'),
             'meta_des' => $this->getColumnLang('meta_des'),
             'des' =>$this->getColumnLang('des'),
-            'sale_price' => (float) $this->sale_price,
-            'price_after_discount'=>(float) $this->getDiscountPrice(),
-            'discount' => (float) $this->discount,
-            'discount_type' => $this->discount_type,
+            // price and discount removed for profile-only app
     
             'on_demand' => $this->on_demand,
             'sku' => $this->sku,

@@ -23,8 +23,6 @@ class FilterProductVaraintResource extends JsonResource
             'title'=>$this->getColumnLang('title'),
             'slug'=>$this->getColumnLang('slug'),
             'type'=>$type,
-            'sale_price'=>($type) == 'product' ? (float)$this->sale_price : $this->getBundlePrice()['total_price'],
-            'price_after_discount'=> ($type) == 'product' ? $this->getDiscountPrice() : $this->getBundlePrice()['price_after_discount'],
             'product'=>$this->whenLoaded('bundelDetails', function () {
                         return $this->bundelDetails->map(function ($detail) {
                             $product = $detail->product;
@@ -53,8 +51,8 @@ class FilterProductVaraintResource extends JsonResource
                                         })
                                         ->filter()
                                         ->implode(' '),
-                                        'sale_price'=>$variant->sale_price,
-                                        'price_after_discount'=>$variant->getDiscountPrice(),
+                                        'sale_price'=>null,
+                                        'price_after_discount'=>null,
                                     ];
                                 }),
                             ];
@@ -103,8 +101,8 @@ class FilterProductVaraintResource extends JsonResource
             })
             ->filter()
             ->implode(' '),
-            'sale_price'=>$variant->sale_price,
-            'price_after_discount'=>$variant->getDiscountPrice(),
+                'sale_price'=>null,
+                'price_after_discount'=>null,
 
         ];
     }

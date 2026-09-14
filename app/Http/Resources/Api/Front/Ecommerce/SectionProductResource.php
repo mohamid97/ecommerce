@@ -21,29 +21,22 @@ class SectionProductResource extends JsonResource
         $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
         $discountInfo = $resolver->resolveDiscountInfo($priceSource);
 
-        return [
-            // This ID makes repeated product rows unique in newest/last-piece.
-            //'section_item_id' => $this->id,
-            'id' => $product->id,
-            'title' => $this->getColumnLang('title' , 'product'),
-            'slug' => $this->getColumnLang('slug' , 'product'),
-            'sale_price' => (float) $priceSource->sale_price,
-            'moq' => $priceSource->moq ?? $product->moq ?? 1,
-            'discount_price' => $discountInfo['discount'],
-            'discount_type' => $discountInfo['discount_type'],
-            'price_after_discount' => (float) $priceSource->getDiscountPrice(),
-            'promotion' => $discountInfo['promotion'],
-            'on_demand' => $product->on_demand,
-            'sku' => $priceSource->sku,
-            'has_options' => (bool) $product->has_options,
-            'product_image' => $this->getImageUrl($variantImage ?: $product->product_image),
-            'variant_image' => $this->getImageUrl($variantImage),
-            'status' => $variant?->status ?? $product->status,
-            'stock' => $variant?->stock ?? $product->stock,
-            'variant_id' => $variant?->id,
-            'variant_name' => $variant?->getVariantFullNameAttribute(),
-            'created_at' => $product->created_at?->format('Y-m-d'),
-            'updated_at' => $product->updated_at?->format('Y-m-d'),
+            return [
+                'id' => $product->id,
+                'title' => $this->getColumnLang('title' , 'product'),
+                'slug' => $this->getColumnLang('slug' , 'product'),
+                'moq' => $priceSource->moq ?? $product->moq ?? 1,
+                'on_demand' => $product->on_demand,
+                'sku' => $priceSource->sku,
+                'has_options' => (bool) $product->has_options,
+                'product_image' => $this->getImageUrl($variantImage ?: $product->product_image),
+                'variant_image' => $this->getImageUrl($variantImage),
+                'status' => $variant?->status ?? $product->status,
+                'stock' => $variant?->stock ?? $product->stock,
+                'variant_id' => $variant?->id,
+                'variant_name' => $variant?->getVariantFullNameAttribute(),
+                'created_at' => $product->created_at?->format('Y-m-d'),
+                'updated_at' => $product->updated_at?->format('Y-m-d'),
         ];
     }
 

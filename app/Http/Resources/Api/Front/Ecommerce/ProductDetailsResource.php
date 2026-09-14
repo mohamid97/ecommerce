@@ -20,8 +20,7 @@ class ProductDetailsResource extends JsonResource
         $defaultVaraintModel = $this->variants->firstWhere('is_default', 1) ?? $this->variants->first();
         $productOrOneMOQ = $this->moq ?? 1;
 
-        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
-        $discountInfo = $resolver->resolveDiscountInfo($defaultVaraintModel ?? $this->resource);
+        // price and discount removed for profile-only app
 
         return [
 
@@ -31,11 +30,6 @@ class ProductDetailsResource extends JsonResource
             'meta_title' => $this->getColumnLang('meta_title'),
             'meta_des' => $this->getColumnLang('meta_des'),
             'des' =>$this->getColumnLang('des'),
-            'sale_price' => (float) $defaultVaraintModel?->sale_price,
-            'price_after_discount' => (float) ($defaultVaraintModel ? $defaultVaraintModel->getDiscountPrice() : $this->getDiscountPrice()),
-            'promotion' => $discountInfo['promotion'],
-            'discount' =>  $discountInfo['discount'],
-            'discount_type' => $discountInfo['discount_type'],
             'on_demand' => $this->on_demand,
             'sku' => $defaultVaraintModel?->sku,
             'moq' => $defaultVaraintModel?->moq ?? $productOrOneMOQ,

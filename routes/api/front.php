@@ -26,14 +26,14 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
             // Route::post('/complete-profile', 'completeProfile');
         });
 
-        // start carts with authanicate
-        Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function () {
-            Route::post('/add', 'addToCart');
-            Route::post('/update-quantity', 'updateQuantity');
-            Route::post('/delete-all', 'deleteAllFromCart');
-            Route::post('/delete-item', 'deleteFromCart');
-            Route::get('/view', 'viewCart');
-        });
+        // carts removed for profile-only app
+        // Route::prefix('carts')->namespace('Ecommerce')->controller('CartController')->group(function () {
+        //     Route::post('/add', 'addToCart');
+        //     Route::post('/update-quantity', 'updateQuantity');
+        //     Route::post('/delete-all', 'deleteAllFromCart');
+        //     Route::post('/delete-item', 'deleteFromCart');
+        //     Route::get('/view', 'viewCart');
+        // });
 
         // wishlists
         Route::prefix('wishlists')->namespace('Ecommerce')->controller('WishlistController')->group(function () {
@@ -43,21 +43,21 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
             Route::get('/view', 'view');
         });
 
-        // orders
-        Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function () {
-            Route::get('/', 'index');
-            Route::post('/preview', 'preview');
-            Route::post('/store', 'store');
-            Route::get('/{order_number}', 'show');
-        });
+        // orders removed for profile-only app
+        // Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function () {
+        //     Route::get('/', 'index');
+        //     Route::post('/preview', 'preview');
+        //     Route::post('/store', 'store');
+        //     Route::get('/{order_number}', 'show');
+        // });
 
     });
 
-    // guest order (no auth)
-    Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function () {
-        Route::post('/guest/preview', 'previewGuest');
-        Route::post('/guest/store', 'storeGuest');
-    });
+    // guest order routes removed for profile-only app
+    // Route::prefix('orders')->namespace('Ecommerce')->controller('OrderController')->group(function () {
+    //     Route::post('/guest/preview', 'previewGuest');
+    //     Route::post('/guest/store', 'storeGuest');
+    // });
 
     Route::prefix('govs')->namespace('Ecommerce')->controller('GovController')->group(function () {
         Route::get('get', 'get');

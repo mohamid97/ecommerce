@@ -20,13 +20,8 @@ class VaraintDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
-            'sale_price' =>  (float)$this->sale_price,
-            'price_after_discount' => (float)$this->getDiscountPrice(),
-            'promotion' => $discountInfo['promotion'],
             'stock' => $this->stock,
             'moq' => (int) $this->moq,
-            'discount' => $discountInfo['discount'],
-            'discount_type' => $discountInfo['discount_type'],
             'status' => $this->status,
             'shipmentDetails'=>[
                 'length' => (float)$this->length,

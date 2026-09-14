@@ -39,7 +39,7 @@ class WishlistVariantProductResource extends JsonResource
                 'id' => $variant->id,
                 'title' => $variant->title,
                 'sku' => $variant->sku,
-                'sale_price' => (float) $variant->sale_price,
+                // sale_price removed for profile-only app
                 'discount' => (float) $variant->discount_value,
                 'discount_type' => $variant->discount_type,
                 'price_after_discount' => (float) $variant->getDiscountPrice(),

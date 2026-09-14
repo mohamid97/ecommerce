@@ -17,12 +17,7 @@ class VarinatDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
-            'sale_price' =>  (float)$this->sale_price,
-            'price_after_discount' => $this->getDiscountPrice(),
             'stock' => $this->stock,
-            'discount' => (float) $this->discount,
-            'discount_type' => $this->discount_type,
-
             'status' => $this->status,
             'moq' => (int) $this->moq,
             'product'=>$this->whenLoaded('product' , function(){
@@ -30,7 +25,6 @@ class VarinatDetailsResource extends JsonResource
                     'id'=>$this->product->id,
                     'title'=>$this->product->title,
                     'on_demand'=>$this->product->on_demand,
-                    'sale_price'=>(float)$this->product->sale_price,
                 ];
             }),
             'shipmentDetails'=>[

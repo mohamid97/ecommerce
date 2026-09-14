@@ -24,6 +24,7 @@ class CategoryResource extends JsonResource
             'des' => $this->getColumnLang('des'),
             'meta_title' => $this->getColumnLang('meta_title'),
             'type' => $this->type,
+            'belongs_to' => $this->belongs_to,
             'parent' => $this->whenLoaded('parent', function () {
                 return $this->parent ? [
                     'id' => $this->parent->id,

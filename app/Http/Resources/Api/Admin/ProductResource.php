@@ -16,20 +16,14 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $resolver = app(\App\Services\Ecommerce\Promotion\PromotionResolver::class);
-        $discountInfo = $resolver->resolveDiscountInfo($this->resource);
-      
+    // price and discount removed for profile-only app
     return [
 
         'id' => $this->id,
         'title' => $this->getColumnLang('title'),
         'slug' => $this->getColumnLang('slug'),
         // 'cost_price' => (float) $this->cost_price,
-        'sale_price' => (float) $this->sale_price,
-        'price_after_discount' => $this->getDiscountPrice(),
-        'promotion' => $discountInfo['promotion'],
-        'discount' =>  $discountInfo['discount'],
-        'discount_type' => $discountInfo['discount_type'],
+        // sale_price, discounts removed
         'sku' => $this->sku,
         'barcode' => $this->barcode,
         'stock' => $this->stock,

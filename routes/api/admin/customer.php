@@ -5,5 +5,5 @@ use Illuminate\Support\Facades\Route;
 Route::controller('CustomerController')->group(function () {
     Route::post('/customer/all', 'all')->middleware('permission:view customer');
     Route::post('/customer/view', 'view')->middleware('permission:view customer');
-    Route::post('/customer/orders', 'orders')->middleware('checkEcommercePermision:order,view');
+    // Route::post('/customer/orders', 'orders')->middleware('checkEcommercePermision:order,view');
 });

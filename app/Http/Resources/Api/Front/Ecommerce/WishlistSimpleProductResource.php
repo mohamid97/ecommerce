@@ -29,7 +29,7 @@ class WishlistSimpleProductResource extends JsonResource
                 'title' => $product->title,
                 'slug' => $product->slug,
                 'des' => $product->des,
-                'sale_price' => (float) $product->sale_price,
+                // sale_price removed for profile-only app
                 'discount' => (float) $product->discount,
                 'discount_type' => $product->discount_type,
                 'price_after_discount' => (float) $product->getDiscountPrice(),
