@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\StoreRelatedProductsRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductSectionRequest;
 use App\Http\Requests\Api\Admin\Ecommerce\Product\UpdateProductVaraintStatusRequest;
+use App\Http\Resources\Api\Admin\Ecommerce\Product\ProductSectionResource;
 use App\Http\Resources\Api\Admin\ProductResource;
 use App\Models\Api\Admin\Product;
 use App\Models\Api\Admin\RelatedProduct;
@@ -101,12 +102,12 @@ class ProductController extends Controller
 
     public function newestProducts(Request $request)
     {
-        return $this->sectionProducts($request, NewProduct::query()->select('product_id'), 'newest_products');
+        return $this->sectionProducts($request, NewProduct::class, 'newest_products');
     }
 
     public function lastPieceProducts(Request $request)
     {
-        return $this->sectionProducts($request, LastPiece::query()->select('product_id'), 'items');
+        return $this->sectionProducts($request, LastPiece::class, 'items');
     }
 
     public function featuredProducts(Request $request)
@@ -226,12 +227,11 @@ public function filterProduct(Request $request)
         return null;
     }
 
-    private function sectionProducts(Request $request, $productsSubQuery, string $responseKey)
+    private function sectionProducts(Request $request, string $sectionModelClass, string $responseKey)
     {
-        $products = $this->baseProductListQuery($request)
-            ->whereIn('id', $productsSubQuery);
+        $sectionItems = $this->baseSectionListQuery($request, $sectionModelClass);
 
-        return $this->paginatedProducts($products, $request, $responseKey);
+        return $this->paginatedSectionProducts($sectionItems, $request, $responseKey);
     }
 
     private function baseProductListQuery(Request $request)
@@ -275,6 +275,59 @@ public function filterProduct(Request $request)
         return $this->successPaginated(
             $products,
             ProductResource::collection($products),
+            $responseKey,
+            __('main.list_successfully', ['model' => 'Products'])
+        );
+    }
+
+    private function baseSectionListQuery(Request $request, string $sectionModelClass)
+    {
+        $sectionItems = $sectionModelClass::query()
+            ->with([
+                'product',
+                'variant.variants.optionValue.option',
+                'variant.varaintImages.image',
+            ])
+            ->whereHas('product');
+
+        if ($request->has('search')) {
+            $sectionItems->whereHas('product.translations', function ($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('category_id')) {
+            $sectionItems->whereHas('product', function ($query) use ($request) {
+                $query->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->has('industry_id')) {
+            $sectionItems->whereHas('product.industries', function ($query) use ($request) {
+                $query->where('industries.id', $request->industry_id);
+            });
+        }
+
+        if ($request->has('sort') && in_array($request->sort, ['asc', 'desc'])) {
+            $sectionItems->orderBy('created_at', $request->sort);
+        } else {
+            $sectionItems->latest();
+        }
+
+        return $sectionItems;
+    }
+
+    private function paginatedSectionProducts($sectionItems, Request $request, string $responseKey)
+    {
+        $perPage = $request->has('paginate') && ($request->paginate >= 1 && $request->paginate <= 100)
+            ? (int) $request->paginate
+            : 10;
+
+        $sectionItems = $sectionItems->paginate($perPage);
+
+        return $this->successPaginated(
+            $sectionItems,
+            ProductSectionResource::collection($sectionItems),
             $responseKey,
             __('main.list_successfully', ['model' => 'Products'])
         );
