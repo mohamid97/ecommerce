@@ -42,8 +42,8 @@ class CategoryResource extends JsonResource
             'alt_image' => $this->getColumnLang('alt_image'),
             'thumbnail' => $this->getImageUrl($this->thumbnail),
             'order' => $this->order,
-            'created_at' => $this->created_at->format('Y-m-d'),
-            'updated_at' => $this->updated_at->format('Y-m-d'),
+            'created_at' => $this->created_at?->format('Y-m-d'),
+            'updated_at' => $this->updated_at?->format('Y-m-d'),
             'brands' => $this->whenLoaded('brands', function () {
                return $this->getColumnsLangWithArrayRelation(['title' , 'slug'] , 'brands' , ['image']);
             }),
