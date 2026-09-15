@@ -40,20 +40,20 @@ class DynamicService
                     ->orWhere('slug', 'LIKE', "%{$request->search}%")
                 );
             }
-            $isPaginated = false;
             if ($request->has('pagination') && $request->pagination > 0) {
-                $data = $query->paginate($request->pagination);
-                $isPaginated = true;
-            } else {
-                
-                $data = $query->get();
+                $paginator = $query->paginate($request->pagination);
+
+                return [
+                    'paginator' => $paginator,
+                    'items' => $this->formatRecords($paginator->getCollection(), $columns),
+                ];
             }
 
 
 
             
             
-            return $this->formatResponse($data , $columns , $isPaginated);
+            return $this->formatRecords($query->get(), $columns);
             
 
           
@@ -77,41 +77,19 @@ class DynamicService
 
 
 
-    public function formatResponse($data, $columns , $isPaginated)
+    private function formatRecords($records, $columns)
     {
 
-        if(!$data || $data->isEmpty()){
+        if (!$records || $records->isEmpty()) {
             return [];
         }
-       
 
-        if ($isPaginated) {
-            $formattedData = [];
-            foreach ($data->items() as $item) {
-                $formattedData[] = $this->formatSingleRecord($item , $columns);
-            }
-            
-            return [
-                'data' => $formattedData,
-                'pagination' => [
-                    'current_page' => $data->currentPage(),
-                    'last_page' => $data->lastPage(),
-                    'per_page' => $data->perPage(),
-                    'total' => $data->total(),
-                    'from' => $data->firstItem(),
-                    'to' => $data->lastItem(),
-                ]
-            ];
-        } else {
-            
-            $formattedData = [];
-            foreach ($data as $item) {
-                
-                $formattedData[] = $this->formatSingleRecord($item , $columns);
-            }
-           
-            return $formattedData;
+        $formattedData = [];
+        foreach ($records as $item) {
+            $formattedData[] = $this->formatSingleRecord($item, $columns);
         }
+
+        return $formattedData;
     }
 
     private function formatSingleRecord($record , $columns)

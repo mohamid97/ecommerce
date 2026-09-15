@@ -26,10 +26,17 @@ class DynamicEndPoint extends Controller
             $modelClass = $this->dynamicService->getModelClass($request->model);
             $this->dynamicService->validateModel($modelClass);            
             $data = $this->dynamicService->getQuery($request, $modelClass);
-            // $isPaginated = $request->has('pagination') && $request->pagination > 0;
-            // $formattedData = $this->dynamicService->formatResponse($rawData, $isPaginated);
-            
-             return $this->success($data,  __('main.list_successfully', ['model' => $request->model]));
+
+            if ($request->filled('pagination')) {
+                return $this->successPaginated(
+                    $data['paginator'],
+                    $data['items'],
+                    'items',
+                    __('main.list_successfully', ['model' => $request->model])
+                );
+            }
+
+            return $this->success($data, __('main.list_successfully', ['model' => $request->model]));
 
             
         } catch (\Exception $e) {

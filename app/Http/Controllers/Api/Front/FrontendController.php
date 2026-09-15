@@ -45,7 +45,18 @@ class FrontendController extends Controller
                 return $this->error(__('main.no_model') , 404);
             }
             $this->PrepareModel($request->model);
-            return  $this->success($this->frontend->getQuery($this->modelClass, $this->resourceClass, $request), __('main.retrieved_successfully', ['model' => $this->studlyName]));
+            $data = $this->frontend->getQuery($this->modelClass, $this->resourceClass, $request);
+
+            if ($request->has('pagination') && $request->pagination > 0) {
+                return $this->successPaginated(
+                    $data['paginator'],
+                    $data['items'],
+                    'items',
+                    __('main.retrieved_successfully', ['model' => $this->studlyName])
+                );
+            }
+
+            return $this->success($data, __('main.retrieved_successfully', ['model' => $this->studlyName]));
 
         }catch(\Exception $e){
             return $this->error($e->getMessage() , 500);
@@ -65,7 +76,18 @@ class FrontendController extends Controller
     public function dynamicFilter(DynamicFilterRequest $request){
         try{
             $this->PrepareModel($request->model);
-            return  $this->success($this->frontend->dynamicFilter($this->modelClass, $this->resourceClass, $request), __('main.retrieved_successfully', ['model' => $this->studlyName]));           
+            $data = $this->frontend->dynamicFilter($this->modelClass, $this->resourceClass, $request);
+
+            if ($request->has('pagination') && $request->pagination > 0) {
+                return $this->successPaginated(
+                    $data['paginator'],
+                    $data['items'],
+                    'items',
+                    __('main.retrieved_successfully', ['model' => $this->studlyName])
+                );
+            }
+
+            return $this->success($data, __('main.retrieved_successfully', ['model' => $this->studlyName]));
 
         }catch(\Exception $e){
             return $this->error($e->getMessage() , 500);

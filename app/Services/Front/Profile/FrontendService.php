@@ -55,7 +55,8 @@ class FrontendService{
         }
 
 
-        if ($request->has('pagination') && $request->pagination > 0) {
+        $isPaginated = $request->has('pagination') && $request->pagination > 0;
+        if ($isPaginated) {
             $query = $query->paginate($request->pagination);
             $this->createResponsePaginate($query);
 
@@ -75,8 +76,14 @@ class FrontendService{
 
         }
 
-        $this->createResponseItem($query , $resourceClass);
+        $this->createResponseItem($query, $resourceClass, $request);
 
+        if ($isPaginated) {
+            return [
+                'paginator' => $query,
+                'items' => $this->reponseData['item'],
+            ];
+        }
 
 
         return $this->reponseData;
@@ -93,8 +100,18 @@ class FrontendService{
     }
 
 
-    private function createResponseItem($query , $resourceClass){
-         $this->reponseData['item'] = $resourceClass::collection($query);
+    private function createResponseItem($query, $resourceClass, $request){
+        $items = $resourceClass::collection($query);
+
+        if (!$request->has('columns') || !is_array($request->columns) || empty($request->columns)) {
+            $this->reponseData['item'] = $items;
+            return;
+        }
+
+        $this->reponseData['item'] = collect($items->resolve($request))
+            ->map(fn ($item) => collect($item)->only($request->columns)->all())
+            ->values()
+            ->all();
     }
 
 
@@ -132,7 +149,8 @@ class FrontendService{
                 $orderBy = $request->order_by ?? 'id';
                 $query->orderBy($orderBy, $request->order);
     }
-    if ($request->has('pagination') && $request->pagination > 0) {
+    $isPaginated = $request->has('pagination') && $request->pagination > 0;
+    if ($isPaginated) {
         $query = $query->paginate($request->pagination);
         $this->createResponsePaginate($query);
 
@@ -140,7 +158,15 @@ class FrontendService{
         $query = $query->get();
     }
 
-    $this->createResponseItem($query , $resourceClass);
+    $this->createResponseItem($query, $resourceClass, $request);
+
+    if ($isPaginated) {
+        return [
+            'paginator' => $query,
+            'items' => $this->reponseData['item'],
+        ];
+    }
+
     return $this->reponseData;
 
 

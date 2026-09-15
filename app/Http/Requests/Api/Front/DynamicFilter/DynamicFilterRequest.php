@@ -35,6 +35,8 @@ class DynamicFilterRequest extends FormRequest
             ],
             'pagination' => 'sometimes|nullable|integer',
             'order'     => 'nullable|in:asc,desc,ASC,DESC',
+            'columns'   => 'sometimes|array',
+            'columns.*' => 'string',
         ];
     }
 }
