@@ -21,8 +21,8 @@ class ProductSectionResource extends JsonResource
 
         return [
             'id' => $product?->id,
-            'title' => $product?->getColumnLang('title'),
-            'slug' => $product?->getColumnLang('slug'),
+            'title' => $this->getColumnLang('title', 'product'),
+            'slug' => $this->getColumnLang('slug', 'product'),
             'image' => $this->getImageUrl($product?->product_image),
             'variant' => $this->variantData(),
         ];
