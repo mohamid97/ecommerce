@@ -19,6 +19,7 @@ class VaraintDetailsResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'des' => $this->getColumnLang('des'),
             'sku' => $this->sku,
             'stock' => $this->stock,
             'moq' => (int) $this->moq,
@@ -43,7 +44,7 @@ class VaraintDetailsResource extends JsonResource
             'variant_full_name' => $this->whenLoaded('variants', function () {
                     return $this->buildVariantName();
              }),
-             'is_default'=>(bool) $this->is_default,
+            'is_default'=>(bool) $this->is_default,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
 

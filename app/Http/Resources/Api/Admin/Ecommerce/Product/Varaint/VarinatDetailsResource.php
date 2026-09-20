@@ -16,6 +16,7 @@ class VarinatDetailsResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'des' => $this->getColumnLang('des'),
             'sku' => $this->sku,
             'stock' => $this->stock,
             'status' => $this->status,
