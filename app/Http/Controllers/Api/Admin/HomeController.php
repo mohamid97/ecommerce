@@ -31,4 +31,8 @@ class HomeController extends Controller
         return $this->success($data , __('main.dashboard_stat'));
         
     }
+
+    
+
+
 }
