@@ -112,7 +112,7 @@ Route::prefix('v1')->middleware('ckeckLang')->group(function () {
 
     
 
-
+    Route::get('/home' ,'HomeController@index'); 
 
 
     });
