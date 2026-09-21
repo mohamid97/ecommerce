@@ -36,8 +36,8 @@ class ProductService extends BaseModelService
     if(isset($this->data['discount']) && isset($this->data['discount_type'])){
         $this->validateDiscount($this->data['discount_type'], $this->data['discount'] , $this->data['sale_price']);
     }
-        $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-        $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $this->data['has_options'] = filter_var($this->data['has_options'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $this->data['on_demand']   = filter_var($this->data['on_demand'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
         $this->uploadSingleImage(['product_image', 'breadcrumb'], 'uploads/products');
         $this->data['slug']  = $this->createSlug($this->data); 
@@ -72,8 +72,8 @@ class ProductService extends BaseModelService
         }
             
 
-        $this->data['has_options'] = filter_var($this->data['has_options'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-        $this->data['on_demand']   = filter_var($this->data['on_demand'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $this->data['has_options'] = filter_var($this->data['has_options'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $this->data['on_demand']   = filter_var($this->data['on_demand'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
         $existingProduct = \App\Models\Api\Admin\Product::findOrFail($id);
         $oldHasOptions = (bool) $existingProduct->has_options;

@@ -23,8 +23,8 @@ class ProductStoreRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'has_options' => filter_var($this->has_options, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-            'on_demand'   => filter_var($this->on_demand, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            'has_options' => filter_var($this->input('has_options', false), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            'on_demand'   => filter_var($this->input('on_demand', false), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
         ]);
         
     }
