@@ -31,8 +31,11 @@ class BlogService extends BaseModelService{
         $this->uploadSingleImage(['blog_image' , 'breadcrumb'] , 'uploads/blog');
         $this->data['slug']  = $this->createSlug($this->data);
         $blog = parent::store($this->getBasicColumn(['breadcrumb' , 'image','category_id','is_active']));
-        $this->processTranslations($blog, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']); 
-        $blog->faqs()->sync($this->data['faqs']);
+        $this->processTranslations($blog, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
+        // check if fqs is in array and has data or not 
+        if(isset($this->data['faqs'])){
+         $blog->faqs()->sync($this->data['faqs']);
+        }
         return $blog;
         
     }
@@ -43,7 +46,9 @@ class BlogService extends BaseModelService{
         $this->uploadSingleImage(['blog_image' , 'breadcrumb'] , 'uploads/blog');
         $blog = parent::update($id , $this->getBasicColumn(['breadcrumb' , 'image','category_id','is_active']));
         $this->processTranslations($blog, $this->data, ['title', 'slug' ,'des' , 'small_des' , 'meta_title' , 'meta_des', 'alt_image' , 'title_image']);
-        $blog->faqs()->sync($this->data['faqs']);
+        if(isset($this->data['faqs'])){
+         $blog->faqs()->sync($this->data['faqs']);
+        }
         return $blog;
         
     }
